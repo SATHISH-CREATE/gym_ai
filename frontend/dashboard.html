@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DASHBOARD | FIT COACH AI</title>
+    <link rel="stylesheet" href="css/styles.css?v=5">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary-glow: rgba(112, 0, 255, 0.4);
+            --accent-glow: rgba(0, 240, 255, 0.4);
+        }
+
+        body {
+            background-attachment: fixed !important;
+            background-image:
+                radial-gradient(circle at 50% 0%, rgba(0, 240, 255, 0.15), transparent 50%),
+                linear-gradient(to bottom, rgba(13, 5, 20, 0.88), rgba(9, 9, 11, 0.98)),
+                url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=2070') !important;
+        }
+
+        .container {
+            max-width: 100% !important;
+            padding: 0 16px !important;
+            padding-bottom: 60px !important;
+        }
+
+        .hero-mini {
+            text-align: center;
+            padding: 60px 0 40px;
+            background: radial-gradient(circle at center, rgba(0, 240, 255, 0.12) 0%, transparent 80%);
+            border-radius: 100px;
+            margin-bottom: 20px;
+        }
+
+        .hero-mini h1 {
+            font-size: 3.5rem;
+            font-weight: 950;
+            margin-bottom: 10px;
+            letter-spacing: -2px;
+            text-transform: uppercase;
+            background: linear-gradient(135deg, #fff 30%, #00f0ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-mini p {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .welcome-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 0 10px;
+        }
+
+        .date-display {
+            text-align: left;
+        }
+
+        .date-display h1 {
+            font-size: 2.2rem;
+            font-weight: 900;
+            letter-spacing: -1px;
+            margin: 0;
+            background: linear-gradient(135deg, #fff, #888);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .date-display p {
+            color: var(--primary-color);
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            font-size: 0.82rem;
+            margin-top: 5px;
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .dash-card {
+            background: rgba(20, 20, 25, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 30px;
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .dash-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(112, 0, 255, 0.3);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .dash-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
+            opacity: 0.3;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .card-title {
+            font-weight: 800;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text-muted);
+        }
+
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: rgba(112, 0, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-color);
+        }
+
+        .big-stat {
+            font-size: 2.5rem;
+            font-weight: 900;
+            margin: 10px 0;
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+        }
+
+        .unit {
+            font-size: 1rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .progress-bar-wrap {
+            height: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            margin-top: 20px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #7000ff, #00f0ff);
+            box-shadow: 0 0 10px rgba(112, 0, 255, 0.5);
+            width: 65%;
+            /* Dynamic */
+        }
+
+        .macro-labels {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .macro-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 6px;
+        }
+
+        .p-label {
+            background: rgba(255, 59, 59, 0.1);
+            color: #ff3b3b;
+        }
+
+        .c-label {
+            background: rgba(176, 0, 255, 0.1);
+            color: #b000ff;
+        }
+
+        .f-label {
+            background: rgba(250, 204, 21, 0.1);
+            color: #facc15;
+        }
+
+        .workout-preview {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .exercise-mini {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .exercise-mini img {
+            width: 45px;
+            height: 45px;
+            border-radius: 10px;
+            object-fit: cover;
+        }
+
+        .exercise-mini h4 {
+            font-size: 0.85rem;
+            margin: 0;
+            color: #eee;
+        }
+
+        .btn-main {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #7000ff, #b000ff);
+            border: none;
+            border-radius: 20px;
+            color: white;
+            font-weight: 800;
+            font-size: 1.1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            box-shadow: 0 10px 30px rgba(112, 0, 255, 0.3);
+            transition: all 0.3s;
+            text-decoration: none;
+            margin-top: 10px;
+        }
+
+        .btn-main:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 15px 40px rgba(112, 0, 255, 0.5);
+        }
+
+        .calendar-strip {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 40px;
+            gap: 10px;
+            overflow-x: auto;
+            padding: 10px 5px;
+            scrollbar-width: none;
+        }
+
+        .calendar-day {
+            min-width: 65px;
+            height: 90px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .calendar-day.active {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            box-shadow: 0 0 20px rgba(112, 0, 255, 0.4);
+        }
+
+        .calendar-day .day-name {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 5px;
+        }
+
+        .calendar-day.active .day-name {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .calendar-day .day-num {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: #fff;
+        }
+
+        @media (max-width: 768px) {
+            .welcome-section {
+                flex-direction: column !important;
+                align-items: center !important;
+                text-align: center !important;
+                gap: 25px !important;
+                margin-top: 20px;
+            }
+
+            .date-display {
+                text-align: center !important;
+                width: 100%;
+            }
+
+            .date-display p:first-child {
+                color: #7000ff !important;
+                font-weight: 950 !important;
+                letter-spacing: 2px !important;
+                font-size: 1.1rem !important;
+            }
+
+            .date-display h1 {
+                font-size: 4rem !important;
+                margin: 5px 0 !important;
+                color: #fff !important;
+                -webkit-text-fill-color: #fff !important;
+            }
+
+            .welcome-info-right {
+                display: flex !important;
+                flex-direction: column !important;
+                align-items: center !important;
+                text-align: center !important;
+                width: 100% !important;
+            }
+
+            #user-goal-badge {
+                background: #1a0511 !important;
+                color: #22c55e !important;
+                border: 1.5px solid #166534 !important;
+                padding: 12px 25px !important;
+                font-size: 1.1rem !important;
+                font-weight: 950 !important;
+                border-radius: 12px !important;
+                display: flex !important;
+                align-items: center !important;
+                gap: 12px;
+                text-transform: uppercase;
+                margin: 0 auto;
+                width: auto;
+                max-width: 90% !important;
+            }
+
+            #user-level-tag {
+                color: #ccc !important;
+                font-size: 1.1rem !important;
+                margin-top: 18px !important;
+                font-weight: 500 !important;
+                letter-spacing: 0.5px;
+            }
+
+            /* Simplified Nav for Mobile */
+            nav {
+                width: 100% !important;
+                padding: 15px !important;
+                gap: 12px !important;
+                justify-content: flex-start !important;
+                overflow-x: auto !important;
+                display: flex !important;
+                scrollbar-width: none;
+                -ms-overflow-style: none;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            nav::-webkit-scrollbar {
+                display: none;
+            }
+
+            nav .btn {
+                background: #111 !important;
+                border: 1px solid #222 !important;
+                border-radius: 15px !important;
+                padding: 12px 20px !important;
+                font-size: 0.9rem !important;
+                font-weight: 700 !important;
+                flex-shrink: 0;
+                /* Prevent buttons from squishing */
+            }
+
+            /* Hide 'Workout' text prefix and icons selectively for super clean look */
+            .nav-hide-mobile {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <div class="logo-container">
+                <div class="logo">FIT COACH AI</div>
+            </div>
+            <nav>
+                <a href="library.html" class="btn glass">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;">
+                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                    </svg>
+                    Workout Library
+                </a>
+                <a href="schedules.html" class="btn glass">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                    </svg>
+                    Schedule
+                </a>
+                <a href="calculators.html" class="btn glass">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;">
+                        <path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path>
+                        <path d="M22 12A10 10 0 0 0 12 2v10z"></path>
+                    </svg>
+                    Tools
+                </a>
+                <a href="profile.html" class="btn glass">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                    My Profile
+                </a>
+            </nav>
+        </header>
+        <section class="hero-mini">
+            <h1>MY DASHBOARD</h1>
+            <p>Welcome back! Track your progress and crush your goals.</p>
+        </section>
+
+        <div class="dashboard-container">
+            <div class="welcome-section">
+                <div class="date-display">
+                    <p id="current-month-year">MARCH 2026</p>
+                    <h1 id="current-day-long">Monday, 02</h1>
+                    <p id="user-greeting"></p>
+                </div>
+                <div class="welcome-info-right">
+                    <span class="badge" id="user-goal-badge">🎯 ACTIVE CYCLE</span>
+                    <p id="user-level-tag">Day 1 of 6-Day Split</p>
+                </div>
+            </div>
+
+            <!-- Weekly Strip -->
+            <div class="calendar-strip" id="calendar-strip">
+                <!-- Injected by JS -->
+            </div>
+
+            <div class="stat-grid">
+                <!-- Daily Target Card -->
+                <div class="dash-card">
+                    <div class="card-header">
+                        <span class="card-title">Daily Focus</span>
+                        <div class="card-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.5">
+                                <path
+                                    d="M20.42 4.58a5 5 0 0 1 0 7.07l-7.07 7.07a1 1 0 0 1-1.41 0L4.87 11.65a5 5 0 0 1 7.07-7.07l.35.35.35-.35a5 5 0 0 1 7.78 0z">
+                                </path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="big-stat" id="dash-focus">LEGS & CORE</div>
+                    <p id="dash-plan-type"
+                        style="color: var(--primary-color); font-weight: 700; font-size: 0.85rem; margin-top: -5px;">
+                        DOUBLE MUSCLE SPLIT</p>
+
+                    <div class="workout-preview" id="dash-workout-preview" style="margin-top: 20px;">
+                        <!-- Injected by JS -->
+                    </div>
+
+                    <a href="#" id="start-session-btn" class="btn-main">
+                        START SESSION
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="3">
+                            <path d="m9 18 6-6-6-6"></path>
+                        </svg>
+                    </a>
+                </div>
+
+                <!-- Nutrition Card -->
+                <div class="dash-card">
+                    <div class="card-header">
+                        <span class="card-title">Nutrition Target</span>
+                        <div class="card-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.5">
+                                <path d="M12 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z"></path>
+                                <path d="M12 7v5l3 3"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="big-stat"><span id="dash-calories">2,850</span> <span class="unit">kcal</span></div>
+                    <p id="dash-goal" style="color: #b000ff; font-weight: 700; font-size: 0.85rem; margin-top: -5px;">
+                        BODY RECOMPOSITION</p>
+
+                    <div class="macro-labels" id="dash-macros">
+                        <span class="macro-label p-label">P: 180g</span>
+                        <span class="macro-label c-label">C: 250g</span>
+                        <span class="macro-label f-label">F: 75g</span>
+                    </div>
+
+                    <div class="progress-bar-wrap">
+                        <div class="progress-bar-fill" id="dash-cal-progress"></div>
+                    </div>
+                    <p style="font-size: 0.75rem; color: #666; margin-top: 10px; text-align: center;">65% of daily
+                        target reached</p>
+
+                    <a href="calculators.html" class="btn glass"
+                        style="width: 100%; margin-top: 15px; border-radius: 15px; font-size: 0.85rem;">UPDATE DIET
+                        PLAN</a>
+                </div>
+
+                <!-- Activity Card -->
+                <div class="dash-card">
+                    <div class="card-header">
+                        <span class="card-title">Training Volume</span>
+                        <div class="card-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.5">
+                                <path d="M18 20V10"></path>
+                                <path d="M12 20V4"></path>
+                                <path d="M6 20v-6"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="big-stat">42 <span class="unit">mins</span></div>
+                    <p style="color: #39FF14; font-weight: 700; font-size: 0.85rem; margin-top: -5px;">AVG WORKOUT TIME
+                    </p>
+
+                    <div style="margin-top: 25px;">
+                        <div
+                            style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 8px;">
+                            <span style="color: #888;">Weekly Intensity</span>
+                            <span style="color: #fff;">Elite</span>
+                        </div>
+                        <div style="display: flex; align-items: flex-end; gap: 4px; height: 60px;">
+                            <div
+                                style="flex: 1; height: 40%; background: var(--primary-color); opacity: 0.3; border-radius: 4px;">
+                            </div>
+                            <div
+                                style="flex: 1; height: 60%; background: var(--primary-color); opacity: 0.5; border-radius: 4px;">
+                            </div>
+                            <div
+                                style="flex: 1; height: 90%; background: var(--primary-color); opacity: 0.7; border-radius: 4px;">
+                            </div>
+                            <div
+                                style="flex: 1; height: 75%; background: var(--primary-color); opacity: 0.5; border-radius: 4px;">
+                            </div>
+                            <div
+                                style="flex: 1; height: 100%; background: var(--primary-color); border-radius: 4px; box-shadow: 0 0 10px var(--primary-color);">
+                            </div>
+                            <div style="flex: 1; height: 20%; background: rgba(255,255,255,0.05); border-radius: 4px;">
+                            </div>
+                            <div style="flex: 1; height: 20%; background: rgba(255,255,255,0.05); border-radius: 4px;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 20px; text-align: center;">
+                        <p style="font-size: 0.75rem; color: #444; font-style: italic;">"Persistence beats talent when
+                            talent doesn't persist."</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Date & Calendar Logic ---
+        function initCalendar() {
+            const now = new Date();
+            const monthNames = ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"];
+            const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+            document.getElementById('current-month-year').innerText = `${monthNames[now.getMonth()]} ${now.getFullYear()}`;
+            document.getElementById('current-day-long').innerText = `${dayNames[now.getDay()]}, ${String(now.getDate()).padStart(2, '0')}`;
+
+            const strip = document.getElementById('calendar-strip');
+            strip.innerHTML = '';
+
+            // Render center-aligned week
+            for (let i = -3; i <= 3; i++) {
+                const d = new Date();
+                d.setDate(now.getDate() + i);
+
+                const dayEl = document.createElement('div');
+                dayEl.className = `calendar-day ${i === 0 ? 'active' : ''}`;
+                dayEl.innerHTML = `
+                    <span class="day-name">${dayNames[d.getDay()].substring(0, 3)}</span>
+                    <span class="day-num">${d.getDate()}</span>
+                `;
+                strip.appendChild(dayEl);
+            }
+        }
+
+        // --- Data Loading Logic ---
+        function loadDashboardData() {
+            // 1. Load Macro Plan
+            const macroData = JSON.parse(localStorage.getItem('user_macro_plan'));
+            if (macroData) {
+                document.getElementById('dash-calories').innerText = macroData.calories.toLocaleString();
+                document.getElementById('dash-goal').innerText = macroData.goal.toUpperCase();
+                document.getElementById('dash-macros').innerHTML = `
+                    <span class="macro-label p-label">P: ${macroData.protein}g</span>
+                    <span class="macro-label c-label">C: ${macroData.carbs}g</span>
+                    <span class="macro-label f-label">F: ${macroData.fat}g</span>
+                `;
+            }
+
+            // 2. Load 6-Day Split Plan
+            const myPlan = JSON.parse(localStorage.getItem('my_6day_plan') || '[]');
+            if (myPlan.length > 0) {
+                // Determine current day in the 6-day cycle (using simple modulo or just showing Day 1 as reactive sample)
+                // For a real app, you'd track the cycle start date.
+                // Let's assume today is Day 1 of the cycle for this demo.
+                const todayCycleIndex = 0;
+                const todayWorkout = myPlan[todayCycleIndex];
+
+                if (todayWorkout) {
+                    document.getElementById('dash-focus').innerText = todayWorkout.focus.toUpperCase();
+                    document.getElementById('dash-plan-type').innerText = todayWorkout.type === 'REST' ? 'RECOVERY DAY' : `${todayWorkout.type} MUSCLE SPLIT`;
+
+                    const previewContainer = document.getElementById('dash-workout-preview');
+                    if (todayWorkout.exercises.length > 0) {
+                        previewContainer.innerHTML = todayWorkout.exercises.slice(0, 3).map(exName => `
+                            <div class="exercise-mini">
+                                <img src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=100" alt="${exName}">
+                                <div>
+                                    <h4>${exName}</h4>
+                                    <span style="font-size: 0.7rem; color: #666;">AI Guided Form</span>
+                                </div>
+                            </div>
+                        `).join('');
+
+                        document.getElementById('start-session-btn').href = `workout.html?exercise=${encodeURIComponent(todayWorkout.exercises[0])}`;
+                    } else {
+                        previewContainer.innerHTML = '<p style="color: #444; font-size: 0.8rem; text-align: center; padding: 20px;">Rest & Recover properly today.</p>';
+                        document.getElementById('start-session-btn').style.display = 'none';
+                    }
+                }
+            }
+        }
+
+        window.onload = () => {
+            // Guard: redirect to setup if no profile
+            const profile = JSON.parse(localStorage.getItem('user_profile'));
+            if (!profile || !profile.name) {
+                window.location.replace('setup.html');
+                return;
+            }
+
+            // Personalise greeting
+            const hour = new Date().getHours();
+            const greeting = hour < 12 ? 'GOOD MORNING' : hour < 17 ? 'GOOD AFTERNOON' : 'GOOD EVENING';
+            document.getElementById('user-greeting').innerText = `${greeting}, ${profile.name.split(' ')[0].toUpperCase()} 👊`;
+
+            // Goal badge
+            const goalBadge = document.getElementById('user-goal-badge');
+            goalBadge.innerHTML = `<span>🎯</span> ${profile.goal.toUpperCase()}`;
+
+            // Level tag
+            document.getElementById('user-level-tag').innerText = `${profile.level} • ${profile.gender === 'male' ? '♂' : '♀'} ${profile.weight}kg · ${profile.height}cm`;
+
+            initCalendar();
+            loadDashboardData();
+        };
+    </script>
+</body>
+
+</html>

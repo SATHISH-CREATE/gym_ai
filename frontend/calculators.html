@@ -1,0 +1,1276 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FIT COACH AI | Fitness Tools</title>
+    <link rel="stylesheet" href="css/styles.css?v=4">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        html,
+        body {
+            height: auto !important;
+            min-height: 100vh !important;
+            overflow-y: auto !important;
+            overflow-x: hidden !important;
+            scrollbar-width: thin;
+            background-attachment: fixed !important;
+            background-image:
+                radial-gradient(circle at 50% 0%, rgba(0, 240, 255, 0.15), transparent 50%),
+                linear-gradient(to bottom, rgba(13, 5, 20, 0.88), rgba(9, 9, 11, 0.98)),
+                url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=2070') !important;
+        }
+
+        .tools-container {
+            max-width: 100%;
+            width: 100%;
+            margin: 40px 0;
+            padding: 0 20px;
+            min-height: calc(100vh - 120px);
+            box-sizing: border-box;
+        }
+
+        .save-btn {
+            background: linear-gradient(135deg, #7000ff, #b000ff);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-weight: 800;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            box-shadow: 0 0 15px rgba(112, 0, 255, 0.4);
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+        }
+
+        .save-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 25px rgba(112, 0, 255, 0.6);
+        }
+
+        @media print {
+
+            .save-btn,
+            .tab-buttons,
+            .calculate-btn,
+            .back-arrow,
+            .see-formula {
+                display: none !important;
+            }
+
+            body {
+                background: white !important;
+            }
+
+            .calculator-card {
+                background: white !important;
+                border: none !important;
+                box-shadow: none !important;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .tools-container {
+                margin: 20px auto;
+                padding: 10px;
+            }
+
+            .tab-buttons {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .tab-btn {
+                width: 100%;
+                padding: 10px;
+            }
+
+            .calculator-card {
+                padding: 20px;
+                border-radius: 20px;
+            }
+
+            .input-row {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .stat-val {
+                font-size: 1.5rem;
+            }
+
+            .macro-donut {
+                width: 140px;
+                height: 140px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .logo-container .logo {
+                font-size: 1.1rem;
+            }
+
+            .calculate-btn {
+                padding: 15px;
+                font-size: 0.9rem;
+            }
+
+            .gender-select {
+                flex-direction: column;
+            }
+        }
+
+        .tab-buttons {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            justify-content: center;
+        }
+
+        .tab-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            color: white;
+            padding: 12px 25px;
+            border-radius: 100px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #7000ff, #b000ff);
+            border-color: #7000ff;
+            color: white;
+            box-shadow: 0 0 15px rgba(112, 0, 255, 0.4);
+        }
+
+        .calculator-card {
+            background: rgba(20, 20, 25, 0.95);
+            border: 1px solid var(--glass-border);
+            border-radius: 30px;
+            padding: 30px;
+            display: none;
+            margin-bottom: 40px;
+        }
+
+        .calculator-card.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 15px;
+        }
+
+        .input-field {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--glass-border);
+            padding: 15px;
+            border-radius: 12px;
+            color: white;
+            font-family: inherit;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .input-field:focus {
+            border-color: #39FF14;
+        }
+
+        select.input-field {
+            appearance: none;
+            cursor: pointer;
+        }
+
+        select.input-field option {
+            background-color: #1a1a20;
+            color: white;
+            padding: 10px;
+        }
+
+        .gender-select {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .gender-btn,
+        .goal-btn {
+            flex: 1;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            color: white;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+        }
+
+        .gender-btn.active {
+            background: #c084fc;
+            color: black;
+            box-shadow: 0 0 15px #c084fc;
+        }
+
+        .goal-btn.active {
+            background: linear-gradient(135deg, #7000ff, #b000ff);
+            color: white;
+            box-shadow: 0 0 15px rgba(112, 0, 255, 0.4);
+        }
+
+        .calculate-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #7000ff, #b000ff);
+            border: none;
+            border-radius: 15px;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 800;
+            cursor: pointer;
+            margin-top: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: transform 0.2s;
+        }
+
+        /* Neon Theme Overrides for Diet */
+        #diet-card .calculate-btn,
+        #diet-card .goal-btn.active {
+            background: linear-gradient(135deg, #7000ff, #b000ff);
+            color: white;
+            box-shadow: 0 0 20px rgba(112, 0, 255, 0.3);
+        }
+
+        .result-panel {
+            margin-top: 30px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 20px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            display: none;
+            /* Hidden until calculated */
+        }
+
+        .stat-val {
+            font-size: 2rem;
+            font-weight: 900;
+            color: #b000ff;
+        }
+
+        /* Donut Chart Simulation */
+        .macro-donut {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            border: 15px solid #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 20px auto;
+            position: relative;
+        }
+
+        .macro-text-inner {
+            text-align: center;
+            font-size: 0.85rem;
+            line-height: 1.4;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .formula-modal {
+            background: #0a0a0c;
+            border: 1px solid #333;
+            border-radius: 20px;
+            max-width: 500px;
+            width: 100%;
+            padding: 30px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .formula-line {
+            font-family: monospace;
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+            color: #eee;
+        }
+
+        .formula-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        /* Diet Timetable Styles */
+        .diet-timetable {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 25px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 15px;
+            overflow: hidden;
+            font-size: 0.85rem;
+            color: #eee;
+        }
+
+        .diet-timetable th,
+        .diet-timetable td {
+            padding: 15px 12px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            text-align: left;
+            vertical-align: top;
+        }
+
+        .diet-timetable th {
+            background: rgba(112, 0, 255, 0.15);
+            color: #b000ff;
+            text-transform: uppercase;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+        }
+
+        .diet-timetable tr:hover {
+            background: rgba(57, 255, 20, 0.03);
+        }
+
+        .meal-name {
+            font-weight: 800;
+            color: #b000ff;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .macro-tag {
+            font-size: 0.7rem;
+            opacity: 0.6;
+            display: block;
+        }
+
+        .food-item-list {
+            margin: 0;
+            padding-left: 15px;
+            font-size: 0.8rem;
+            opacity: 0.9;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container" style="max-width: 100% !important; padding: 0 20px !important;">
+        <header
+            style="flex-direction: row !important; align-items: center !important; justify-content: space-between !important; padding: 20px 0 !important;">
+            <div class="logo-container">
+                <a href="dashboard.html" class="back-arrow" title="Back to Home">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="19" y1="12" x2="5" y2="12"></line>
+                        <polyline points="12 19 5 12 12 5"></polyline>
+                    </svg>
+                </a>
+                <div class="logo">FIT COACH AI</div>
+            </div>
+            <button class="save-btn" onclick="saveResults()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                Save Results
+            </button>
+        </header>
+
+        <div class="tools-container">
+            <div class="tab-buttons" style="justify-content: center;">
+                <button class="tab-btn active" onclick="switchTab('bodyfat')">Body Fat</button>
+                <button class="tab-btn" onclick="switchTab('diet')">Diet Plan</button>
+            </div>
+
+            <!-- Body Fat Calculator -->
+            <div id="bodyfat-card" class="calculator-card active">
+                <h2 style="text-align: center; margin-bottom: 30px;">Body Fat Zone Calculator</h2>
+
+                <div class="input-row">
+                    <div class="input-group" style="flex: 1;">
+                        <label>Height (cm)</label>
+                        <input type="number" id="bf-height-cm" placeholder="175" class="input-field"
+                            oninput="syncInput('height', this.value)">
+                    </div>
+
+                    <div class="input-group" style="flex: 1;">
+                        <label>Weight (kg)</label>
+                        <input type="number" id="bf-weight" placeholder="100" class="input-field"
+                            oninput="syncInput('weight', this.value)">
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Waist (inches)</label>
+                    <input type="number" id="bf-waist" placeholder="38" class="input-field">
+                </div>
+
+                <div class="input-group">
+                    <label>Gender</label>
+                    <div class="gender-select">
+                        <button class="gender-btn active" onclick="setGender('male')">Male</button>
+                        <button class="gender-btn" onclick="setGender('female')">Female</button>
+                    </div>
+                </div>
+
+                <button class="calculate-btn" onclick="calculateBodyFat()">Calculate</button>
+
+                <div id="bf-result" class="result-panel">
+                    <div class="stat-item">
+                        <span style="font-size: 1.1rem;">🔥 Estimated Body Fat Zone: </span>
+                        <span id="res-bf" class="stat-val">--</span>
+                    </div>
+                    <div
+                        style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0; background: rgba(255,255,255,0.03); padding: 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+                        <p id="res-ratio" style="font-size: 0.85rem;">Ratio: --</p>
+                        <p id="res-bmi" style="font-size: 0.85rem;">BMI: --</p>
+                    </div>
+
+                    <div style="margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
+                        <h4 style="color: #b000ff; font-size: 0.95rem; margin-bottom: 10px;">📉 Estimated Target
+                            Weights:</h4>
+                        <div style="font-size: 0.85rem; line-height: 1.8;">
+                            <p>🏁 Maintenance Target: <strong id="tgt-maint" style="color: #fff;">--</strong></p>
+                            <p>🔥 Fat Loss Target: <strong id="tgt-fat" style="color: #ff4d00;">--</strong></p>
+                            <p>🔄 Recomp Target: <strong id="tgt-recomp" style="color: #00f0ff;">--</strong></p>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 20px;">
+                        <h4 style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 5px;">Recommendation:
+                        </h4>
+                        <p id="res-recommend" style="font-weight: 900; font-size: 1.3rem; text-transform: uppercase;">--
+                        </p>
+                    </div>
+
+                    <div style="margin-top: 10px;">
+                        <h4 style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 5px;">Reason:</h4>
+                        <p id="res-reason" style="line-height: 1.5; font-size: 0.9rem;">--</p>
+                    </div>
+
+                    <div style="margin-top: 30px; display: flex; gap: 10px; color: #facc15; font-size: 0.85rem;">
+                        <span>⚠️</span>
+                        <p style="opacity: 0.8;">Estimate based on waist, height & bodyweight. Actual body fat may vary
+                            ±3–6%.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Diet Plan Calculator -->
+            <div id="diet-card" class="calculator-card">
+                <h2 style="text-align: center; margin-bottom: 30px;">Premium Diet & Macro Plan</h2>
+
+                <div class="input-row">
+                    <div class="input-group" style="flex: 1;">
+                        <label>Height (cm)</label>
+                        <input type="number" id="diet-height-cm" placeholder="175" class="input-field"
+                            oninput="syncInput('height', this.value)">
+                    </div>
+                    <div class="input-group" style="flex: 1;">
+                        <label>Weight (kg)</label>
+                        <input type="number" id="diet-weight" placeholder="e.g. 75" class="input-field"
+                            oninput="syncInput('weight', this.value)">
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Age</label>
+                    <input type="number" id="diet-age" placeholder="e.g. 25" class="input-field"
+                        oninput="syncInput('age', this.value)">
+                </div>
+
+                <div class="input-group">
+                    <label>Gender</label>
+                    <div class="gender-select">
+                        <button class="gender-btn active" onclick="setGender('male')">Male</button>
+                        <button class="gender-btn" onclick="setGender('female')">Female</button>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Your Goal</label>
+                    <div class="gender-select" style="flex-wrap: wrap;">
+                        <button class="goal-btn active" onclick="setGoal('Fat Loss', this)">Fat Loss</button>
+                        <button class="goal-btn" onclick="setGoal('Body Recomposition', this)">Body
+                            Recomposition</button>
+                        <button class="goal-btn" onclick="setGoal('Lean Bulk', this)">Lean Bulk</button>
+                        <button class="goal-btn" onclick="setGoal('Aggressive Bulk', this)">Aggressive Bulk</button>
+                        <button class="goal-btn" onclick="setGoal('Maintenance', this)">Maintenance</button>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Activity Level</label>
+                    <select id="diet-activity" class="input-field" style="width: 100%;">
+                        <option value="1.2">Sedentary (Little/No exercise)</option>
+                        <option value="1.375">Lightly Active (1-3 days/week)</option>
+                        <option value="1.55" selected>Moderate (4-5 days/week)</option>
+                        <option value="1.725">Very Active (6-7 days/week)</option>
+                        <option value="1.9">Athlete (Professional Sports)</option>
+                    </select>
+                </div>
+
+                <div class="brand-section">
+                    <label style="color: var(--accent-color); font-weight: 700;">Whey Protein Integration</label>
+                    <div class="input-row" style="margin-top: 10px;">
+                        <input type="number" id="protein-per-scoop" placeholder="Protein per Scoop (g)"
+                            class="input-field">
+                        <input type="number" id="protein-scoops" placeholder="Scoops/Day" class="input-field"
+                            style="flex: 0.4;">
+                    </div>
+                </div>
+
+                <button class="calculate-btn" style="margin-top: 25px;" onclick="calculateDiet()">Generate Premium
+                    Plan</button>
+
+                <div id="diet-result" class="result-panel">
+                    <!-- Macro Ring -->
+                    <div class="macro-donut" id="macro-ring" style="border-width: 12px; width: 150px; height: 150px;">
+                        <div class="macro-text-inner">
+                            <p style="color: #ff3b3b; font-weight: 800;">P: <span id="r-p">--</span>g</p>
+                            <p style="color: #b000ff; font-weight: 800;">C: <span id="r-c">--</span>g</p>
+                            <p style="color: #facc15; font-weight: 800;">F: <span id="r-f">--</span>g</p>
+                        </div>
+                    </div>
+
+                    <div style="text-align: center; margin-top: 15px;">
+                        <p style="font-size: 1.2rem; font-weight: 600;">🔥 Calories: <span id="res-calories">3542</span>
+                        </p>
+
+                        <div id="nutritional-summary"
+                            style="margin: 15px 0; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+                            <h4
+                                style="color: #b000ff; font-size: 0.9rem; margin-bottom: 10px; text-transform: uppercase;">
+                                Total Daily Intake:</h4>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 0.85rem;">
+                                <p>🥩 Protein: <strong id="sum-p">--</strong>g</p>
+                                <p>🍚 Carbs: <strong id="sum-c">--</strong>g</p>
+                                <p>🥑 Fats: <strong id="sum-f">--</strong>g</p>
+                                <p>🥛 Minerals: <strong id="sum-m">Met</strong></p>
+                                <p>🥦 Vitamins: <strong id="sum-v">High</strong></p>
+                                <p>💧 Water: <span id="res-water">4.0</span> L Above/per day</p>
+                            </div>
+                        </div>
+
+                        <a href="#" onclick="showFormula(); return false;" class="see-formula"
+                            style="color: #facc15; font-size: 0.9rem; text-decoration: underline; display: inline-block; margin-top: 10px;">See
+                            Formula</a>
+                    </div>
+
+                    <div id="food-plan-suggested" style="display: none;">
+                        <!-- Categorized food will be shown here -->
+                    </div>
+                </div>
+            </div>
+            <div id="formula-modal" class="modal-overlay">
+                <div class="formula-modal">
+                    <h2 class="formula-title">Your Calculation</h2>
+                    <div id="formula-content">
+                        <!-- Lines will be injected -->
+                    </div>
+                    <button class="calculate-btn" style="background: #facc15; color: black; margin-top: 30px;"
+                        onclick="closeFormula()">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentGender = 'male';
+        let currentGoal = 'Fat Loss';
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.calculator-card').forEach(c => c.classList.remove('active'));
+
+            if (tab === 'bodyfat') {
+                document.querySelector('button[onclick="switchTab(\'bodyfat\')"]').classList.add('active');
+                document.getElementById('bodyfat-card').classList.add('active');
+            } else {
+                document.querySelector('button[onclick="switchTab(\'diet\')"]').classList.add('active');
+                document.getElementById('diet-card').classList.add('active');
+            }
+        }
+
+        function setGender(gender) {
+            currentGender = gender;
+            document.querySelectorAll('.gender-btn').forEach(btn => {
+                if (btn.innerText.toLowerCase() === gender) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+        }
+
+        function setGoal(goal, btn) {
+            currentGoal = goal;
+            document.querySelectorAll('.goal-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        }
+
+        function syncInput(field, value) {
+            // Synchronize common fields across both calculators
+            if (field === 'weight') {
+                document.getElementById('bf-weight').value = value;
+                document.getElementById('diet-weight').value = value;
+            } else if (field === 'height') {
+                document.getElementById('bf-height-cm').value = value;
+                document.getElementById('diet-height-cm').value = value;
+            } else if (field === 'age') {
+                document.getElementById('diet-age').value = value;
+            }
+        }
+
+        function calculateBodyFat() {
+            const heightCm = parseFloat(document.getElementById('bf-height-cm').value) || 0;
+            const weight = parseFloat(document.getElementById('bf-weight').value) || 0;
+            const waist = parseFloat(document.getElementById('bf-waist').value) || 0;
+
+            if (!heightCm || !weight || !waist) return;
+
+            const totalInches = heightCm / 2.54;
+            const ratio = (waist / totalInches).toFixed(2);
+
+            // BMI
+            const heightM = totalInches * 0.0254;
+            const bmi = (weight / (heightM * heightM)).toFixed(1);
+
+            // Estimated BF% (Simplified approximation for UI demonstration matching image logic)
+            let bfRange = "";
+            let recommend = "";
+            let reason = "";
+
+            if (currentGender === 'male') {
+                if (ratio < 0.43) { bfRange = "8-12%"; recommend = "Lean Bulk"; reason = "Low body fat detected. Healthy lean growth is possible."; }
+                else if (ratio < 0.52) { bfRange = "15-20%"; recommend = "Maintenance / Body Recomposition"; reason = "Healthy mid-range. Focus on building muscle."; }
+                else if (ratio < 0.58) { bfRange = "23-26%+"; recommend = "Aggressive Cut"; reason = "Higher body fat detected. Intensive calorie deficit suggested."; }
+                else { bfRange = "30%+"; recommend = "Medical Consultation"; reason = "High obesity risk detected."; }
+            } else {
+                if (ratio < 0.45) { bfRange = "15-18%"; recommend = "Normal"; reason = "Healthy athletic range."; }
+                else if (ratio < 0.55) { bfRange = "22-28%"; recommend = "Tone"; reason = "Standard healthy range."; }
+                else { bfRange = "32%+"; recommend = "Active Weight Loss"; reason = "Fat storage above optimal levels."; }
+            }
+
+            // Ideal/Target Weight Calculations
+            const idealBMI = 22.5;
+            const maintWeight = (idealBMI * (heightM * heightM)).toFixed(1);
+            const fatLossTarget = (weight * 0.9).toFixed(1); // Initial 10% drop suggestion
+            const recompTarget = (weight * 0.98).toFixed(1); // Slight shift
+
+            document.getElementById('res-bf').innerText = bfRange;
+            document.getElementById('res-ratio').innerText = `Ratio: ${ratio}`;
+            document.getElementById('res-bmi').innerText = `BMI: ${bmi}`;
+
+            document.getElementById('tgt-maint').innerText = `${maintWeight} kg`;
+            document.getElementById('tgt-fat').innerText = `${fatLossTarget} kg`;
+            document.getElementById('tgt-recomp').innerText = `${recompTarget} kg`;
+
+            document.getElementById('res-recommend').innerText = recommend;
+            document.getElementById('res-reason').innerText = reason;
+            document.getElementById('bf-result').style.display = 'block';
+            document.getElementById('bf-result').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        /* -----------------------------
+           UPDATED INDIAN BODYBUILDER
+           FOOD DATABASE (ONLY CHANGE)
+        ------------------------------*/
+
+        const FOOD_DATABASE = {
+
+            "Fat Loss": {
+                "🥩 Protein (Ultra Lean Indian Sources)": [
+                    "Chicken Breast (Grilled/Tandoori)",
+                    "Egg Whites (Anda Safed)",
+                    "Fish (Rohu, Katla, Tilapia)",
+                    "Low-Fat Paneer",
+                    "Soya Chunks (Nutrela)",
+                    "Moong Dal",
+                    "Masoor Dal"
+                ],
+                "🍚 Controlled Carbs (Low GI Indian)": [
+                    "Brown Rice",
+                    "Multigrain Roti (No Oil)",
+                    "Oats",
+                    "Daliya (Broken Wheat)",
+                    "Sweet Potato (Shakarkandi)",
+                    "Red Rice",
+                    "Quinoa (Limited)"
+                ],
+                "🥑 Healthy Fats (Measured Portions)": [
+                    "Almonds (5-10)",
+                    "Walnuts (2-3)",
+                    "Flax Seeds",
+                    "Chia Seeds",
+                    "Desi Cow Ghee (Few Drops)",
+                    "Natural Peanut Butter"
+                ],
+                "🥦 Fat Loss Veggies (High Fiber Indian)": [
+                    "Palak (Spinach)",
+                    "Lauki (Bottle Gourd)",
+                    "Tori (Ridge Gourd)",
+                    "Bhindi (Okra)",
+                    "Cabbage",
+                    "Karela (Bitter Gourd)"
+                ],
+                "🧂 Mineral Boosters": [
+                    "Black Chana",
+                    "Pumpkin Seeds",
+                    "Banana (Post Workout)",
+                    "Coconut Water",
+                    "Rock Salt (Electrolytes)"
+                ]
+            },
+
+            "Body Recomposition": {
+                "🥩 High Protein Indian Muscle Foods": [
+                    "Chicken Breast",
+                    "Eggs (Whole + Whites)",
+                    "Paneer (Low Fat)",
+                    "Fish Curry (Low Oil)",
+                    "Rajma",
+                    "Chole",
+                    "Greek Yogurt (Dahi)"
+                ],
+                "🍚 Smart Desi Carbs": [
+                    "Basmati Rice",
+                    "Multigrain Roti",
+                    "Oats",
+                    "Sweet Potato",
+                    "Poha (Controlled Oil)"
+                ],
+                "🥑 Balanced Fats": [
+                    "Almonds",
+                    "Cashews (Limited)",
+                    "Ghee (Measured)",
+                    "Mustard Oil (Controlled)",
+                    "Peanuts"
+                ],
+                "⭐ Recovery Support (Indian Style)": [
+                    "Haldi Milk (Low Fat)",
+                    "Ginger",
+                    "Tulsi Tea",
+                    "Bone Broth (Yakhni)",
+                    "Electrolyte Lemon Water"
+                ]
+            },
+
+            "Bulk": {
+                "🥩 Heavy Muscle Building Indian Protein": [
+                    "Whole Eggs (Anda)",
+                    "Chicken Thighs",
+                    "Lean Mutton",
+                    "Paneer (Full Fat)",
+                    "Fish (Rohu/Salmon)",
+                    "Whey Protein",
+                    "Buffalo Milk"
+                ],
+                "🍚 High Energy Indian Carbs": [
+                    "White Rice",
+                    "Basmati Rice",
+                    "Chapati",
+                    "Paratha (Limited Oil)",
+                    "Potatoes",
+                    "Idli",
+                    "Dosa",
+                    "Upma"
+                ],
+                "🍌 Workout Boosters": [
+                    "Banana",
+                    "Dates (Khajoor)",
+                    "Honey",
+                    "Raisins",
+                    "Jaggery (Gur)"
+                ],
+                "🥑 Calorie Dense Fats": [
+                    "Peanut Butter",
+                    "Cashews",
+                    "Almonds",
+                    "Ghee",
+                    "Cheese",
+                    "Dark Chocolate"
+                ]
+            },
+
+            "Maintenance": {
+                "🥩 Stable Indian Protein": [
+                    "Chicken Breast",
+                    "Eggs",
+                    "Paneer",
+                    "Fish",
+                    "Dal",
+                    "Curd (Dahi)"
+                ],
+                "🍚 Maintenance Carbs": [
+                    "Brown Rice",
+                    "Chapati",
+                    "Oats",
+                    "Sweet Potato",
+                    "Poha"
+                ],
+                "🥑 Healthy Fats": [
+                    "Almonds",
+                    "Walnuts",
+                    "Flax Seeds",
+                    "Ghee (Small Amount)",
+                    "Mustard Oil"
+                ],
+                "🥦 Essential Micronutrients": [
+                    "Spinach",
+                    "Mixed Sabzi",
+                    "Carrots",
+                    "Beetroot",
+                    "Seasonal Fruits"
+                ]
+            }
+        };
+
+        let calculationDetails = {};
+
+        function calculateDiet() {
+            const weight = parseFloat(document.getElementById('diet-weight').value);
+            const age = parseFloat(document.getElementById('diet-age').value);
+            const heightCm = parseFloat(document.getElementById('diet-height-cm').value);
+            const activity = parseFloat(document.getElementById('diet-activity').value);
+            const proteinPerScoopInput = parseFloat(document.getElementById('protein-per-scoop').value) || 0;
+            const scoops = parseInt(document.getElementById('protein-scoops').value) || 0;
+
+            if (!weight || !age || !heightCm) {
+                alert("Please enter Weight, Age, and Height.");
+                return;
+            }
+
+            // 1. Calculate BMR (Mifflin-St Jeor Equation)
+            let bmr = Math.round((10 * weight) + (6.25 * heightCm) - (5 * age));
+            bmr = currentGender === 'male' ? bmr + 5 : bmr - 161;
+
+            // 2. TDEE
+            const tdee = Math.round(bmr * activity);
+            let targetCalories = tdee;
+            const heightM = heightCm / 100;
+
+            let protein_ratio = 1.6; // Default
+            let fat_ratio = 0.8;
+            let weightChangeRate = 0;
+
+            if (currentGoal === 'Fat Loss') {
+                targetCalories = tdee - 500;
+                protein_ratio = 2.0; // Higher protein to preserve muscle
+                fat_ratio = 0.6;
+                weightChangeRate = -0.5;
+            } else if (currentGoal === 'Body Recomposition') {
+                targetCalories = tdee;
+                protein_ratio = 2.2;
+                fat_ratio = 0.7;
+                weightChangeRate = -0.1;
+            } else if (currentGoal === 'Lean Bulk') {
+                targetCalories = tdee + 300;
+                protein_ratio = 1.8;
+                fat_ratio = 0.85;
+                weightChangeRate = 0.25;
+            } else if (currentGoal === 'Aggressive Bulk' || currentGoal === 'Bulk') {
+                targetCalories = tdee + 600;
+                protein_ratio = 1.6;
+                fat_ratio = 1.0;
+                weightChangeRate = 0.5;
+            } else if (currentGoal === 'Maintenance') {
+                targetCalories = tdee;
+                protein_ratio = 1.5;
+                fat_ratio = 0.9;
+                weightChangeRate = 0;
+            }
+
+            const totalProtein = Math.round(weight * protein_ratio);
+            const totalFats = Math.round(weight * fat_ratio);
+
+            const proteinCals = totalProtein * 4;
+            const fatCals = totalFats * 9;
+            const carbCals = targetCalories - (proteinCals + fatCals);
+            const totalCarbs = Math.round(carbCals / 4);
+
+            const waterL = (weight * 0.04).toFixed(1); // 40ml per kg
+
+            // Store for Formula
+            calculationDetails = {
+                weight, heightCm, age, genderBonus: currentGender === 'male' ? 5 : -161,
+                bmr, activity, tdee, targetCalories,
+                protein_ratio, fat_ratio,
+                totalProtein, totalFats, totalCarbs,
+                proteinCals, fatCals, carbCals,
+                waterMl: Math.round(waterL * 1000)
+            };
+
+            // Update UI
+            document.getElementById('res-calories').innerText = targetCalories;
+            document.getElementById('r-p').innerText = totalProtein;
+            document.getElementById('r-c').innerText = totalCarbs;
+            document.getElementById('r-f').innerText = totalFats;
+
+            // Update Detailed Summary
+            document.getElementById('sum-p').innerText = totalProtein;
+            document.getElementById('sum-c').innerText = totalCarbs;
+            document.getElementById('sum-f').innerText = totalFats;
+            document.getElementById('sum-v').innerText = "High (Micronutrients)";
+            document.getElementById('sum-m').innerText = "Optimized";
+            document.getElementById('res-water').innerText = waterL;
+
+            // Donut styling logic
+            const ring = document.getElementById('macro-ring');
+            const pPerc = (proteinCals / targetCalories) * 360;
+            const fPerc = (fatCals / targetCalories) * 360;
+            ring.style.background = `conic-gradient(#ff3b3b ${pPerc}deg, #facc15 ${pPerc}deg ${pPerc + fPerc}deg, #39FF14 ${pPerc + fPerc}deg)`;
+
+            // --- Meal Distribution Logic ---
+            const totalWheyProtein = proteinPerScoopInput * scoops;
+            const proteinFromFood = Math.max(0, totalProtein - totalWheyProtein);
+
+            // Meal Distribution Percentages (Protein | Carbs | Fats)
+            const distribution = {
+                breakfast: { p: 0.25, c: 0.25, f: 0.30 },
+                snack: { p: 0.15, c: 0.15, f: 0.20 },
+                lunch: { p: 0.25, c: 0.30, f: 0.25 },
+                pre: { p: 0.05, c: 0.15, f: 0.05 },
+                recovery: { p: 0.10, c: 0.10, f: 0.00 }, // Base recovery before whey
+                dinner: { p: 0.20, c: 0.05, f: 0.20 }
+            };
+
+            const calculateMealMacros = (meal) => {
+                const dist = distribution[meal];
+                let p = Math.round(proteinFromFood * dist.p);
+                let c = Math.round(totalCarbs * dist.c);
+                let f = Math.round(totalFats * dist.f);
+
+                if (meal === 'recovery') {
+                    p += totalWheyProtein;
+                    // Post-workout we often want higher carbs if bulking
+                    if (currentGoal.includes('Bulk')) c = Math.round(totalCarbs * 0.20);
+                }
+                return { p, c, f };
+            };
+
+            const m_bf = calculateMealMacros('breakfast');
+            const m_snack = calculateMealMacros('snack');
+            const m_lunch = calculateMealMacros('lunch');
+            const m_pre = calculateMealMacros('pre');
+            const m_post = calculateMealMacros('recovery');
+            const m_dinner = calculateMealMacros('dinner');
+
+            // --- Food Logic with Database ---
+            let listKey = "Maintenance";
+            if (currentGoal === 'Fat Loss') listKey = "Fat Loss";
+            else if (currentGoal === 'Body Recomposition') listKey = "Body Recomposition";
+            else if (currentGoal.includes('Bulk')) listKey = "Bulk";
+
+            const db = FOOD_DATABASE[listKey];
+
+            const pTag = '<strong style="color:#ff3b3b">🥩P</strong>';
+            const cTag = '<strong style="color:#b000ff">🍚C</strong>';
+            const fTag = '<strong style="color:#facc15">🥑F</strong>';
+            const vmTag = '<strong style="color:#39FF14">🥦V/M</strong>';
+
+            const getFoodName = (type) => {
+                for (let cat in db) {
+                    if (cat.toLowerCase().includes(type.toLowerCase())) return db[cat][0];
+                }
+                return "Healthy Option";
+            };
+
+            // Dynamic Food Descriptions
+            const breakfast_food = `${pTag} ${m_bf.p * 10}g Egg Whites / ${getFoodName('protein')}, ${cTag} ${m_bf.c * 4}g ${getFoodName('carb')}, ${fTag} ${getFoodName('fat')}`;
+            const snack_food = `${pTag} ${m_snack.p * 5}g ${getFoodName('protein')}, ${fTag} ${m_snack.f * 1}g ${getFoodName('fat')} / Seeds`;
+            const lunch_food = `${pTag} ${m_lunch.p * 4.5}g Chicken/Paneer, ${cTag} ${m_lunch.c * 3.5}g ${getFoodName('carb')}, ${vmTag} Mixed Green Salad`;
+            const pre_food = `${cTag} ${m_pre.c * 3}g Fruit / ${getFoodName('carb')}, ${pTag} Small portion Protein`;
+
+            let post_food_desc = scoops > 0
+                ? `${pTag} ${scoops} Scoop(s) Whey (${totalWheyProtein}g), ${cTag} ${m_post.c * 4}g ${getFoodName('carb')}`
+                : `${pTag} ${m_post.p * 4.5}g ${getFoodName('protein')}, ${cTag} ${m_post.c * 3.5}g ${getFoodName('carb')}`;
+
+            const dinner_food = `${pTag} ${m_dinner.p * 5}g ${getFoodName('protein')}, ${vmTag} Large Sabzi (Spinach/Lauki), ${fTag} Small Ghee/Nuts`;
+
+            try {
+                const timetableHTML = `
+                    <div style="margin-top: 30px; overflow-x: auto;">
+                        <h3 style="font-size: 1.4rem; color: #fff; margin-bottom: 20px; text-align: center;">📅 Personalized Nutrition Schedule</h3>
+                        <table class="diet-timetable">
+                            <thead>
+                                <tr>
+                                    <th style="width: 15%;">Time</th>
+                                    <th style="width: 15%;">Meal</th>
+                                    <th style="width: 45%;">Suggested Foods & Amounts</th>
+                                    <th style="width: 25%;">Macros (P|C|F)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>08:00 AM</td>
+                                    <td><span class="meal-name">Breakfast</span></td>
+                                    <td>${breakfast_food}</td>
+                                    <td><span class="macro-tag">${m_bf.p}g | ${m_bf.c}g | ${m_bf.f}g</span></td>
+                                </tr>
+                                <tr>
+                                    <td>11:00 AM</td>
+                                    <td><span class="meal-name">Snack</span></td>
+                                    <td>${snack_food}</td>
+                                    <td><span class="macro-tag">${m_snack.p}g | ${m_snack.c}g | ${m_snack.f}g</span></td>
+                                </tr>
+                                <tr>
+                                    <td>01:30 PM</td>
+                                    <td><span class="meal-name">Lunch</span></td>
+                                    <td>${lunch_food}</td>
+                                    <td><span class="macro-tag">${m_lunch.p}g | ${m_lunch.c}g | ${m_lunch.f}g</span></td>
+                                </tr>
+                                <tr>
+                                    <td>04:30 PM</td>
+                                    <td><span class="meal-name">Pre-Workout</span></td>
+                                    <td>${pre_food}</td>
+                                    <td><span class="macro-tag">${m_pre.p}g | ${m_pre.c}g | ${m_pre.f}g</span></td>
+                                </tr>
+                                <tr>
+                                    <td>06:30 PM</td>
+                                    <td><span class="meal-name">Recovery</span></td>
+                                    <td>${post_food_desc}</td>
+                                    <td><span class="macro-tag">${m_post.p}g | ${m_post.c}g | ${m_post.f}g</span></td>
+                                </tr>
+                                <tr>
+                                    <td>08:30 PM</td>
+                                    <td><span class="meal-name">Dinner</span></td>
+                                    <td>${dinner_food}</td>
+                                    <td><span class="macro-tag">${m_dinner.p}g | ${m_dinner.c}g | ${m_dinner.f}g</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+
+                const resContainer = document.getElementById('food-plan-suggested');
+                resContainer.innerHTML = timetableHTML;
+                resContainer.style.display = 'block';
+
+                const resultPanel = document.getElementById('diet-result');
+                resultPanel.style.display = 'block';
+                resultPanel.scrollIntoView({ behavior: 'smooth' });
+
+                // Persist to localStorage for Dashboard access
+                localStorage.setItem('user_macro_plan', JSON.stringify({
+                    calories: targetCalories,
+                    protein: totalProtein,
+                    carbs: totalCarbs,
+                    fat: totalFats,
+                    goal: currentGoal,
+                    timestamp: new Date().getTime()
+                }));
+            } catch (e) {
+                console.error("Timetable Error:", e);
+                document.getElementById('food-plan-suggested').innerHTML = "<p style='color:red'>Plan rendering error. Check inputs.</p>";
+            }
+        }
+
+        function showFormula() {
+            const d = calculationDetails;
+            const content = document.getElementById('formula-content');
+            content.innerHTML = `
+                <div class="formula-line">BMR = ${d.weight} × 10 + ${d.heightCm} × 6.25 - 5 × ${d.age} ${d.genderBonus >= 0 ? '+' : ''}${d.genderBonus} = ${d.bmr}</div>
+                <div class="formula-line">Calories = ${d.bmr} × ${d.activity} ${calculationDetails.targetCalories > calculationDetails.tdee ? '+' : '-'} ${Math.abs(calculationDetails.targetCalories - calculationDetails.tdee)} = ${d.targetCalories}</div>
+                <div class="formula-line">Protein = ${d.weight} × ${d.protein_ratio} = ${d.totalProtein} g</div>
+                <div class="formula-line">Fat = ${d.weight} × ${d.fat_ratio} = ${d.totalFats} g</div>
+                <hr style="border: 0; border-top: 1px solid #333; margin: 15px 0;">
+                <div class="formula-line">Protein Calories = ${d.totalProtein} × 4 = ${d.proteinCals}</div>
+                <div class="formula-line">Fat Calories = ${d.totalFats} × 9 = ${d.fatCals}</div>
+                <div class="formula-line">Carbs Calories = ${d.targetCalories} - (${d.proteinCals} + ${d.fatCals}) = ${d.carbCals}</div>
+                <div class="formula-line">Carbs = ${d.carbCals} ÷ 4 = ${d.totalCarbs} g</div>
+                <div class="formula-line">Water = ${d.weight} × 35 = ${d.waterMl} ml</div>
+            `;
+            document.getElementById('formula-modal').style.display = 'flex';
+        }
+
+        function closeFormula() {
+            document.getElementById('formula-modal').style.display = 'none';
+        }
+
+        async function saveResults() {
+            const bfResult = document.getElementById('bf-result');
+            const dietResult = document.getElementById('diet-result');
+
+            // Check if results are actually visible on screen
+            const isBfVisible = bfResult && getComputedStyle(bfResult).display !== 'none';
+            const isDietVisible = dietResult && getComputedStyle(dietResult).display !== 'none';
+
+            if (!isBfVisible && !isDietVisible) {
+                alert("⚠️ No results found to save! Please calculate your Body Fat or Diet Plan first.");
+                return;
+            }
+
+            const btn = document.querySelector('.save-btn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = "<span>⏳ Processing...</span>";
+            btn.disabled = true;
+
+            // Extract values manually to guarantee they are captured
+            const bfVal = isBfVisible ? document.getElementById('res-bf').innerText : "";
+            const ratioVal = isBfVisible ? document.getElementById('res-ratio').innerText : "";
+            const bmiVal = isBfVisible ? document.getElementById('res-bmi').innerText : "";
+            const recommendVal = isBfVisible ? document.getElementById('res-recommend').innerText : "";
+            const reasonVal = isBfVisible ? document.getElementById('res-reason').innerText : "";
+
+            const calories = isDietVisible ? document.getElementById('res-calories').innerText : "";
+            const p = isDietVisible ? document.getElementById('sum-p').innerText : "";
+            const c = isDietVisible ? document.getElementById('sum-c').innerText : "";
+            const f = isDietVisible ? document.getElementById('sum-f').innerText : "";
+            const dietTable = isDietVisible ? document.getElementById('food-plan-suggested').innerHTML : "";
+
+            // Create a self-contained HTML report for the PDF
+            const reportHtml = `
+                <div style="padding: 30px; background: #141419; color: white; font-family: 'Outfit', Arial, sans-serif; width: 750px; border: 1px solid #333;">
+                    <style>
+                        .pdf-header { text-align: center; border-bottom: 2px solid #b000ff; padding-bottom: 15px; margin-bottom: 30px; }
+                        .section { background: rgba(255,255,255,0.05); padding: 25px; border-radius: 20px; margin-bottom: 30px; border: 1px solid rgba(255,255,255,0.1); }
+                        .section-title { color: #b000ff; font-size: 1.1rem; text-transform: uppercase; margin-bottom: 15px; letter-spacing: 1px; }
+                        .big-val { font-size: 2.2rem; font-weight: 800; color: #b000ff; margin: 5px 0; }
+                        .diet-timetable { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 0.8rem; }
+                        .diet-timetable th { background: rgba(112, 0, 255, 0.2) !important; color: #b000ff !important; padding: 12px; text-align: left; }
+                        .diet-timetable td { padding: 12px; border: 1px solid rgba(255,255,255,0.05); color: white; }
+                        .meal-name { color: #b000ff; font-weight: 800; display: block; }
+                        .macro-tag { color: #888; font-size: 0.75rem; }
+                        strong { color: #b000ff; }
+                    </style>
+
+                    <div class="pdf-header">
+                        <h1 style="color: #b000ff; margin: 0; font-size: 2.5rem;">FIT COACH AI</h1>
+                        <p style="color: #666; margin: 5px 0;">Performance Fitness Report &bull; ${new Date().toLocaleDateString()}</p>
+                    </div>
+
+                    ${isBfVisible ? `
+                    <div class="section">
+                        <div class="section-title">Body Fat Analysis</div>
+                        <div class="big-val">${bfVal}</div>
+                        <p style="color: #888; margin: 10px 0;">${ratioVal} | ${bmiVal}</p>
+                        <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1);">
+                            <p><strong>Recommendation:</strong> <span style="color: #b000ff;">${recommendVal}</span></p>
+                            <p style="font-size: 0.85rem; color: #aaa; margin-top: 5px;">${reasonVal}</p>
+                        </div>
+                    </div>
+                    ` : ""}
+
+                    ${isDietVisible ? `
+                    <div class="section">
+                        <div class="section-title">Premium Nutrition Plan</div>
+                        <div style="display: flex; gap: 40px; align-items: center; margin-bottom: 20px;">
+                            <div style="flex: 1;">
+                                <div class="big-val">${calories}</div>
+                                <p style="color: #666; font-size: 0.7rem; margin: 0;">DAILY CALORIES</p>
+                            </div>
+                            <div style="font-size: 1.1rem; flex: 2; text-align: right;">
+                                <span style="color: #ff3b3b;">P: ${p}g</span> | 
+                                <span style="color: #b000ff;">C: ${c}g</span> | 
+                                <span style="color: #facc15;">F: ${f}g</span>
+                            </div>
+                        </div>
+                        ${dietTable}
+                    </div>
+                    ` : ""}
+
+                    <p style="text-align: center; font-size: 0.7rem; color: #444; margin-top: 40px;">
+                        &copy; 2026 FIT COACH AI - Pure Performance &bull; Limitless Growth
+                    </p>
+                </div>
+            `;
+
+            const opt = {
+                margin: 5,
+                filename: 'FitCoachAI_Report.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true, backgroundColor: '#141419' },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            try {
+                await html2pdf().set(opt).from(reportHtml).save();
+            } catch (error) {
+                console.error("Save Error:", error);
+                alert("Failed to save high-quality PDF. Opening manual print menu.");
+                window.print();
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
+        window.onload = () => {
+            const profile = JSON.parse(localStorage.getItem('user_profile'));
+            if (profile) {
+                // Pre-fill fields
+                syncInput('weight', profile.weight);
+                syncInput('height', profile.height);
+                syncInput('age', profile.age);
+
+                // Set Gender
+                setGender(profile.gender.toLowerCase());
+
+                // Set Goal on Diet Tab
+                const goalBtns = document.querySelectorAll('.goal-btn');
+                goalBtns.forEach(btn => {
+                    if (btn.innerText.toLowerCase() === profile.goal.toLowerCase() ||
+                        (profile.goal === 'Bulk' && btn.innerText.includes('Bulk'))) {
+                        setGoal(btn.innerText, btn);
+                    }
+                });
+            }
+        };
+    </script>
+</body>
+
+</html>

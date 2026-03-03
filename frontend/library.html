@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FIT COACH AI | Workout Library</title>
+    <link rel="stylesheet" href="css/styles.css?v=3">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <style>
+        body {
+            background-attachment: fixed !important;
+            background-image:
+                radial-gradient(circle at 50% 0%, rgba(0, 240, 255, 0.15), transparent 50%),
+                linear-gradient(to bottom, rgba(13, 5, 20, 0.88), rgba(9, 9, 11, 0.98)),
+                url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=2070') !important;
+        }
+
+        .container {
+            max-width: 100% !important;
+            padding: 0 12px !important;
+        }
+
+        .hero-mini {
+            text-align: center;
+            padding: 60px 0 40px;
+            background: radial-gradient(circle at center, rgba(0, 240, 255, 0.12) 0%, transparent 80%);
+            border-radius: 100px;
+            margin-bottom: 20px;
+        }
+
+        .hero-mini h1 {
+            font-size: 3.5rem;
+            font-weight: 900;
+            margin-bottom: 10px;
+            letter-spacing: -2px;
+        }
+
+        .hero-mini p {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <div class="logo-container">
+                <a href="dashboard.html" class="back-arrow" title="Back to Home">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="19" y1="12" x2="5" y2="12"></line>
+                        <polyline points="12 19 5 12 12 5"></polyline>
+                    </svg>
+                </a>
+                <div class="logo">FIT COACH AI</div>
+            </div>
+        </header>
+
+        <section class="hero-mini">
+            <h1>WORKOUT LIBRARY</h1>
+            <p>Master your form with real-time AI guidance.</p>
+            <div style="margin-top: 20px;">
+                <a href="schedules.html" class="btn glass"
+                    style="padding: 15px 35px; border-radius: 50px; font-weight: 800; border-color: rgba(112, 0, 255, 0.3);">
+                    VIEW ELITE WORKOUT PLANS →
+                </a>
+            </div>
+        </section>
+
+        <div class="category-grid" id="category-grid">
+            <!-- Chest -->
+            <a href="exercises.html?category=Chest" class="category-card">
+                <div class="category-img-container">
+                    <img src="https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=800" alt="Chest">
+                    <div class="category-title-overlay">
+                        <h2>CHEST</h2>
+                    </div>
+                </div>
+                <div class="category-info">
+                    <h3>Chest Exercises</h3>
+                    <p>15 variations • Strength & Form Training</p>
+                    <div class="pill-container">
+                        <span class="pill pill-purple">AI Coach</span>
+                        <span class="pill pill-blue">Live Feedback</span>
+                        <span class="pill pill-green">Rep Count</span>
+                        <span class="pill pill-amber">Recovery: 48-72h</span>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Back -->
+            <a href="exercises.html?category=Back" class="category-card">
+                <div class="category-img-container">
+                    <img src="https://images.unsplash.com/photo-1605296867304-46d5465a13f1?w=800" alt="Back">
+                    <div class="category-title-overlay">
+                        <h2>BACK</h2>
+                    </div>
+                </div>
+                <div class="category-info">
+                    <h3>Back Exercises</h3>
+                    <p>12 variations • Strength & Form Training</p>
+                    <div class="pill-container">
+                        <span class="pill pill-purple">AI Coach</span>
+                        <span class="pill pill-blue">Live Feedback</span>
+                        <span class="pill pill-green">Rep Count</span>
+                        <span class="pill pill-amber">Recovery: 48-72h</span>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Shoulders -->
+            <a href="exercises.html?category=Shoulders" class="category-card">
+                <div class="category-img-container">
+                    <img src="https://images.unsplash.com/photo-1541534741688-6078c65b5a33?w=800" alt="Shoulders">
+                    <div class="category-title-overlay">
+                        <h2>SHOULDERS</h2>
+                    </div>
+                </div>
+                <div class="category-info">
+                    <h3>Shoulders Exercises</h3>
+                    <p>10 variations • Strength & Form Training</p>
+                    <div class="pill-container">
+                        <span class="pill pill-purple">AI Coach</span>
+                        <span class="pill pill-blue">Live Feedback</span>
+                        <span class="pill pill-green">Rep Count</span>
+                        <span class="pill pill-amber">Recovery: 48h</span>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Biceps -->
+            <a href="exercises.html?category=Biceps" class="category-card">
+                <div class="category-img-container">
+                    <img src="https://images.unsplash.com/photo-1581009146145-b5ef03a7403f?w=800" alt="Biceps">
+                    <div class="category-title-overlay">
+                        <h2>BICEPS</h2>
+                    </div>
+                </div>
+                <div class="category-info">
+                    <h3>Biceps Exercises</h3>
+                    <p>12 variations • Strength & Peak Training</p>
+                    <div class="pill-container">
+                        <span class="pill pill-purple">AI Coach</span>
+                        <span class="pill pill-blue">Live Feedback</span>
+                        <span class="pill pill-green">Rep Count</span>
+                        <span class="pill pill-amber">Recovery: 24-48h</span>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Triceps -->
+            <a href="exercises.html?category=Triceps" class="category-card">
+                <div class="category-img-container">
+                    <img src="https://images.unsplash.com/photo-1532384748853-8f54a8f476e2?w=800" alt="Triceps">
+                    <div class="category-title-overlay">
+                        <h2>TRICEPS</h2>
+                    </div>
+                </div>
+                <div class="category-info">
+                    <h3>Triceps Exercises</h3>
+                    <p>10 variations • Horseshoe Development</p>
+                    <div class="pill-container">
+                        <span class="pill pill-purple">AI Coach</span>
+                        <span class="pill pill-blue">Live Feedback</span>
+                        <span class="pill pill-green">Rep Count</span>
+                        <span class="pill pill-amber">Recovery: 24-48h</span>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Legs -->
+            <a href="exercises.html?category=Legs" class="category-card">
+                <div class="category-img-container">
+                    <img src="https://images.unsplash.com/photo-1574680096145-d05b474e2155?w=800" alt="Legs">
+                    <div class="category-title-overlay">
+                        <h2>LEGS</h2>
+                    </div>
+                </div>
+                <div class="category-info">
+                    <h3>Legs Exercises</h3>
+                    <p>12 variations • Strength & Form Training</p>
+                    <div class="pill-container">
+                        <span class="pill pill-purple">AI Coach</span>
+                        <span class="pill pill-blue">Live Feedback</span>
+                        <span class="pill pill-green">Rep Count</span>
+                        <span class="pill pill-amber">Recovery: 72h</span>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Core -->
+            <a href="exercises.html?category=Abs" class="category-card">
+                <div class="category-img-container">
+                    <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800" alt="Core">
+                    <div class="category-title-overlay">
+                        <h2>CORE</h2>
+                    </div>
+                </div>
+                <div class="category-info">
+                    <h3>Core Exercises</h3>
+                    <p>9 variations • Strength & Form Training</p>
+                    <div class="pill-container">
+                        <span class="pill pill-purple">AI Coach</span>
+                        <span class="pill pill-blue">Live Feedback</span>
+                        <span class="pill pill-green">Rep Count</span>
+                        <span class="pill pill-amber">Recovery: 24h</span>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Full Body -->
+            <a href="exercises.html?category=Full Body" class="category-card">
+                <div class="category-img-container">
+                    <img src="https://images.unsplash.com/photo-1526506118085-60ce8714f8c5?w=800" alt="Full Body">
+                    <div class="category-title-overlay">
+                        <h2>FULL BODY</h2>
+                    </div>
+                </div>
+                <div class="category-info">
+                    <h3>Full Body Exercises</h3>
+                    <p>10 variations • Compound & Explosive</p>
+                    <div class="pill-container">
+                        <span class="pill pill-purple">AI Coach</span>
+                        <span class="pill pill-blue">Live Feedback</span>
+                        <span class="pill pill-green">Rep Count</span>
+                        <span class="pill pill-amber">Recovery: 48-72h</span>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Cardio -->
+            <a href="exercises.html?category=Cardio" class="category-card">
+                <div class="category-img-container">
+                    <img src="https://images.unsplash.com/photo-1538805060514-97d9cc17730c?w=800" alt="Cardio">
+                    <div class="category-title-overlay">
+                        <h2>CARDIO</h2>
+                    </div>
+                </div>
+                <div class="category-info">
+                    <h3>Cardio Training</h3>
+                    <p>11 variations • Endurance & HIIT</p>
+                    <div class="pill-container">
+                        <span class="pill pill-purple">AI Coach</span>
+                        <span class="pill pill-blue">Live Feedback</span>
+                        <span class="pill pill-green">Rep Count</span>
+                        <span class="pill pill-amber">Recovery: 24h</span>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <script src="js/landing-effects.js"></script>
+    <script src="js/app.js"></script>
+</body>
+
+</html>
+```

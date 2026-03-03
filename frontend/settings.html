@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings | FIT COACH AI</title>
+    <link rel="stylesheet" href="css/styles.css?v=3">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <style>
+        .container {
+            max-width: 100% !important;
+            padding: 0 12px !important;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header style="display: flex; justify-content: space-between; align-items: center;">
+            <div class="logo-container">
+                <a href="dashboard.html" class="logo" style="text-decoration: none; color: inherit;">FIT COACH AI</a>
+            </div>
+
+        </header>
+
+        <section class="hero" style="padding: 20px 0 10px; min-height: unset;">
+            <h1>⚙️ Settings</h1>
+            <p>Customize your AI coaching experience.</p>
+        </section>
+
+        <div class="settings-grid">
+            <!-- Voice Assistant -->
+            <div class="settings-card glass">
+                <div class="settings-card-header">
+                    <span class="settings-icon">🎙️</span>
+                    <h3>Voice Assistant</h3>
+                </div>
+                <p class="settings-desc">Set your assistant's name. Use it in voice commands like <strong>"hey <span
+                            id="namePreview">buddy</span>, start"</strong></p>
+                <div class="settings-input-group">
+                    <label for="assistantName">Assistant Name</label>
+                    <input type="text" id="assistantName" class="settings-input" placeholder="e.g. buddy, coach, bro"
+                        value="buddy">
+                </div>
+                <div class="settings-input-group">
+                    <label>Voice Commands</label>
+                    <div class="command-list">
+                        <div class="command-item"><code>"start"</code> or <code>"begin"</code> — Start counting</div>
+                        <div class="command-item"><code>"stop"</code> or <code>"pause"</code> — Stop counting</div>
+                        <div class="command-item"><code>"record"</code> — Start recording</div>
+                        <div class="command-item"><code>"save"</code> — Save recording</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Coaching -->
+            <div class="settings-card glass">
+                <div class="settings-card-header">
+                    <span class="settings-icon">🏋️</span>
+                    <h3>Voice Coaching</h3>
+                </div>
+                <p class="settings-desc">The AI coach will speak warnings when your form is incorrect and announce rep
+                    milestones.</p>
+                <div class="settings-input-group">
+                    <label for="coachCooldown">Alert Cooldown (seconds)</label>
+                    <input type="number" id="coachCooldown" class="settings-input" value="5" min="2" max="30">
+                    <small>Minimum time between voice alerts</small>
+                </div>
+                <div class="settings-input-group">
+                    <label for="repMilestone">Rep Milestone</label>
+                    <input type="number" id="repMilestone" class="settings-input" value="5" min="1" max="25">
+                    <small>Announce every N reps (e.g. "Nice! 5 reps completed!")</small>
+                </div>
+            </div>
+        </div>
+
+        <div style="text-align:center; margin-top: 30px; padding-bottom: 60px;">
+            <button id="saveBtn" class="btn btn-primary" style="padding: 15px 50px; font-size: 1.1rem;">💾 Save
+                Settings</button>
+            <p id="saveConfirm" style="margin-top: 15px; color: var(--accent-color); font-weight:700; display:none;">✅
+                Settings saved!</p>
+        </div>
+    </div>
+
+    <script>
+        // Load saved settings
+        const saved = JSON.parse(localStorage.getItem('fitcoach_settings') || '{}');
+
+        const nameInput = document.getElementById('assistantName');
+        const cooldownInput = document.getElementById('coachCooldown');
+        const milestoneInput = document.getElementById('repMilestone');
+        const namePreview = document.getElementById('namePreview');
+
+        nameInput.value = saved.assistantName || 'buddy';
+        cooldownInput.value = saved.coachCooldown || 5;
+        milestoneInput.value = saved.repMilestone || 5;
+        namePreview.innerText = nameInput.value;
+
+        nameInput.oninput = () => {
+            namePreview.innerText = nameInput.value || 'buddy';
+        };
+
+        document.getElementById('saveBtn').onclick = () => {
+            const settings = {
+                assistantName: nameInput.value.trim().toLowerCase() || 'buddy',
+                coachCooldown: parseInt(cooldownInput.value) || 5,
+                repMilestone: parseInt(milestoneInput.value) || 5
+            };
+            localStorage.setItem('fitcoach_settings', JSON.stringify(settings));
+
+            const confirm = document.getElementById('saveConfirm');
+            confirm.style.display = 'block';
+            setTimeout(() => confirm.style.display = 'none', 3000);
+        };
+    </script>
+</body>
+
+</html>

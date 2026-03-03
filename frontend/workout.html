@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Workout | FIT COACH AI</title>
+    <link rel="stylesheet" href="css/styles.css?v=3">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <div class="logo-container">
+                <a href="#" onclick="history.back(); return false;" class="back-arrow" title="Go Back">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="19" y1="12" x2="5" y2="12"></line>
+                        <polyline points="12 19 5 12 12 5"></polyline>
+                    </svg>
+                </a>
+                <a href="dashboard.html" class="logo" id="active-exercise"
+                    style="text-decoration: none; color: inherit; margin: 0;">WORKOUT</a>
+            </div>
+        </header>
+
+        <div class="workout-view">
+            <div class="camera-section">
+                <div class="camera-container glass">
+                    <video id="video" autoplay playsinline muted></video>
+                    <canvas id="canvas"></canvas>
+
+                    <!-- New UI Overlays -->
+                    <div class="camera-overlay top-left">
+
+                        <div class="overlay-item rep-counter">
+                            <span class="label">COUNT:</span>
+                            <div id="overlay-rep-count" class="count">0</div>
+                        </div>
+                        <div class="overlay-item form-stats">
+                            <div id="overlay-angle" class="stat-line yellow">Angle: --</div>
+                            <div id="overlay-target" class="stat-line yellow">Target: --</div>
+                            <div id="overlay-stage" class="stat-line blue">Stage: --</div>
+                            <div id="overlay-accuracy" class="stat-line cyan">Accuracy: 0%</div>
+                        </div>
+                    </div>
+
+                    <div class="camera-overlay bottom-left">
+                        <div class="session-log">
+                            <span class="label">SESSION LOG:</span>
+                            <div id="session-log-text" class="log-text">Waiting to start...</div>
+                        </div>
+                    </div>
+
+                    <div class="camera-overlay bottom-right">
+                        <div id="recordingIndicator" class="recording-indicator hidden">
+                            <span class="dot"></span> REC <span id="recordTimer">00:00</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="controls-bar floating-bar glass">
+                    <button id="startStopBtn" class="control-btn start-pnl" title="Start Counting">
+                        <span class="icon">▶️</span> START
+                    </button>
+                    <button id="cameraToggle" class="control-btn" title="Switch Camera">
+                        🔄 FLIP
+                    </button>
+                    <button id="recordBtn" class="control-btn" title="Record Workout">
+                        ⏺ RECORD
+                    </button>
+                    <button id="voiceBtn" class="control-btn voice-pnl" title="Voice Assistant">
+                        🎙️ ASSISTANT
+                    </button>
+                </div>
+
+                <div class="voice-status-bar glass">
+                    <span id="voiceLight" class="light"></span>
+                    <span id="voiceStatusText">Say "hey buddy start"</span>
+                </div>
+
+            </div>
+
+        </div> <!-- End camera-section -->
+
+    </div> <!-- End workout-view -->
+
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const repCountEl = document.getElementById('overlay-rep-count');
+        const feedbackEl = document.getElementById('session-log-text');
+        const accuracyEl = document.getElementById('overlay-accuracy');
+        const exerciseTitle = document.getElementById('active-exercise');
+
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const exercise = urlParams.get('exercise') || 'Bicep Curl';
+        exerciseTitle.innerText = exercise.toUpperCase();
+        // overlayExerciseName.innerText = exercise.toUpperCase();
+
+        // Initialize Camera
+        let currentFacingMode = 'user';
+        let stream = null;
+
+        async function setupCamera() {
+            try {
+                if (stream) {
+                    stream.getTracks().forEach(track => track.stop());
+                }
+
+                stream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: currentFacingMode },
+                    audio: true
+                });
+                video.srcObject = stream;
+                return new Promise((resolve) => {
+                    video.onloadedmetadata = () => {
+                        canvas.width = video.videoWidth;
+                        canvas.height = video.videoHeight;
+                        resolve(video);
+                    };
+                });
+            } catch (err) {
+                console.error("Camera error:", err);
+                alert("Please enable camera/mic access.");
+            }
+        }
+
+
+        let isProcessing = false;
+        let isCounting = false;
+
+        // Ultra-Optimized Frame Processing
+        const tempCanvas = document.createElement('canvas');
+        const tempCtx = tempCanvas.getContext('2d');
+        const TARGET_WIDTH = 240; // Even smaller for lightning fast network transfer
+        let lastProcessTime = 0;
+        const MIN_FRAME_INTERVAL = 20; // Aim for ~50 FPS logic (will be capped by network)
+        let lastData = null;
+
+        // Send frames to backend
+        async function processFrame() {
+            const now = Date.now();
+
+            if (!isCounting || isProcessing) {
+                requestAnimationFrame(processFrame);
+                return;
+            }
+
+            if (now - lastProcessTime < MIN_FRAME_INTERVAL) {
+                requestAnimationFrame(processFrame);
+                return;
+            }
+
+            isProcessing = true;
+            lastProcessTime = now;
+
+            // Smallest viable size for MediaPipe
+            const scale = TARGET_WIDTH / video.videoWidth;
+            tempCanvas.width = TARGET_WIDTH;
+            tempCanvas.height = video.videoHeight * scale;
+
+            tempCtx.drawImage(video, 0, 0, tempCanvas.width, tempCanvas.height);
+            const imageData = tempCanvas.toDataURL('image/jpeg', 0.2); // Ultra low quality for speed
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/process_frame`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        image: imageData,
+                        exercise: exercise
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    lastData = data;
+                    updateUI(data);
+                    voiceCoach(data);
+                }
+            } catch (err) {
+                console.error("Backend error:", err);
+            } finally {
+                isProcessing = false;
+                requestAnimationFrame(processFrame);
+            }
+        }
+
+        // Dedicated Render Loop (Smoothest visuals)
+        function renderLoop() {
+            if (lastData) {
+                drawSkeleton(lastData.landmarks, lastData.is_correct, lastData.incorrect_indices);
+            } else {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }
+            requestAnimationFrame(renderLoop);
+        }
+        requestAnimationFrame(renderLoop);
+
+        function updateUI(data) {
+            const count = data.rep_count || data.counter || 0;
+            repCountEl.innerText = count;
+            feedbackEl.innerText = data.feedback;
+
+            if (data.angle) {
+                document.getElementById('overlay-angle').innerText = `Angle: ${Math.round(data.angle)}°`;
+                document.getElementById('overlay-angle').style.display = 'block';
+            } else {
+                document.getElementById('overlay-angle').style.display = 'none';
+            }
+
+            if (data.target) {
+                document.getElementById('overlay-target').innerText = `Target: > ${data.target}°`;
+                document.getElementById('overlay-target').style.display = 'block';
+            } else {
+                document.getElementById('overlay-target').style.display = 'none';
+            }
+
+            document.getElementById('overlay-stage').innerText = `Stage: ${data.stage || 'Ready'}`;
+
+            if (data.feedback && data.feedback !== "Get Ready") {
+                if (feedbackEl.innerText !== data.feedback) {
+                    feedbackEl.innerText = data.feedback;
+                    feedbackEl.style.animation = 'none';
+                    feedbackEl.offsetHeight;
+                    feedbackEl.style.animation = 'pulse 0.5s ease-out';
+                }
+            }
+
+            // Handle visibility state
+            if (data.visibility_ok === false) {
+                feedbackEl.style.borderLeftColor = '#ff4444';
+                return;
+            }
+
+            // Accuracy calculation
+            const correctReps = data.correct_reps || 0;
+            const accuracy = count > 0 ? Math.round((correctReps / count) * 100) : 0;
+            accuracyEl.innerText = `Accuracy: ${accuracy}%`;
+
+            // Border color based on feedback type
+            const fb = data.feedback.toLowerCase();
+            if (fb.includes('good') || fb.includes('solid') || fb.includes('great')) {
+                feedbackEl.style.borderLeftColor = '#00ff88';
+            } else if (fb.includes('ready') || fb.includes('wait')) {
+                feedbackEl.style.borderLeftColor = 'rgba(255,255,255,0.3)';
+            } else {
+                feedbackEl.style.borderLeftColor = '#ff4444';
+            }
+        }
+
+        // ---- Voice Coaching Logic ----
+        let lastCoachTime = 0;
+        let COACH_COOLDOWN = 5000;
+        let lastRepAnnounced = 0;
+
+        const formWarnings = [
+            "Careful! Your form is off.",
+            "Watch your form!",
+            "Adjust your posture.",
+            "Quality over quantity, fix your form.",
+        ];
+
+        function voiceCoach(data) {
+            const now = Date.now();
+            if (now - lastCoachTime < 5000) return;
+
+            // If visibility is bad, mention it occasionally
+            if (data.visibility_ok === false && data.feedback.includes("Step back")) {
+                lastCoachTime = now;
+                speak("Step back so I can see you.");
+                return;
+            }
+
+            if (data.rep_count > 0 && data.rep_count !== lastRepAnnounced && data.rep_count % 5 === 0) {
+                lastRepAnnounced = data.rep_count;
+                lastCoachTime = now;
+                speak(`Nice! ${data.rep_count} reps!`);
+                return;
+            }
+
+            if (data.incorrect_indices && data.incorrect_indices.length > 0) {
+                const warning = formWarnings[Math.floor(Math.random() * formWarnings.length)];
+                lastCoachTime = now;
+                speak(warning);
+            }
+        }
+
+        // ---- Load Settings ----
+        const _settings = JSON.parse(localStorage.getItem('fitcoach_settings') || '{}');
+        let wakeWord = _settings.assistantName || 'buddy';
+        COACH_COOLDOWN = (_settings.coachCooldown || 5) * 1000;
+        const REP_MILESTONE = _settings.repMilestone || 5;
+        document.getElementById('voiceStatusText').innerText = `Say "hey ${wakeWord} start"`;
+
+        // ---- Skeleton Drawing (ULTRA HIGH VISIBILITY RED LINES) ----
+        function drawSkeleton(landmarks, isCorrect = true, incorrectIndices = []) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            if (!landmarks || landmarks.length === 0) return;
+
+            const greenColor = '#00ff88';
+            const redColor = '#ff4444';
+            const threshold = 0.1; // Low threshold for high responsiveness
+
+            const connections = [
+                [11, 12], [11, 13], [13, 15], [12, 14], [14, 16],
+                [11, 23], [12, 24], [23, 24],
+                [23, 25], [25, 27], [24, 26], [26, 28]
+            ];
+
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+
+            // 1. Draw connections
+            connections.forEach(([i, j]) => {
+                const lm1 = landmarks[i];
+                const lm2 = landmarks[j];
+
+                if (lm1 && lm2 && lm1.visibility > threshold && lm2.visibility > threshold) {
+                    const isIncorrect = (incorrectIndices || []).includes(i) || (incorrectIndices || []).includes(j);
+
+                    ctx.strokeStyle = isIncorrect ? redColor : greenColor;
+                    ctx.lineWidth = isIncorrect ? 15 : 6; // THICKER RED LINES
+
+                    if (isIncorrect) {
+                        ctx.shadowBlur = 30; // BRIGHTER GLOW
+                        ctx.shadowColor = redColor;
+                    } else {
+                        ctx.shadowBlur = 0;
+                    }
+
+                    ctx.beginPath();
+                    ctx.moveTo(lm1.x * canvas.width, lm1.y * canvas.height);
+                    ctx.lineTo(lm2.x * canvas.width, lm2.y * canvas.height);
+                    ctx.stroke();
+                }
+            });
+
+            // 2. Draw joints
+            landmarks.forEach((lm, idx) => {
+                if (lm.visibility > threshold) {
+                    const isIncorrect = (incorrectIndices || []).includes(idx);
+                    const color = isIncorrect ? redColor : greenColor;
+
+                    ctx.fillStyle = color;
+                    ctx.shadowBlur = isIncorrect ? 30 : 0;
+                    ctx.shadowColor = color;
+
+                    ctx.beginPath();
+                    ctx.arc(lm.x * canvas.width, lm.y * canvas.height, isIncorrect ? 12 : 7, 0, 2 * Math.PI);
+                    ctx.fill();
+                }
+            });
+            ctx.shadowBlur = 0;
+        }
+
+
+        // ---- Camera Controls ----
+        const startStopBtn = document.getElementById('startStopBtn');
+        const recordBtn = document.getElementById('recordBtn');
+        const cameraToggle = document.getElementById('cameraToggle');
+        const voiceBtn = document.getElementById('voiceBtn');
+        const voiceLight = document.getElementById('voiceLight');
+        const recordingIndicator = document.getElementById('recordingIndicator');
+        const recordTimer = document.getElementById('recordTimer');
+
+        function toggleCounting(fromVoice = false) {
+            isCounting = !isCounting;
+            const voiceStatusText = document.getElementById('voiceStatusText');
+            if (isCounting) {
+                startStopBtn.innerHTML = '<span class="icon">⏸️</span> STOP';
+                startStopBtn.className = 'control-btn stop-pnl';
+                voiceLight.classList.add('active');
+                voiceStatusText.innerText = '🟢 Counting...';
+                if (!fromVoice) speak("Workout started!");
+            } else {
+                startStopBtn.innerHTML = '<span class="icon">▶️</span> START';
+                startStopBtn.className = 'control-btn start-pnl';
+                voiceLight.classList.remove('active');
+                voiceStatusText.innerText = `Say "hey ${wakeWord} start"`;
+                if (!fromVoice) speak("Workout paused.");
+            }
+        }
+        startStopBtn.onclick = () => toggleCounting(false);
+
+        cameraToggle.onclick = async () => {
+            currentFacingMode = currentFacingMode === 'user' ? 'environment' : 'user';
+            await setupCamera();
+        };
+
+        // ---- Video Recording ----
+        let mediaRecorder;
+        let recordedChunks = [];
+        let recordStartTime;
+        let timerInterval;
+
+        async function startRecording() {
+            recordedChunks = [];
+            const options = { mimeType: 'video/webm; codecs=vp9,opus' };
+            mediaRecorder = new MediaRecorder(stream, options);
+
+            mediaRecorder.ondataavailable = (e) => {
+                if (e.data.size > 0) recordedChunks.push(e.data);
+            };
+
+            mediaRecorder.onstop = () => {
+                const blob = new Blob(recordedChunks, { type: 'video/webm' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `workout_${exercise.replace(/\s+/g, '_')}_${new Date().getTime()}.webm`;
+                a.click();
+            };
+
+            mediaRecorder.start();
+            recordBtn.innerHTML = '<span class="icon">⏹️</span> <span class="btn-text">SAVE</span>';
+            recordBtn.classList.add('recording');
+            recordingIndicator.classList.remove('hidden');
+
+            recordStartTime = Date.now();
+            timerInterval = setInterval(() => {
+                const seconds = Math.floor((Date.now() - recordStartTime) / 1000);
+                const mins = Math.floor(seconds / 60).toString().padStart(2, '0');
+                const secs = (seconds % 60).toString().padStart(2, '0');
+                recordTimer.innerText = `${mins}:${secs}`;
+            }, 1000);
+        }
+
+        function stopRecording() {
+            mediaRecorder.stop();
+            recordBtn.innerHTML = '<span class="icon">⏺️</span> <span class="btn-text">RECORD</span>';
+            recordBtn.classList.remove('recording');
+            recordingIndicator.classList.add('hidden');
+            clearInterval(timerInterval);
+        }
+
+        recordBtn.onclick = () => {
+            if (mediaRecorder && mediaRecorder.state === "recording") {
+                stopRecording();
+            } else {
+                startRecording();
+            }
+        };
+
+        // ============================================================
+        // VOICE ASSISTANT — High-Accuracy Speech Recognition
+        // ============================================================
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const synth = window.speechSynthesis;
+
+        function speak(text) {
+            if (synth.speaking) synth.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.rate = 1.1;
+            synth.speak(utterance);
+        }
+
+        // --- Levenshtein distance for fuzzy matching ---
+        function levenshtein(a, b) {
+            const m = a.length, n = b.length;
+            const dp = Array.from({ length: m + 1 }, () => Array(n + 1).fill(0));
+            for (let i = 0; i <= m; i++) dp[i][0] = i;
+            for (let j = 0; j <= n; j++) dp[0][j] = j;
+            for (let i = 1; i <= m; i++) {
+                for (let j = 1; j <= n; j++) {
+                    dp[i][j] = Math.min(
+                        dp[i - 1][j] + 1,
+                        dp[i][j - 1] + 1,
+                        dp[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)
+                    );
+                }
+            }
+            return dp[m][n];
+        }
+
+        // Check if any word in the transcript fuzzy-matches a keyword
+        function fuzzyMatch(transcript, keywords, maxDistance = 2) {
+            const words = transcript.toLowerCase().split(/\s+/);
+            for (const word of words) {
+                for (const keyword of keywords) {
+                    if (transcript.toLowerCase().includes(keyword)) return true;
+                    if (levenshtein(word, keyword) <= maxDistance) return true;
+                }
+            }
+            return false;
+        }
+
+        // Debounce to prevent duplicate commands - reduced for fast response
+        let lastVoiceCommandTime = 0;
+        const VOICE_COMMAND_DEBOUNCE = 500;
+
+        if (SpeechRecognition) {
+            const recognition = new SpeechRecognition();
+            recognition.continuous = true;
+            recognition.interimResults = true;
+            recognition.maxAlternatives = 3;
+            recognition.lang = 'en-US';
+
+            recognition.onresult = (event) => {
+                const now = Date.now();
+                if (now - lastVoiceCommandTime < VOICE_COMMAND_DEBOUNCE) return;
+
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    const result = event.results[i];
+                    const isFinal = result.isFinal;
+                    // Lower confidence threshold for interim results to achieve "sudden" response
+                    const minConfidence = isFinal ? 0.3 : 0.25;
+
+                    let bestTranscript = '';
+                    let bestConfidence = 0;
+
+                    // Check all alternatives
+                    for (let alt = 0; alt < result.length; alt++) {
+                        const transcript = result[alt].transcript.toLowerCase().trim();
+                        const confidence = result[alt].confidence;
+
+                        if (confidence > bestConfidence) {
+                            bestConfidence = confidence;
+                            bestTranscript = transcript;
+                        }
+
+                        if (confidence >= minConfidence) {
+                            const cmd = detectCommand(transcript);
+                            if (cmd) {
+                                executeVoiceCommand(cmd);
+                                lastVoiceCommandTime = now;
+                                return;
+                            }
+                        }
+                    }
+                }
+
+                // Fuzzy fallback for final results with low confidence
+                if (isFinal && bestConfidence >= 0.3 && bestTranscript) {
+                    const cmd = detectCommandFuzzy(bestTranscript);
+                    if (cmd) {
+                        executeVoiceCommand(cmd);
+                        lastVoiceCommandTime = now;
+                        return;
+                    }
+                }
+            };
+
+            // Exact keyword matching with Wake Word enforcement
+            function detectCommand(transcript) {
+                const lowerTranscript = transcript.toLowerCase();
+                const wakeWordLower = wakeWord.toLowerCase();
+
+                // Must start with wake word or "hey [wake word]"
+                if (!lowerTranscript.includes(wakeWordLower)) return null;
+
+                const wantStart = lowerTranscript.includes('start') || lowerTranscript.includes('begin');
+                const wantStop = lowerTranscript.includes('stop') || lowerTranscript.includes('pause');
+                const wantRecord = lowerTranscript.includes('record');
+                const wantSave = lowerTranscript.includes('save');
+
+                if (wantStart && !wantStop) return 'start';
+                if (wantStop) return 'stop';
+                if (wantRecord) return 'record';
+                if (wantSave) return 'save';
+                return null;
+            }
+
+            // Fuzzy matching for common mishearings
+            function detectCommandFuzzy(transcript) {
+                const lowerTranscript = transcript.toLowerCase();
+                const wakeWordLower = wakeWord.toLowerCase();
+
+                // Wake word check (fuzzy)
+                const wakeKeywords = [wakeWordLower, 'hey ' + wakeWordLower, 'hi ' + wakeWordLower, 'buddy', 'body', 'steady'];
+                if (!fuzzyMatch(lowerTranscript, wakeKeywords, 1)) return null;
+
+                const startKeywords = ['start', 'star', 'stark', 'sart', 'begin', 'began', 'begun'];
+                const stopKeywords = ['stop', 'stoop', 'pause', 'paws', 'halt'];
+                const recordKeywords = ['record', 'chord', 'accord', 'recorde', 'recording'];
+                const saveKeywords = ['save', 'safe', 'saved', 'saves'];
+
+                const wantStart = fuzzyMatch(lowerTranscript, startKeywords, 1);
+                const wantStop = fuzzyMatch(lowerTranscript, stopKeywords, 1);
+                const wantRecord = fuzzyMatch(lowerTranscript, recordKeywords, 1);
+                const wantSave = fuzzyMatch(lowerTranscript, saveKeywords, 1);
+
+                if (wantStart && !wantStop) return 'start';
+                if (wantStop) return 'stop';
+                if (wantRecord) return 'record';
+                if (wantSave) return 'save';
+                return null;
+            }
+
+            // Execute the detected command
+            function executeVoiceCommand(cmd) {
+                switch (cmd) {
+                    case 'start':
+                        if (!isCounting) {
+                            toggleCounting(true);
+                            speak("Workout started. Go for it!");
+                        }
+                        break;
+                    case 'stop':
+                        if (isCounting) {
+                            toggleCounting(true);
+                            speak("Workout paused. Take a breath.");
+                        }
+                        break;
+                    case 'record':
+                        if (!mediaRecorder || mediaRecorder.state !== "recording") {
+                            startRecording();
+                            speak("Recording started.");
+                        }
+                        break;
+                    case 'save':
+                        if (mediaRecorder && mediaRecorder.state === "recording") {
+                            stopRecording();
+                            speak("Recording saved.");
+                        }
+                        break;
+                }
+            }
+
+            // Error recovery with exponential backoff
+            let restartAttempts = 0;
+            const MAX_RESTART_DELAY = 8000;
+
+            recognition.onerror = (event) => {
+                console.warn('🎙️ Speech recognition error:', event.error);
+                if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+                    document.getElementById('voiceStatusText').innerText = '🔇 Mic access denied';
+                    return;
+                }
+                const delay = Math.min(500 * Math.pow(2, restartAttempts), MAX_RESTART_DELAY);
+                restartAttempts++;
+                setTimeout(() => {
+                    try { recognition.start(); } catch (e) { }
+                }, delay);
+            };
+
+            recognition.onend = () => {
+                restartAttempts = 0;
+                try { recognition.start(); } catch (e) { }
+            };
+
+            recognition.onstart = () => {
+                restartAttempts = 0;
+            };
+
+            recognition.start();
+        } else {
+            document.getElementById('voiceStatusText').innerText = '🔇 Voice not supported';
+        }
+
+        voiceBtn.onclick = () => {
+            speak(`I'm listening, ${wakeWord}. Use commands like start, stop, or record.`);
+            const originalText = voiceStatusText.innerText;
+            voiceStatusText.innerText = "🎙️ Listening for commands...";
+            setTimeout(() => { if (voiceStatusText.innerText === "🎙️ Listening for commands...") voiceStatusText.innerText = originalText; }, 3000);
+        };
+
+        // ---- Start ----
+        setupCamera().then(async () => {
+            try {
+                await fetch(`${API_BASE_URL}/reset`, { method: 'POST' });
+            } catch (e) { console.error("Reset failed", e); }
+            processFrame();
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile | FIT COACH AI</title>
+    <link rel="stylesheet" href="css/styles.css?v=5">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <style>
+        /* Match library.html layout exactly */
+        .container {
+            max-width: 100% !important;
+            padding: 0 16px !important;
+            padding-bottom: 60px !important;
+        }
+
+        body {
+            background-attachment: fixed !important;
+            background-image:
+                radial-gradient(circle at 50% 0%, rgba(0, 240, 255, 0.15), transparent 50%),
+                linear-gradient(to bottom, rgba(13, 5, 20, 0.88), rgba(9, 9, 11, 0.98)),
+                url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=2070') !important;
+        }
+
+        .hero-mini {
+            text-align: center;
+            padding: 60px 0 40px;
+            background: radial-gradient(circle at center, rgba(0, 240, 255, 0.12) 0%, transparent 80%);
+            border-radius: 100px;
+            margin-bottom: 20px;
+        }
+
+        .hero-mini h1 {
+            font-size: 3.5rem;
+            font-weight: 950;
+            margin-bottom: 10px;
+            letter-spacing: -2px;
+            text-transform: uppercase;
+            background: linear-gradient(135deg, #fff 30%, #00f0ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-mini p {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        /* ---- Profile Hero Card ---- */
+        .profile-hero {
+            display: flex;
+            align-items: center;
+            gap: 28px;
+            background: rgba(20, 20, 30, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            border-radius: 24px;
+            padding: 28px 32px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(16px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .profile-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #7000ff, #00f0ff, #ff00c8);
+        }
+
+        .avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #7000ff, #b000ff);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.2rem;
+            flex-shrink: 0;
+            box-shadow: 0 0 28px rgba(112, 0, 255, 0.4);
+        }
+
+        .profile-info h2 {
+            font-size: 1.8rem;
+            font-weight: 900;
+            letter-spacing: -1px;
+            margin-bottom: 4px;
+        }
+
+        .profile-info .sub {
+            color: #666;
+            font-size: 0.82rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .profile-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .profile-pill {
+            padding: 4px 12px;
+            border-radius: 7px;
+            font-size: 0.72rem;
+            font-weight: 800;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: #aaa;
+        }
+
+        .profile-pill.goal {
+            background: rgba(112, 0, 255, 0.12);
+            border-color: rgba(112, 0, 255, 0.3);
+            color: #c084fc;
+        }
+
+        .profile-pill.level {
+            background: rgba(0, 240, 255, 0.08);
+            border-color: rgba(0, 240, 255, 0.2);
+            color: #00f0ff;
+        }
+
+        .edit-profile-btn {
+            margin-left: auto;
+            padding: 11px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 13px;
+            color: #888;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.82rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            flex-shrink: 0;
+        }
+
+        .edit-profile-btn:hover {
+            color: #fff;
+            border-color: rgba(112, 0, 255, 0.4);
+            background: rgba(112, 0, 255, 0.1);
+        }
+
+        /* ---- Stats Row ---- */
+        .stat-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+            margin-bottom: 28px;
+        }
+
+        .stat-card {
+            background: rgba(20, 20, 30, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            border-radius: 18px;
+            padding: 22px 16px;
+            backdrop-filter: blur(12px);
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .stat-card:hover {
+            border-color: rgba(112, 0, 255, 0.25);
+            transform: translateY(-3px);
+        }
+
+        .stat-val {
+            font-size: 2rem;
+            font-weight: 900;
+            color: #b000ff;
+            margin-bottom: 5px;
+        }
+
+        .stat-unit {
+            font-size: 0.68rem;
+            color: #555;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+
+        /* ---- Settings Section ---- */
+        .settings-section-title {
+            font-size: 0.72rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: #444;
+            margin: 28px 0 14px;
+        }
+
+        /* reuse existing settings-grid / settings-card styles from styles.css,
+           plus override to fit within this page's width */
+        .settings-grid {
+            gap: 16px !important;
+        }
+
+        .save-row {
+            text-align: center;
+            margin-top: 28px;
+            padding-bottom: 50px;
+        }
+
+        #saveConfirm {
+            margin-top: 12px;
+            color: var(--accent-color);
+            font-weight: 700;
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .hero-mini h1 {
+                font-size: 2.5rem;
+            }
+
+            .stat-row {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+
+            .profile-hero {
+                flex-direction: column;
+                text-align: center;
+                gap: 15px;
+                padding: 20px;
+                border-radius: 15px;
+            }
+
+            .avatar {
+                width: 70px;
+                height: 70px;
+                font-size: 1.8rem;
+            }
+
+            .edit-profile-btn {
+                margin: 0 auto;
+                width: 100%;
+                justify-content: center;
+            }
+
+            .profile-pills {
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-mini h1 {
+                font-size: 2rem;
+            }
+
+            .stat-val {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+
+        <!-- Header — same style as library -->
+        <header>
+            <div class="logo-container">
+                <a href="dashboard.html" class="back-arrow" title="Back to Home">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="19" y1="12" x2="5" y2="12"></line>
+                        <polyline points="12 19 5 12 12 5"></polyline>
+                    </svg>
+                </a>
+                <div class="logo">FIT COACH AI</div>
+            </div>
+        </header>
+
+        <!-- Hero -->
+        <section class="hero-mini">
+            <h1>
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round"
+                    style="vertical-align: middle; margin-right: 15px; opacity: 0.9;">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                My Profile
+            </h1>
+            <p>Your stats, goals & AI coaching preferences — all in one place.</p>
+        </section>
+
+        <!-- Profile Banner -->
+        <div class="profile-hero">
+            <div class="avatar" id="avatar-icon">👤</div>
+            <div class="profile-info">
+                <h2 id="profile-name">Loading...</h2>
+                <div class="sub" id="profile-sub">— · — · —</div>
+                <div class="profile-pills">
+                    <span class="profile-pill goal" id="profile-goal-pill">🎯 Goal</span>
+                    <span class="profile-pill level" id="profile-level-pill">⚡ Level</span>
+                    <span class="profile-pill" id="profile-bmi-pill">BMI —</span>
+                </div>
+            </div>
+            <a href="setup.html" class="edit-profile-btn" onclick="localStorage.removeItem('user_profile')">
+                ✎ Edit Profile
+            </a>
+        </div>
+
+        <!-- Stats Row -->
+        <div class="stat-row">
+            <div class="stat-card">
+                <div class="stat-val" id="s-age">—</div>
+                <div class="stat-unit">Age (yrs)</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-val" id="s-weight">—</div>
+                <div class="stat-unit">Weight (kg)</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-val" id="s-height">—</div>
+                <div class="stat-unit">Height (cm)</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-val" id="s-water">—</div>
+                <div class="stat-unit">Water (L/day)</div>
+            </div>
+        </div>
+
+        <!-- Settings Section Label -->
+        <div class="settings-section-title">⚙️ &nbsp;AI Coaching Settings</div>
+
+        <!-- Settings Cards (from settings.html) -->
+        <div class="settings-grid">
+
+            <!-- Voice Assistant -->
+            <div class="settings-card glass">
+                <div class="settings-card-header">
+                    <span class="settings-icon">🎙️</span>
+                    <h3>Voice Assistant</h3>
+                </div>
+                <p class="settings-desc">Set your assistant's name. Use it in voice commands like
+                    <strong>"hey <span id="namePreview">buddy</span>, start"</strong>
+                </p>
+                <div class="settings-input-group">
+                    <label for="assistantName">Assistant Name</label>
+                    <input type="text" id="assistantName" class="settings-input" placeholder="e.g. buddy, coach, bro"
+                        value="buddy">
+                </div>
+                <div class="settings-input-group">
+                    <label>Voice Commands</label>
+                    <div class="command-list">
+                        <div class="command-item"><code>"start"</code> or <code>"begin"</code> — Start counting</div>
+                        <div class="command-item"><code>"stop"</code> or <code>"pause"</code> — Stop counting</div>
+                        <div class="command-item"><code>"record"</code> — Start recording</div>
+                        <div class="command-item"><code>"save"</code> — Save recording</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Voice Coaching -->
+            <div class="settings-card glass">
+                <div class="settings-card-header">
+                    <span class="settings-icon">🏋️</span>
+                    <h3>Voice Coaching</h3>
+                </div>
+                <p class="settings-desc">The AI coach will speak warnings when your form is incorrect
+                    and announce rep milestones.</p>
+                <div class="settings-input-group">
+                    <label for="coachCooldown">Alert Cooldown (seconds)</label>
+                    <input type="number" id="coachCooldown" class="settings-input" value="5" min="2" max="30">
+                    <small>Minimum time between voice alerts</small>
+                </div>
+                <div class="settings-input-group">
+                    <label for="repMilestone">Rep Milestone</label>
+                    <input type="number" id="repMilestone" class="settings-input" value="5" min="1" max="25">
+                    <small>Announce every N reps (e.g. "Nice! 5 reps completed!")</small>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Save Button -->
+        <div class="save-row">
+            <button id="saveBtn" class="btn btn-primary" style="padding: 15px 50px; font-size: 1.1rem;">
+                💾 Save Settings
+            </button>
+            <p id="saveConfirm">✅ Settings saved!</p>
+        </div>
+
+    </div><!-- /container -->
+
+    <script>
+        /* ---- Profile ---- */
+        window.onload = () => {
+            const profile = JSON.parse(localStorage.getItem('user_profile'));
+            if (!profile || !profile.name) { window.location.replace('setup.html'); return; }
+
+            document.getElementById('avatar-icon').textContent = profile.gender === 'female' ? '👩' : '👨';
+            document.getElementById('profile-name').textContent = profile.name;
+            document.getElementById('profile-sub').textContent =
+                `${profile.gender === 'male' ? 'Male' : 'Female'} · ${profile.age} yrs · ${profile.weight}kg · ${profile.height}cm`;
+            document.getElementById('profile-goal-pill').textContent = `🎯 ${profile.goal}`;
+            document.getElementById('profile-level-pill').textContent = `⚡ ${profile.level}`;
+
+            const bmi = (profile.weight / Math.pow(profile.height / 100, 2)).toFixed(1);
+            document.getElementById('profile-bmi-pill').textContent = `BMI ${bmi}`;
+
+            document.getElementById('s-age').textContent = profile.age;
+            document.getElementById('s-weight').textContent = profile.weight;
+            document.getElementById('s-height').textContent = profile.height;
+            document.getElementById('s-water').textContent = (profile.weight * 0.04).toFixed(1);
+
+            /* ---- Settings ---- */
+            const saved = JSON.parse(localStorage.getItem('fitcoach_settings') || '{}');
+            const nameInput = document.getElementById('assistantName');
+            const cooldownInput = document.getElementById('coachCooldown');
+            const milestoneInput = document.getElementById('repMilestone');
+            const namePreview = document.getElementById('namePreview');
+
+            nameInput.value = saved.assistantName || 'buddy';
+            cooldownInput.value = saved.coachCooldown || 5;
+            milestoneInput.value = saved.repMilestone || 5;
+            namePreview.innerText = nameInput.value;
+
+            nameInput.oninput = () => { namePreview.innerText = nameInput.value || 'buddy'; };
+
+            document.getElementById('saveBtn').onclick = () => {
+                const settings = {
+                    assistantName: nameInput.value.trim().toLowerCase() || 'buddy',
+                    coachCooldown: parseInt(cooldownInput.value) || 5,
+                    repMilestone: parseInt(milestoneInput.value) || 5
+                };
+                localStorage.setItem('fitcoach_settings', JSON.stringify(settings));
+                const confirm = document.getElementById('saveConfirm');
+                confirm.style.display = 'block';
+                setTimeout(() => confirm.style.display = 'none', 3000);
+            };
+        };
+    </script>
+</body>
+
+</html>

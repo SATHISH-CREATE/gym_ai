@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Exercise | FIT COACH AI</title>
+    <link rel="stylesheet" href="css/styles.css?v=3">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <style>
+        .container {
+            max-width: 100% !important;
+            padding: 0 12px !important;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <div class="logo-container">
+                <a href="library.html" class="back-arrow" title="Back to Library">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="19" y1="12" x2="5" y2="12"></line>
+                        <polyline points="12 19 5 12 12 5"></polyline>
+                    </svg>
+                </a>
+                <a href="dashboard.html" class="logo" style="text-decoration: none; color: inherit;">FIT COACH AI</a>
+            </div>
+        </header>
+
+        <section class="hero" style="padding: 20px 0 10px; min-height: unset;">
+            <h1 id="category-title">Loading...</h1>
+            <p>Choose an exercise to start your AI-guided session.</p>
+        </section>
+
+        <div id="subcategory-container" class="subcategory-list">
+            <!-- Subcategories and Exercises will be injected here -->
+        </div>
+    </div>
+
+    <!-- Video Modal -->
+    <div id="video-modal" class="glass"
+        style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; z-index:1000; justify-content:center; align-items:center;">
+        <div
+            style="position:relative; width:80%; max-width:900px; aspect-ratio:16/9; background:#000; border-radius:15px; overflow:hidden;">
+            <button onclick="closeModal()"
+                style="position:absolute; top:15px; right:15px; background:rgba(255,255,255,0.2); border:none; color:white; padding:10px 15px; border-radius:50%; cursor:pointer; z-index:10;">X</button>
+            <iframe id="demo-video" width="100%" height="100%" src="" frameborder="0" allowfullscreen></iframe>
+        </div>
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const categoryName = urlParams.get('category') || 'Chest';
+        document.getElementById('category-title').innerText = categoryName + ' Library';
+
+        async function loadExercises() {
+            try {
+                const response = await fetch('exercises.json');
+                const data = await response.json();
+
+                const categoryData = data.find(c => c.name === categoryName);
+                if (!categoryData) {
+                    document.getElementById('subcategory-container').innerHTML = '<p>Category not found.</p>';
+                    return;
+                }
+
+                renderExercises(categoryData);
+            } catch (err) {
+                console.error("Error loading exercises:", err);
+            }
+        }
+
+        function renderExercises(category) {
+            const container = document.getElementById('subcategory-container');
+            container.innerHTML = '';
+
+            category.subcategories.forEach(sub => {
+                const subSection = document.createElement('div');
+                subSection.className = 'subcategory-item';
+
+                let exercisesHTML = sub.exercises.map(ex => `
+                    <div class="exercise-card">
+                        <img src="${ex.imageUrl}" alt="${ex.name}">
+                        <div class="exercise-card-content">
+                            <h4>${ex.name}</h4>
+                            <p>${ex.description}</p>
+                            <div style="margin-top: 15px; display: flex; gap: 10px;">
+                                <button onclick="startWorkout('${ex.name}')" class="btn btn-primary" style="padding: 10px 20px; font-size: 0.8rem;">Train</button>
+                                <button onclick="playVideo('${ex.videoUrl}')" class="btn glass" style="padding: 10px 20px; font-size: 0.8rem;">Demo</button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+
+                subSection.innerHTML = `
+                    <div class="subcategory-label">
+                        <h2>${sub.title}</h2>
+                    </div>
+                    <div class="exercise-cards">
+                        ${exercisesHTML}
+                    </div>
+                `;
+                container.appendChild(subSection);
+            });
+        }
+
+        function startWorkout(name) {
+            window.location.href = `workout.html?exercise=${encodeURIComponent(name)}`;
+        }
+
+        function playVideo(url) {
+            const videoId = url.split('v=')[1];
+            const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+            document.getElementById('demo-video').src = embedUrl;
+            document.getElementById('video-modal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('video-modal').style.display = 'none';
+            document.getElementById('demo-video').src = '';
+        }
+
+        loadExercises();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,1550 @@
+[
+    {
+        "name": "Chest",
+        "subcategories": [
+            {
+                "title": "Upper Chest",
+                "exercises": [
+                    {
+                        "name": "Incline Barbell Bench Press",
+                        "description": "Primary compound movement targeting the upper chest (clavicular head of pectoralis major).",
+                        "tags": [
+                            "Chest",
+                            "Compound",
+                            "Strength"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=SrqOu55lrYU",
+                        "imageUrl": "https://img.youtube.com/vi/SrqOu55lrYU/0.jpg",
+                        "recoveryTime": 120
+                    },
+                    {
+                        "name": "Incline Dumbbell Press",
+                        "description": "Targets upper chest with greater range of motion and unilateral stability.",
+                        "tags": [
+                            "Chest",
+                            "Dumbbell",
+                            "Strength"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=8iPEnn-ltC8",
+                        "imageUrl": "https://img.youtube.com/vi/8iPEnn-ltC8/0.jpg",
+                        "recoveryTime": 120
+                    },
+                    {
+                        "name": "Incline Machine Press",
+                        "description": "Machine-based variation for controlled upper chest work.",
+                        "tags": [
+                            "Chest",
+                            "Machine",
+                            "Strength"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=0w0z3fJqM0k",
+                        "imageUrl": "https://img.youtube.com/vi/0w0z3fJqM0k/0.jpg",
+                        "recoveryTime": 120
+                    },
+                    {
+                        "name": "Incline Cable Fly",
+                        "description": "Isolation movement emphasizing upper chest stretch and contraction.",
+                        "tags": [
+                            "Chest",
+                            "Cable",
+                            "Isolation"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=5rEdskJR260",
+                        "imageUrl": "https://img.youtube.com/vi/5rEdskJR260/0.jpg",
+                        "recoveryTime": 60
+                    }
+                ]
+            },
+            {
+                "title": "Middle Chest",
+                "exercises": [
+                    {
+                        "name": "Flat Barbell Bench Press",
+                        "description": "Classic compound lift for overall chest mass and strength.",
+                        "tags": [
+                            "Chest",
+                            "Compound",
+                            "Strength"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=vcBig73ojpE",
+                        "imageUrl": "https://img.youtube.com/vi/vcBig73ojpE/0.jpg",
+                        "recoveryTime": 120
+                    },
+                    {
+                        "name": "Push-Ups",
+                        "description": "Bodyweight staple targeting the entire chest (middle emphasis with standard form).",
+                        "tags": [
+                            "Chest",
+                            "Bodyweight"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=IODxDxX7oi4",
+                        "imageUrl": "https://img.youtube.com/vi/IODxDxX7oi4/0.jpg",
+                        "recoveryTime": 45
+                    },
+                    {
+                        "name": "Chest Press Machine",
+                        "description": "Seated machine press for controlled middle chest development.",
+                        "tags": [
+                            "Chest",
+                            "Machine"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=ZmKX9z4g5kA",
+                        "imageUrl": "https://img.youtube.com/vi/ZmKX9z4g5kA/0.jpg",
+                        "recoveryTime": 75
+                    },
+                    {
+                        "name": "Flat Dumbbell Press",
+                        "description": "Dumbbell variation for middle chest with improved range and symmetry.",
+                        "tags": [
+                            "Chest",
+                            "Dumbbell",
+                            "Strength"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=VmB1G1K7v94",
+                        "imageUrl": "https://img.youtube.com/vi/VmB1G1K7v94/0.jpg",
+                        "recoveryTime": 120
+                    }
+                ]
+            },
+            {
+                "title": "Lower Chest",
+                "exercises": [
+                    {
+                        "name": "Decline Bench Press",
+                        "description": "Targets the lower chest (sternal head) with decline angle.",
+                        "tags": [
+                            "Chest",
+                            "Compound",
+                            "Strength"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=LfyQBUKR8SE",
+                        "imageUrl": "https://img.youtube.com/vi/LfyQBUKR8SE/0.jpg",
+                        "recoveryTime": 120
+                    },
+                    {
+                        "name": "Decline Pushups",
+                        "description": "Bodyweight exercise with lower chest emphasis (feet elevated).",
+                        "tags": [
+                            "Chest",
+                            "Bodyweight"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=0Oh_0kC9X3Q",
+                        "imageUrl": "https://img.youtube.com/vi/0Oh_0kC9X3Q/0.jpg",
+                        "recoveryTime": 45
+                    },
+                    {
+                        "name": "Decline Dumbbell Press",
+                        "description": "Dumbbell press on decline bench for lower chest focus.",
+                        "tags": [
+                            "Chest",
+                            "Dumbbell",
+                            "Strength"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=5rEdskJR260",
+                        "imageUrl": "https://img.youtube.com/vi/5rEdskJR260/0.jpg",
+                        "recoveryTime": 120
+                    },
+                    {
+                        "name": "Decline Cable Fly",
+                        "description": "Cable isolation for lower chest with constant tension.",
+                        "tags": [
+                            "Chest",
+                            "Cable",
+                            "Isolation"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=5rEdskJR260",
+                        "imageUrl": "https://img.youtube.com/vi/5rEdskJR260/0.jpg",
+                        "recoveryTime": 60
+                    }
+                ]
+            },
+            {
+                "title": "Inner / Definition Chest",
+                "exercises": [
+                    {
+                        "name": "Cable Crossover",
+                        "description": "High-to-low crossover for inner chest definition and peak contraction.",
+                        "tags": [
+                            "Chest",
+                            "Cable",
+                            "Isolation"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=taI4XduLpTk",
+                        "imageUrl": "https://img.youtube.com/vi/taI4XduLpTk/0.jpg",
+                        "recoveryTime": 60
+                    },
+                    {
+                        "name": "Pec Deck Fly",
+                        "description": "Machine fly isolating the chest for inner definition.",
+                        "tags": [
+                            "Chest",
+                            "Machine",
+                            "Isolation"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=Z57CtFmRMxA",
+                        "imageUrl": "https://img.youtube.com/vi/Z57CtFmRMxA/0.jpg",
+                        "recoveryTime": 60
+                    },
+                    {
+                        "name": "Svend Press",
+                        "description": "Plate squeeze press emphasizing inner chest squeeze.",
+                        "tags": [
+                            "Chest",
+                            "Isolation"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=cIoUZOnypS8",
+                        "imageUrl": "https://img.youtube.com/vi/cIoUZOnypS8/0.jpg",
+                        "recoveryTime": 60
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "name": "Back",
+        "subcategories": [
+            {
+                "title": "\ud83d\udd39 Lats (Width)",
+                "exercises": [
+                    {
+                        "name": "Pull-ups",
+                        "description": "Bodyweight compound for lat width and upper back.",
+                        "tags": [
+                            "Back",
+                            "Bodyweight",
+                            "Compound"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=eGo4IYlbE5g",
+                        "imageUrl": "https://img.youtube.com/vi/eGo4IYlbE5g/0.jpg",
+                        "recoveryTime": 120
+                    },
+                    {
+                        "name": "Lat Pulldown (Wide Grip)",
+                        "description": "Machine variation for lat width development.",
+                        "tags": [
+                            "Back",
+                            "Machine"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=CAwf7n6Luuc",
+                        "imageUrl": "https://img.youtube.com/vi/CAwf7n6Luuc/0.jpg",
+                        "recoveryTime": 75
+                    },
+                    {
+                        "name": "Straight Arm Pulldown",
+                        "description": "Isolation for lat stretch and width.",
+                        "tags": [
+                            "Back",
+                            "Cable",
+                            "Isolation"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=aoCGzG9zFtw",
+                        "imageUrl": "https://img.youtube.com/vi/aoCGzG9zFtw/0.jpg",
+                        "recoveryTime": 60
+                    },
+                    {
+                        "name": "Chin-Ups",
+                        "description": "Underhand grip hits lats strongly with biceps assistance.",
+                        "tags": [
+                            "Back",
+                            "Bodyweight",
+                            "Compound"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=HRV5YKKaeVw",
+                        "imageUrl": "https://img.youtube.com/vi/HRV5YKKaeVw/0.jpg",
+                        "recoveryTime": 120
+                    }
+                ]
+            },
+            {
+                "title": "\ud83d\udd39 Mid Back (Thickness)",
+                "exercises": [
+                    {
+                        "name": "Barbell Bent-Over Rows",
+                        "description": "Heavy compound for mid-back thickness.",
+                        "tags": [
+                            "Back",
+                            "Barbell",
+                            "Compound"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=QFq5jdwWwX4",
+                        "imageUrl": "https://img.youtube.com/vi/QFq5jdwWwX4/0.jpg",
+                        "recoveryTime": 120
+                    },
+                    {
+                        "name": "Dumbbell Bent-Over Rows",
+                        "description": "Unilateral row for mid-back and symmetry.",
+                        "tags": [
+                            "Back",
+                            "Dumbbell"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=pYcpY20QaE8",
+                        "imageUrl": "https://img.youtube.com/vi/pYcpY20QaE8/0.jpg",
+                        "recoveryTime": 90
+                    },
+                    {
+                        "name": "Seated Cable Row",
+                        "description": "Controlled mid-back builder with constant tension.",
+                        "tags": [
+                            "Back",
+                            "Cable"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=GZbfZ033f74",
+                        "imageUrl": "https://img.youtube.com/vi/GZbfZ033f74/0.jpg",
+                        "recoveryTime": 90
+                    },
+                    {
+                        "name": "T-Bar Row",
+                        "description": "Thick back builder with neutral grip option.",
+                        "tags": [
+                            "Back",
+                            "Compound"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=j3Igk5nyZE4",
+                        "imageUrl": "https://img.youtube.com/vi/j3Igk5nyZE4/0.jpg",
+                        "recoveryTime": 120
+                    },
+                    {
+                        "name": "Chest-Supported Row",
+                        "description": "Isolates mid-back without lower back strain.",
+                        "tags": [
+                            "Back",
+                            "Machine"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=5-3JahXCFUk",
+                        "imageUrl": "https://img.youtube.com/vi/5-3JahXCFUk/0.jpg",
+                        "recoveryTime": 75
+                    },
+                    {
+                        "name": "Close-Grip Lat Pulldown",
+                        "description": "Targets mid-back and lats with narrow grip.",
+                        "tags": [
+                            "Back",
+                            "Machine"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=Z_6W1T4UD8k",
+                        "imageUrl": "https://img.youtube.com/vi/Z_6W1T4UD8k/0.jpg",
+                        "recoveryTime": 75
+                    }
+                ]
+            },
+            {
+                "title": "\ud83d\udd39 Lower Back",
+                "exercises": [
+                    {
+                        "name": "Deadlift",
+                        "description": "Full posterior chain and lower back strength builder.",
+                        "tags": [
+                            "Back",
+                            "Compound",
+                            "Strength"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=ytGaGIn3SjE",
+                        "imageUrl": "https://img.youtube.com/vi/ytGaGIn3SjE/0.jpg",
+                        "recoveryTime": 120
+                    },
+                    {
+                        "name": "Romanian Deadlift",
+                        "description": "Hamstring and lower back focus with hip hinge.",
+                        "tags": [
+                            "Back",
+                            "Compound"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=JCXUYuzwNrM",
+                        "imageUrl": "https://img.youtube.com/vi/JCXUYuzwNrM/0.jpg",
+                        "recoveryTime": 120
+                    },
+                    {
+                        "name": "Hyperextensions",
+                        "description": "Bodyweight or weighted lower back isolation.",
+                        "tags": [
+                            "Back",
+                            "Bodyweight"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=ph3pddpKzzw",
+                        "imageUrl": "https://img.youtube.com/vi/ph3pddpKzzw/0.jpg",
+                        "recoveryTime": 45
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "name": "Shoulders",
+        "subcategories": [
+            {
+                "title": "\ud83d\udd39 Front Delts",
+                "exercises": [
+                    {
+                        "name": "Front Raises (Dumbbell/Plate/Barbell)",
+                        "description": "Isolation for anterior deltoids.",
+                        "tags": [
+                            "Shoulders",
+                            "Isolation"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=-t7fuZ0KhDA",
+                        "imageUrl": "https://img.youtube.com/vi/-t7fuZ0KhDA/0.jpg",
+                        "recoveryTime": 60
+                    },
+                    {
+                        "name": "Overhead Barbell Press",
+                        "description": "Compound overhead press for front delts and strength.",
+                        "tags": [
+                            "Shoulders",
+                            "Compound",
+                            "Strength"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=M2rwvNhTOu0",
+                        "imageUrl": "https://img.youtube.com/vi/M2rwvNhTOu0/0.jpg",
+                        "recoveryTime": 120
+                    },
+                    {
+                        "name": "Overhead Dumbbell Press",
+                        "description": "Seated or standing dumbbell press for front/side delts.",
+                        "tags": [
+                            "Shoulders",
+                            "Dumbbell",
+                            "Strength"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=qEwKCR5JCog",
+                        "imageUrl": "https://img.youtube.com/vi/qEwKCR5JCog/0.jpg",
+                        "recoveryTime": 120
+                    },
+                    {
+                        "name": "Arnold Press",
+                        "description": "Rotational press hitting all delt heads.",
+                        "tags": [
+                            "Shoulders",
+                            "Dumbbell"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=3ml7BH7mNwQ",
+                        "imageUrl": "https://img.youtube.com/vi/3ml7BH7mNwQ/0.jpg",
+                        "recoveryTime": 90
+                    },
+                    {
+                        "name": "Push Press",
+                        "description": "Explosive overhead with leg drive.",
+                        "tags": [
+                            "Shoulders",
+                            "Power"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=iaBVSJm78ko",
+                        "imageUrl": "https://img.youtube.com/vi/iaBVSJm78ko/0.jpg",
+                        "recoveryTime": 120
+                    }
+                ]
+            },
+            {
+                "title": "\ud83d\udd39 Side Delts",
+                "exercises": [
+                    {
+                        "name": "Dumbbell Lateral Raises",
+                        "description": "Primary isolation for medial deltoids (shoulder width).",
+                        "tags": [
+                            "Shoulders",
+                            "Isolation"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=3VcKaXpzqRo",
+                        "imageUrl": "https://img.youtube.com/vi/3VcKaXpzqRo/0.jpg",
+                        "recoveryTime": 60
+                    },
+                    {
+                        "name": "Cable Lateral Raises",
+                        "description": "Cable version for constant tension on side delts.",
+                        "tags": [
+                            "Shoulders",
+                            "Cable",
+                            "Isolation"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=3VcKaXpzqRo",
+                        "imageUrl": "https://img.youtube.com/vi/3VcKaXpzqRo/0.jpg",
+                        "recoveryTime": 60
+                    },
+                    {
+                        "name": "Machine Lateral Raise",
+                        "description": "Machine isolation for side delts.",
+                        "tags": [
+                            "Shoulders",
+                            "Machine"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=3VcKaXpzqRo",
+                        "imageUrl": "https://img.youtube.com/vi/3VcKaXpzqRo/0.jpg",
+                        "recoveryTime": 75
+                    },
+                    {
+                        "name": "Cable Y-Raise",
+                        "description": "Cable variation targeting side and front delts.",
+                        "tags": [
+                            "Shoulders",
+                            "Cable"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=3VcKaXpzqRo",
+                        "imageUrl": "https://img.youtube.com/vi/3VcKaXpzqRo/0.jpg",
+                        "recoveryTime": 90
+                    }
+                ]
+            },
+            {
+                "title": "\ud83d\udd39 Rear Delts",
+                "exercises": [
+                    {
+                        "name": "Reverse Pec Deck",
+                        "description": "Machine isolation for posterior deltoids.",
+                        "tags": [
+                            "Shoulders",
+                            "Machine",
+                            "Isolation"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=EA7u4Q_8HQ0",
+                        "imageUrl": "https://img.youtube.com/vi/EA7u4Q_8HQ0/0.jpg",
+                        "recoveryTime": 60
+                    },
+                    {
+                        "name": "Bent Over Dumbbell Rear Delt Fly",
+                        "description": "Bent-over isolation for rear delts.",
+                        "tags": [
+                            "Shoulders",
+                            "Dumbbell",
+                            "Isolation"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=EA7u4Q_8HQ0",
+                        "imageUrl": "https://img.youtube.com/vi/EA7u4Q_8HQ0/0.jpg",
+                        "recoveryTime": 60
+                    },
+                    {
+                        "name": "Rear Delt Cable Fly",
+                        "description": "Cable crossover for rear delts.",
+                        "tags": [
+                            "Shoulders",
+                            "Cable",
+                            "Isolation"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=EA7u4Q_8HQ0",
+                        "imageUrl": "https://img.youtube.com/vi/EA7u4Q_8HQ0/0.jpg",
+                        "recoveryTime": 60
+                    },
+                    {
+                        "name": "Face Pull",
+                        "description": "Cable pull for rear delts and upper back health.",
+                        "tags": [
+                            "Shoulders",
+                            "Cable"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=HdayfBGypLI",
+                        "imageUrl": "https://img.youtube.com/vi/HdayfBGypLI/0.jpg",
+                        "recoveryTime": 90
+                    }
+                ]
+            },
+            {
+                "title": "\ud83d\udd39 Traps",
+                "exercises": [
+                    {
+                        "name": "Barbell Shrugs",
+                        "description": "Direct trap development with heavy loads.",
+                        "tags": [
+                            "Traps",
+                            "Strength"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=ja_P3YhmAlE",
+                        "imageUrl": "https://img.youtube.com/vi/ja_P3YhmAlE/0.jpg",
+                        "recoveryTime": 120
+                    },
+                    {
+                        "name": "Dumbbell Shrugs",
+                        "description": "Dumbbell variation for traps.",
+                        "tags": [
+                            "Traps",
+                            "Dumbbell"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=ja_P3YhmAlE",
+                        "imageUrl": "https://img.youtube.com/vi/ja_P3YhmAlE/0.jpg",
+                        "recoveryTime": 90
+                    },
+                    {
+                        "name": "Upright Rows",
+                        "description": "Targets traps and lateral delts (use EZ-bar to reduce shoulder strain).",
+                        "tags": [
+                            "Traps",
+                            "Shoulders"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=K0dYiqQY2vY",
+                        "imageUrl": "https://img.youtube.com/vi/K0dYiqQY2vY/0.jpg",
+                        "recoveryTime": 90
+                    },
+                    {
+                        "name": "Face Pulls",
+                        "description": "Rear delts and upper traps for posture and shoulder health.",
+                        "tags": [
+                            "Traps",
+                            "Cable"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=HdayfBGypLI",
+                        "imageUrl": "https://img.youtube.com/vi/HdayfBGypLI/0.jpg",
+                        "recoveryTime": 90
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "name": "Biceps",
+        "subcategories": [
+            {
+                "title": "\ud83d\udd39 Long Head",
+                "exercises": [
+                    {
+                        "name": "Incline Dumbbell Curl",
+                        "description": "Stretches long head for peak development.",
+                        "tags": [
+                            "Biceps",
+                            "Dumbbell",
+                            "Isolation"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=soxrZlIl35U",
+                        "imageUrl": "https://img.youtube.com/vi/soxrZlIl35U/0.jpg",
+                        "recoveryTime": 60
+                    },
+                    {
+                        "name": "Hammer Curl",
+                        "description": "Neutral grip hits brachialis and long head.",
+                        "tags": [
+                            "Biceps",
+                            "Dumbbell"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=zC3nLlEvin4",
+                        "imageUrl": "https://img.youtube.com/vi/zC3nLlEvin4/0.jpg",
+                        "recoveryTime": 90
+                    },
+                    {
+                        "name": "Close Grip Barbell Curl",
+                        "description": "Narrow grip emphasizes long head.",
+                        "tags": [
+                            "Biceps",
+                            "Barbell"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=kwG2ipFRgfo",
+                        "imageUrl": "https://img.youtube.com/vi/kwG2ipFRgfo/0.jpg",
+                        "recoveryTime": 90
+                    },
+                    {
+                        "name": "Cable Curl (Behind Body)",
+                        "description": "Behind-the-body cable curl for long head stretch.",
+                        "tags": [
+                            "Biceps",
+                            "Cable"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=soxrZlIl35U",
+                        "imageUrl": "https://img.youtube.com/vi/soxrZlIl35U/0.jpg",
+                        "recoveryTime": 90
+                    }
+                ]
+            },
+            {
+                "title": "\ud83d\udd39 Short Head",
+                "exercises": [
+                    {
+                        "name": "Preacher Curl",
+                        "description": "Isolates short head with arm support.",
+                        "tags": [
+                            "Biceps",
+                            "Machine",
+                            "Isolation"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=fIWP-FRFNU0",
+                        "imageUrl": "https://img.youtube.com/vi/fIWP-FRFNU0/0.jpg",
+                        "recoveryTime": 60
+                    },
+                    {
+                        "name": "Concentration Curl",
+                        "description": "Single-arm focus on short head peak.",
+                        "tags": [
+                            "Biceps",
+                            "Dumbbell",
+                            "Isolation"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=0AUGkch3iC4",
+                        "imageUrl": "https://img.youtube.com/vi/0AUGkch3iC4/0.jpg",
+                        "recoveryTime": 60
+                    },
+                    {
+                        "name": "Wide Grip Barbell Curl",
+                        "description": "Wider grip targets short head.",
+                        "tags": [
+                            "Biceps",
+                            "Barbell"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=kwG2ipFRgfo",
+                        "imageUrl": "https://img.youtube.com/vi/kwG2ipFRgfo/0.jpg",
+                        "recoveryTime": 90
+                    },
+                    {
+                        "name": "Spider Curl",
+                        "description": "Prone incline curl for short head contraction.",
+                        "tags": [
+                            "Biceps",
+                            "Dumbbell"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=soxrZlIl35U",
+                        "imageUrl": "https://img.youtube.com/vi/soxrZlIl35U/0.jpg",
+                        "recoveryTime": 90
+                    }
+                ]
+            },
+            {
+                "title": "\ud83d\udd39 Brachialis",
+                "exercises": [
+                    {
+                        "name": "Reverse Curl",
+                        "description": "Targets brachialis and forearms.",
+                        "tags": [
+                            "Biceps",
+                            "Barbell"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=kwG2ipFRgfo",
+                        "imageUrl": "https://img.youtube.com/vi/kwG2ipFRgfo/0.jpg",
+                        "recoveryTime": 90
+                    },
+                    {
+                        "name": "Cross Body Hammer Curl",
+                        "description": "Cross-body variation for brachialis emphasis.",
+                        "tags": [
+                            "Biceps",
+                            "Dumbbell"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=zC3nLlEvin4",
+                        "imageUrl": "https://img.youtube.com/vi/zC3nLlEvin4/0.jpg",
+                        "recoveryTime": 90
+                    }
+                ]
+            },
+            {
+                "title": "Forearms",
+                "exercises": [
+                    {
+                        "name": "Wrist Curl (Palms Up)",
+                        "description": "Isolates flexors (inner forearms).",
+                        "tags": [
+                            "Forearms",
+                            "Isolation"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=zC3nLlEvin4",
+                        "imageUrl": "https://img.youtube.com/vi/zC3nLlEvin4/0.jpg",
+                        "recoveryTime": 60
+                    },
+                    {
+                        "name": "Reverse Wrist Curl (Palms Down)",
+                        "description": "Targets extensors (outer forearms).",
+                        "tags": [
+                            "Forearms",
+                            "Isolation"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=zC3nLlEvin4",
+                        "imageUrl": "https://img.youtube.com/vi/zC3nLlEvin4/0.jpg",
+                        "recoveryTime": 60
+                    },
+                    {
+                        "name": "Cable Wrist Curl",
+                        "description": "Cable variation for forearm flexors.",
+                        "tags": [
+                            "Forearms",
+                            "Cable",
+                            "Isolation"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=zC3nLlEvin4",
+                        "imageUrl": "https://img.youtube.com/vi/zC3nLlEvin4/0.jpg",
+                        "recoveryTime": 60
+                    },
+                    {
+                        "name": "Barbell Wrist Curl",
+                        "description": "Barbell forearm flexor isolation.",
+                        "tags": [
+                            "Forearms",
+                            "Isolation"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=zC3nLlEvin4",
+                        "imageUrl": "https://img.youtube.com/vi/zC3nLlEvin4/0.jpg",
+                        "recoveryTime": 60
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "name": "Triceps",
+        "subcategories": [
+            {
+                "title": "\ud83d\udd39 Long Head",
+                "exercises": [
+                    {
+                        "name": "Overhead Triceps Extension",
+                        "description": "Overhead movement stretches long head.",
+                        "tags": [
+                            "Triceps",
+                            "Dumbbell",
+                            "Isolation"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=YbX7wdC_jvI",
+                        "imageUrl": "https://img.youtube.com/vi/YbX7wdC_jvI/0.jpg",
+                        "recoveryTime": 60
+                    },
+                    {
+                        "name": "Skull Crushers",
+                        "description": "Lying EZ-bar extension for triceps mass.",
+                        "tags": [
+                            "Triceps",
+                            "Barbell",
+                            "Isolation"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=d_KZxkY_0cM",
+                        "imageUrl": "https://img.youtube.com/vi/d_KZxkY_0cM/0.jpg",
+                        "recoveryTime": 60
+                    },
+                    {
+                        "name": "Close Grip Bench Press",
+                        "description": "Compound triceps builder with chest involvement.",
+                        "tags": [
+                            "Triceps",
+                            "Compound",
+                            "Strength"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=nEF0bv2FW94",
+                        "imageUrl": "https://img.youtube.com/vi/nEF0bv2FW94/0.jpg",
+                        "recoveryTime": 120
+                    }
+                ]
+            },
+            {
+                "title": "\ud83d\udd39 Lateral Head",
+                "exercises": [
+                    {
+                        "name": "Tricep Pushdown (Straight Bar)",
+                        "description": "Cable isolation for lateral head.",
+                        "tags": [
+                            "Triceps",
+                            "Cable",
+                            "Isolation"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=2-LAMcpzODU",
+                        "imageUrl": "https://img.youtube.com/vi/2-LAMcpzODU/0.jpg",
+                        "recoveryTime": 60
+                    },
+                    {
+                        "name": "Rope Pushdown",
+                        "description": "Rope variation for lateral and medial heads.",
+                        "tags": [
+                            "Triceps",
+                            "Cable",
+                            "Isolation"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=kiuLAaMWiAY",
+                        "imageUrl": "https://img.youtube.com/vi/kiuLAaMWiAY/0.jpg",
+                        "recoveryTime": 60
+                    },
+                    {
+                        "name": "Diamond Push-ups",
+                        "description": "Bodyweight triceps with lateral emphasis.",
+                        "tags": [
+                            "Triceps",
+                            "Bodyweight"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=J4h3qNNv2D0",
+                        "imageUrl": "https://img.youtube.com/vi/J4h3qNNv2D0/0.jpg",
+                        "recoveryTime": 45
+                    },
+                    {
+                        "name": "Weighted Bench Dips",
+                        "description": "Triceps-focused dip variation.",
+                        "tags": [
+                            "Triceps",
+                            "Bodyweight"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=0326dy_-CzM",
+                        "imageUrl": "https://img.youtube.com/vi/0326dy_-CzM/0.jpg",
+                        "recoveryTime": 45
+                    }
+                ]
+            },
+            {
+                "title": "\ud83d\udd39 Medial Head",
+                "exercises": [
+                    {
+                        "name": "Reverse Grip Pushdown",
+                        "description": "Reverse grip emphasizes medial head.",
+                        "tags": [
+                            "Triceps",
+                            "Cable",
+                            "Isolation"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=kiuLAaMWiAY",
+                        "imageUrl": "https://img.youtube.com/vi/kiuLAaMWiAY/0.jpg",
+                        "recoveryTime": 60
+                    },
+                    {
+                        "name": "Reverse Grip Overhead Extension",
+                        "description": "Overhead reverse grip for medial focus.",
+                        "tags": [
+                            "Triceps",
+                            "Cable"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=YbX7wdC_jvI",
+                        "imageUrl": "https://img.youtube.com/vi/YbX7wdC_jvI/0.jpg",
+                        "recoveryTime": 90
+                    },
+                    {
+                        "name": "Cable Kickbacks",
+                        "description": "Single-arm cable kickback for triceps isolation.",
+                        "tags": [
+                            "Triceps",
+                            "Cable",
+                            "Isolation"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=kiuLAaMWiAY",
+                        "imageUrl": "https://img.youtube.com/vi/kiuLAaMWiAY/0.jpg",
+                        "recoveryTime": 60
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "name": "Legs",
+        "subcategories": [
+            {
+                "title": "\ud83d\udd39 Quadriceps",
+                "exercises": [
+                    {
+                        "name": "Barbell Squats",
+                        "description": "King of leg exercises for overall quads and strength.",
+                        "tags": [
+                            "Legs",
+                            "Compound",
+                            "Strength"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=DYp1469BOeM",
+                        "imageUrl": "https://img.youtube.com/vi/DYp1469BOeM/0.jpg",
+                        "recoveryTime": 120
+                    },
+                    {
+                        "name": "Front Squats",
+                        "description": "Quad-dominant squat variation.",
+                        "tags": [
+                            "Legs",
+                            "Compound",
+                            "Strength"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=1dR87CEgQJI",
+                        "imageUrl": "https://img.youtube.com/vi/1dR87CEgQJI/0.jpg",
+                        "recoveryTime": 120
+                    },
+                    {
+                        "name": "Leg Press",
+                        "description": "Machine-based quad builder with high volume potential.",
+                        "tags": [
+                            "Legs",
+                            "Machine"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=IZxyjAPSmJ0",
+                        "imageUrl": "https://img.youtube.com/vi/IZxyjAPSmJ0/0.jpg",
+                        "recoveryTime": 75
+                    },
+                    {
+                        "name": "Bulgarian Split Squat",
+                        "description": "Unilateral quad and glute exercise.",
+                        "tags": [
+                            "Legs",
+                            "Dumbbell",
+                            "Unilateral"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=2C-uNgKwPLE",
+                        "imageUrl": "https://img.youtube.com/vi/2C-uNgKwPLE/0.jpg",
+                        "recoveryTime": 90
+                    },
+                    {
+                        "name": "Lunges",
+                        "description": "Walking or stationary lunges for quads.",
+                        "tags": [
+                            "Legs",
+                            "Bodyweight",
+                            "Unilateral"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=L8fvjJoPBd0",
+                        "imageUrl": "https://img.youtube.com/vi/L8fvjJoPBd0/0.jpg",
+                        "recoveryTime": 45
+                    }
+                ]
+            },
+            {
+                "title": "\ud83d\udd39 Hamstrings",
+                "exercises": [
+                    {
+                        "name": "Lying Leg Curl",
+                        "description": "Machine isolation for hamstrings.",
+                        "tags": [
+                            "Legs",
+                            "Machine",
+                            "Isolation"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=1Tq3QdYUuHs",
+                        "imageUrl": "https://img.youtube.com/vi/1Tq3QdYUuHs/0.jpg",
+                        "recoveryTime": 60
+                    },
+                    {
+                        "name": "Seated Leg Curl",
+                        "description": "Seated variation for hamstring isolation.",
+                        "tags": [
+                            "Legs",
+                            "Machine",
+                            "Isolation"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=ELOCsoDSmrg",
+                        "imageUrl": "https://img.youtube.com/vi/ELOCsoDSmrg/0.jpg",
+                        "recoveryTime": 60
+                    },
+                    {
+                        "name": "Nordic Curl",
+                        "description": "Advanced bodyweight eccentric hamstring exercise.",
+                        "tags": [
+                            "Legs",
+                            "Bodyweight"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=fI4wC8xW_9A",
+                        "imageUrl": "https://img.youtube.com/vi/fI4wC8xW_9A/0.jpg",
+                        "recoveryTime": 45
+                    }
+                ]
+            },
+            {
+                "title": "\ud83d\udd39 Glutes",
+                "exercises": [
+                    {
+                        "name": "Hip Thrust",
+                        "description": "Best glute builder with barbell load.",
+                        "tags": [
+                            "Legs",
+                            "Compound",
+                            "Glutes"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=LM8XHLYJoYs",
+                        "imageUrl": "https://img.youtube.com/vi/LM8XHLYJoYs/0.jpg",
+                        "recoveryTime": 120
+                    },
+                    {
+                        "name": "Glute Bridge",
+                        "description": "Bodyweight or weighted glute isolation.",
+                        "tags": [
+                            "Legs",
+                            "Bodyweight"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=9vZF3x4Q1Xs",
+                        "imageUrl": "https://img.youtube.com/vi/9vZF3x4Q1Xs/0.jpg",
+                        "recoveryTime": 45
+                    },
+                    {
+                        "name": "Cable Kickbacks",
+                        "description": "Cable glute isolation with constant tension.",
+                        "tags": [
+                            "Legs",
+                            "Cable",
+                            "Isolation"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=9vZF3x4Q1Xs",
+                        "imageUrl": "https://img.youtube.com/vi/9vZF3x4Q1Xs/0.jpg",
+                        "recoveryTime": 60
+                    },
+                    {
+                        "name": "Sumo Deadlift",
+                        "description": "Wide stance deadlift for glutes and inner thighs.",
+                        "tags": [
+                            "Legs",
+                            "Compound"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=ytGaGIn3SjE",
+                        "imageUrl": "https://img.youtube.com/vi/ytGaGIn3SjE/0.jpg",
+                        "recoveryTime": 120
+                    },
+                    {
+                        "name": "Walking Lunges",
+                        "description": "Dynamic movement for glutes and quads.",
+                        "tags": [
+                            "Legs",
+                            "Unilateral"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=L8fvjJoPBd0",
+                        "imageUrl": "https://img.youtube.com/vi/L8fvjJoPBd0/0.jpg",
+                        "recoveryTime": 90
+                    }
+                ]
+            },
+            {
+                "title": "\ud83d\udd39 Calves",
+                "exercises": [
+                    {
+                        "name": "Standing Calf Raises",
+                        "description": "Gastrocnemius isolation (straight knees).",
+                        "tags": [
+                            "Calves",
+                            "Strength"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=-qz3H7J8b9w",
+                        "imageUrl": "https://img.youtube.com/vi/-qz3H7J8b9w/0.jpg",
+                        "recoveryTime": 120
+                    },
+                    {
+                        "name": "Seated Calf Raises",
+                        "description": "Soleus focus (bent knees).",
+                        "tags": [
+                            "Calves",
+                            "Machine"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=-qz3H7J8b9w",
+                        "imageUrl": "https://img.youtube.com/vi/-qz3H7J8b9w/0.jpg",
+                        "recoveryTime": 75
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "name": "Abs",
+        "subcategories": [
+            {
+                "title": "\ud83d\udd39 Upper Abs",
+                "exercises": [
+                    {
+                        "name": "Weighted Crunch",
+                        "description": "Weighted upper rectus abdominis focus.",
+                        "tags": [
+                            "Core",
+                            "Isolation"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=MKmrqcoCZ-M",
+                        "imageUrl": "https://img.youtube.com/vi/MKmrqcoCZ-M/0.jpg",
+                        "recoveryTime": 60
+                    },
+                    {
+                        "name": "Cable Crunch",
+                        "description": "Kneeling cable crunch for upper abs.",
+                        "tags": [
+                            "Core",
+                            "Cable"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=0u5ckTI2fVA",
+                        "imageUrl": "https://img.youtube.com/vi/0u5ckTI2fVA/0.jpg",
+                        "recoveryTime": 45
+                    },
+                    {
+                        "name": "Sit-ups",
+                        "description": "Bodyweight upper abs classic.",
+                        "tags": [
+                            "Core",
+                            "Bodyweight"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=1fbU_MkV7NE",
+                        "imageUrl": "https://img.youtube.com/vi/1fbU_MkV7NE/0.jpg",
+                        "recoveryTime": 45
+                    }
+                ]
+            },
+            {
+                "title": "\ud83d\udd39 Lower Abs",
+                "exercises": [
+                    {
+                        "name": "Hanging Leg Raises",
+                        "description": "Advanced hanging raise for lower abs.",
+                        "tags": [
+                            "Core",
+                            "Bodyweight"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=JB2oyawG9KI",
+                        "imageUrl": "https://img.youtube.com/vi/JB2oyawG9KI/0.jpg",
+                        "recoveryTime": 45
+                    },
+                    {
+                        "name": "Reverse Crunch",
+                        "description": "Floor-based lower abs movement.",
+                        "tags": [
+                            "Core",
+                            "Bodyweight"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=JB2oyawG9KI",
+                        "imageUrl": "https://img.youtube.com/vi/JB2oyawG9KI/0.jpg",
+                        "recoveryTime": 45
+                    },
+                    {
+                        "name": "Mountain Climbers",
+                        "description": "Dynamic cardio-core exercise hitting lower abs.",
+                        "tags": [
+                            "Core",
+                            "Cardio"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=nmwgirgXLYM",
+                        "imageUrl": "https://img.youtube.com/vi/nmwgirgXLYM/0.jpg",
+                        "recoveryTime": 45
+                    }
+                ]
+            },
+            {
+                "title": "\ud83d\udd39 Obliques",
+                "exercises": [
+                    {
+                        "name": "Russian Twists",
+                        "description": "Rotational movement for obliques.",
+                        "tags": [
+                            "Core",
+                            "Bodyweight"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=wkD8rjkodUI",
+                        "imageUrl": "https://img.youtube.com/vi/wkD8rjkodUI/0.jpg",
+                        "recoveryTime": 45
+                    },
+                    {
+                        "name": "Side Plank",
+                        "description": "Isometric oblique stability hold.",
+                        "tags": [
+                            "Core",
+                            "Bodyweight"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=K2VljzCC16g",
+                        "imageUrl": "https://img.youtube.com/vi/K2VljzCC16g/0.jpg",
+                        "recoveryTime": 45
+                    },
+                    {
+                        "name": "Bicycle Crunch",
+                        "description": "Alternating twist for obliques and rectus.",
+                        "tags": [
+                            "Core",
+                            "Bodyweight"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=9FGilxCbdz8",
+                        "imageUrl": "https://img.youtube.com/vi/9FGilxCbdz8/0.jpg",
+                        "recoveryTime": 45
+                    }
+                ]
+            },
+            {
+                "title": "\ud83d\udd39 Deep Core",
+                "exercises": [
+                    {
+                        "name": "Plank",
+                        "description": "Core stability and anti-extension hold.",
+                        "tags": [
+                            "Core",
+                            "Bodyweight"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=pSHjTRCQxIw",
+                        "imageUrl": "https://img.youtube.com/vi/pSHjTRCQxIw/0.jpg",
+                        "recoveryTime": 45
+                    },
+                    {
+                        "name": "Dead Bug",
+                        "description": "Anti-extension coordination exercise.",
+                        "tags": [
+                            "Core",
+                            "Bodyweight"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=4qWJR8xO5l8",
+                        "imageUrl": "https://img.youtube.com/vi/4qWJR8xO5l8/0.jpg",
+                        "recoveryTime": 45
+                    },
+                    {
+                        "name": "Ab Wheel Rollout",
+                        "description": "Advanced anti-extension and core strength.",
+                        "tags": [
+                            "Core",
+                            "Equipment"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=d4s3C0H9Y_I",
+                        "imageUrl": "https://img.youtube.com/vi/d4s3C0H9Y_I/0.jpg",
+                        "recoveryTime": 45
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "name": "Full Body",
+        "subcategories": [
+            {
+                "title": "Full Body Compound & Power",
+                "exercises": [
+                    {
+                        "name": "Clean and Press",
+                        "description": "Olympic lift combining pull and overhead press.",
+                        "tags": [
+                            "Full-Body",
+                            "Power",
+                            "Olympic"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=M2rwvNhTOu0",
+                        "imageUrl": "https://img.youtube.com/vi/M2rwvNhTOu0/0.jpg",
+                        "recoveryTime": 120
+                    },
+                    {
+                        "name": "Power Clean",
+                        "description": "Explosive hip drive and catch.",
+                        "tags": [
+                            "Full-Body",
+                            "Power",
+                            "Olympic"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=7x0rZswr6Ts",
+                        "imageUrl": "https://img.youtube.com/vi/7x0rZswr6Ts/0.jpg",
+                        "recoveryTime": 120
+                    },
+                    {
+                        "name": "Snatch",
+                        "description": "Ground to overhead in one motion.",
+                        "tags": [
+                            "Full-Body",
+                            "Power",
+                            "Olympic"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=9iX5uJ4dU4A",
+                        "imageUrl": "https://img.youtube.com/vi/9iX5uJ4dU4A/0.jpg",
+                        "recoveryTime": 120
+                    },
+                    {
+                        "name": "Thrusters",
+                        "description": "Front squat to overhead press combo.",
+                        "tags": [
+                            "Full-Body",
+                            "Conditioning"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=5T0SnQdUNQU",
+                        "imageUrl": "https://img.youtube.com/vi/5T0SnQdUNQU/0.jpg",
+                        "recoveryTime": 90
+                    },
+                    {
+                        "name": "Barbell Complex (Clean + Front Squat + Jerk)",
+                        "description": "Multi-movement sequence for full-body power.",
+                        "tags": [
+                            "Full-Body",
+                            "Complex"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=3Y5tJ6u6v1M",
+                        "imageUrl": "https://img.youtube.com/vi/3Y5tJ6u6v1M/0.jpg",
+                        "recoveryTime": 90
+                    }
+                ]
+            },
+            {
+                "title": "Full Body Strength & Conditioning",
+                "exercises": [
+                    {
+                        "name": "Deadlift to High Pull to Press",
+                        "description": "Hinge + pull + press flow.",
+                        "tags": [
+                            "Full-Body",
+                            "Power"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=0rJ_9q2j5vA",
+                        "imageUrl": "https://img.youtube.com/vi/0rJ_9q2j5vA/0.jpg",
+                        "recoveryTime": 120
+                    },
+                    {
+                        "name": "Man Makers",
+                        "description": "Dumbbell burpee + row + press + squat.",
+                        "tags": [
+                            "Full-Body",
+                            "Conditioning"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=5rR7y1vR3cA",
+                        "imageUrl": "https://img.youtube.com/vi/5rR7y1vR3cA/0.jpg",
+                        "recoveryTime": 90
+                    },
+                    {
+                        "name": "Devil Press",
+                        "description": "Burpee + dumbbell snatch.",
+                        "tags": [
+                            "Full-Body",
+                            "Conditioning"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=3z2v9v3kZ8A",
+                        "imageUrl": "https://img.youtube.com/vi/3z2v9v3kZ8A/0.jpg",
+                        "recoveryTime": 90
+                    },
+                    {
+                        "name": "Burpee Pull-Up",
+                        "description": "Burpee + pull-up combo.",
+                        "tags": [
+                            "Full-Body",
+                            "Bodyweight"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=dZgVxmf0jkA",
+                        "imageUrl": "https://img.youtube.com/vi/dZgVxmf0jkA/0.jpg",
+                        "recoveryTime": 45
+                    },
+                    {
+                        "name": "Turkish Get-Up",
+                        "description": "Slow, full-body stability movement.",
+                        "tags": [
+                            "Full-Body",
+                            "Functional"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=0rJ_9q2j5vA",
+                        "imageUrl": "https://img.youtube.com/vi/0rJ_9q2j5vA/0.jpg",
+                        "recoveryTime": 90
+                    },
+                    {
+                        "name": "Farmer's Carry + Overhead Press",
+                        "description": "Loaded carry into press for grip and full-body strength.",
+                        "tags": [
+                            "Full-Body",
+                            "Carry"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=3Y5tJ6u6v1M",
+                        "imageUrl": "https://img.youtube.com/vi/3Y5tJ6u6v1M/0.jpg",
+                        "recoveryTime": 90
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "name": "Cardio",
+        "subcategories": [
+            {
+                "title": "Bodyweight Cardio",
+                "exercises": [
+                    {
+                        "name": "Jumping Jacks",
+                        "description": "A classic full-body cardio exercise that improves heart health and coordination.",
+                        "tags": [
+                            "Cardio",
+                            "Bodyweight",
+                            "Full-Body"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=1b98WR7rST0",
+                        "imageUrl": "https://img.youtube.com/vi/1b98WR7rST0/0.jpg",
+                        "recoveryTime": 45
+                    },
+                    {
+                        "name": "Mountain Climbers",
+                        "description": "High-intensity bodyweight exercise that works the core, arms, and legs while boosting heart rate.",
+                        "tags": [
+                            "Cardio",
+                            "Core",
+                            "Bodyweight"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=nmwgirgXLYM",
+                        "imageUrl": "https://img.youtube.com/vi/nmwgirgXLYM/0.jpg",
+                        "recoveryTime": 45
+                    },
+                    {
+                        "name": "High Knees",
+                        "description": "Running in place with an emphasis on bringing knees to chest height.",
+                        "tags": [
+                            "Cardio",
+                            "Explosive",
+                            "Bodyweight"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=ZfSTp_n_vC4",
+                        "imageUrl": "https://img.youtube.com/vi/ZfSTp_n_vC4/0.jpg",
+                        "recoveryTime": 45
+                    },
+                    {
+                        "name": "Butt Kicks",
+                        "description": "Cardio movement focusing on hamstring engagement and high-rep heart rate elevation.",
+                        "tags": [
+                            "Cardio",
+                            "Frequency",
+                            "Bodyweight"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=-dtvX-kd90I",
+                        "imageUrl": "https://img.youtube.com/vi/-dtvX-kd90I/0.jpg",
+                        "recoveryTime": 45
+                    },
+                    {
+                        "name": "Running in Place",
+                        "description": "Simple stationary run to maintain an elevated heart rate.",
+                        "tags": [
+                            "Cardio",
+                            "Aerobic",
+                            "Bodyweight"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=0AUGkch3iC4",
+                        "imageUrl": "https://img.youtube.com/vi/0AUGkch3iC4/0.jpg",
+                        "recoveryTime": 45
+                    }
+                ]
+            },
+            {
+                "title": "HIIT & Explosive Cardio",
+                "exercises": [
+                    {
+                        "name": "Burpees",
+                        "description": "Ultimate full-body metabolic conditioning movement.",
+                        "tags": [
+                            "Cardio",
+                            "HIIT",
+                            "Explosive"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=dZgVxmf0jkA",
+                        "imageUrl": "https://img.youtube.com/vi/dZgVxmf0jkA/0.jpg",
+                        "recoveryTime": 45
+                    },
+                    {
+                        "name": "Squat Jumps",
+                        "description": "Plyometric movement targeting lower body power and cardiovascular endurance.",
+                        "tags": [
+                            "Cardio",
+                            "Plyometrics",
+                            "Power"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=72BSZupb-1I",
+                        "imageUrl": "https://img.youtube.com/vi/72BSZupb-1I/0.jpg",
+                        "recoveryTime": 120
+                    },
+                    {
+                        "name": "Skater Jumps",
+                        "description": "Lateral explosive movement that builds agility and speeds up the heart rate.",
+                        "tags": [
+                            "Cardio",
+                            "Agility",
+                            "Lateral"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=4R3m7fH3S9A",
+                        "imageUrl": "https://img.youtube.com/vi/4R3m7fH3S9A/0.jpg",
+                        "recoveryTime": 45
+                    },
+                    {
+                        "name": "Jump Lunges",
+                        "description": "High-intensity lunging variation for leg strength and cardio capacity.",
+                        "tags": [
+                            "Cardio",
+                            "Plyometrics",
+                            "Legs"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=Kq5lZ4o26Ho",
+                        "imageUrl": "https://img.youtube.com/vi/Kq5lZ4o26Ho/0.jpg",
+                        "recoveryTime": 45
+                    },
+                    {
+                        "name": "Plank Jacks",
+                        "description": "Core stability meets cardio in this plank-based jumping movement.",
+                        "tags": [
+                            "Cardio",
+                            "Core",
+                            "HIIT"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=gS6SAt0h7pU",
+                        "imageUrl": "https://img.youtube.com/vi/gS6SAt0h7pU/0.jpg",
+                        "recoveryTime": 45
+                    },
+                    {
+                        "name": "Bicycle Crunches",
+                        "description": "Fast-paced core movement that also provides a cardiovascular challenge.",
+                        "tags": [
+                            "Cardio",
+                            "Core",
+                            "Abdominals"
+                        ],
+                        "videoUrl": "https://www.youtube.com/watch?v=9FGilxCbdz8",
+                        "imageUrl": "https://img.youtube.com/vi/9FGilxCbdz8/0.jpg",
+                        "recoveryTime": 45
+                    }
+                ]
+            }
+        ]
+    }
+]
