@@ -21,91 +21,122 @@ class PoseAnalyzer:
             root_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
             print(f"Files in {root_path}: {os.listdir(root_path)}")
         
-        base_options = python.BaseOptions(model_asset_path=model_path)
-        options = vision.PoseLandmarkerOptions(
-            base_options=base_options,
-            running_mode=vision.RunningMode.VIDEO
-        )
-        self.detector = vision.PoseLandmarker.create_from_options(options)
+        try:
+            base_options = python.BaseOptions(model_asset_path=model_path)
+            options = vision.PoseLandmarkerOptions(
+                base_options=base_options,
+                running_mode=vision.RunningMode.IMAGE # Switching to IMAGE for more robust sync calls
+            )
+            self.detector = vision.PoseLandmarker.create_from_options(options)
+        except Exception as e:
+            print(f"WARNING: MediaPipe Pose Landmarker failed to initialize: {e}")
+            self.detector = None
+            
         self.detector_lock = threading.Lock()
-        self.current_exercise = None
-        self.rule_engine = None
+        
+        # Session state to handle multiple users on a single process (Render)
+        self.sessions = {} # {user_id: {"exercise": str, "rule_engine": obj, "last_active": float}}
         self.timestamp_ms = 0
+
+    def get_user_session(self, user_id, exercise_name):
+        now = time.time()
+        
+        # Create session if none exists or exercise changed
+        if user_id not in self.sessions or self.sessions[user_id]["exercise"] != exercise_name:
+            rule_engine = self.create_rule_engine(exercise_name)
+            self.sessions[user_id] = {
+                "exercise": exercise_name,
+                "rule_engine": rule_engine,
+                "last_active": now
+            }
+        else:
+            self.sessions[user_id]["last_active"] = now
+            
+        # Optional: Cleanup old sessions every 100 calls (approx 15 seconds of frames)
+        if len(self.sessions) > 50: # Limit memory footprint
+            expired = [uid for uid, s in self.sessions.items() if now - s["last_active"] > 600] # 10 min
+            for uid in expired:
+                del self.sessions[uid]
+                
+        return self.sessions[user_id]["rule_engine"]
+
+    def create_rule_engine(self, exercise_name):
+        if exercise_name in EXERCISE_RULES:
+            return EXERCISE_RULES[exercise_name]()
+        
+        # 2. Try keyword fallback
+        name_lower = exercise_name.lower()
+        engine = None
+        
+        # Check keywords in order of specificity
+        if "push-up" in name_lower or "pushup" in name_lower:
+            engine = EXERCISE_RULES["Push-ups"]()
+        elif "leg press" in name_lower:
+            engine = EXERCISE_RULES["Squats"]()
+        elif "calf raise" in name_lower:
+            engine = EXERCISE_RULES["Standing Calf Raises"]()
+        elif "press" in name_lower:
+            if "overhead" in name_lower or "arnold" in name_lower or "shoulder" in name_lower:
+                engine = EXERCISE_RULES["Overhead Barbell Press"]()
+            else:
+                engine = EXERCISE_RULES["Flat Barbell Bench Press"]()
+        elif "curl" in name_lower:
+            if "wrist" in name_lower:
+                engine = EXERCISE_RULES["Wrist Curl (Palms Up)"]()
+            else:
+                engine = EXERCISE_RULES["Bicep Curl"]()
+        elif "squat" in name_lower:
+            engine = EXERCISE_RULES["Squats"]()
+        elif "lunge" in name_lower:
+            engine = EXERCISE_RULES["Lunges"]()
+        elif "pull-up" in name_lower or "pullup" in name_lower or "chin-up" in name_lower or "chinup" in name_lower:
+            engine = EXERCISE_RULES["Pull-ups"]()
+        elif "pulldown" in name_lower:
+            engine = EXERCISE_RULES["Pull-ups"]() # Pulldowns are vertical pulls
+        elif "row" in name_lower or "face pull" in name_lower:
+            engine = EXERCISE_RULES["Barbell Bent-Over Rows"]()
+        elif "deadlift" in name_lower or "thrust" in name_lower or "bridge" in name_lower or "extension" in name_lower and "back" in name_lower:
+            engine = EXERCISE_RULES["Deadlift"]()
+        elif "raise" in name_lower:
+            if "leg" in name_lower or "knee" in name_lower:
+                engine = EXERCISE_RULES["Hanging Leg Raises"]()
+            else:
+                engine = EXERCISE_RULES["Dumbbell Lateral Raises"]()
+        elif "shrug" in name_lower:
+            engine = EXERCISE_RULES["Dumbbell Lateral Raises"]() # Shrugs use lateral raise logic (shoulder height)
+        elif "fly" in name_lower or "crossover" in name_lower or "pec deck" in name_lower:
+            engine = EXERCISE_RULES["Incline Cable Fly"]()
+        elif "crunch" in name_lower or "sit-up" in name_lower or "twist" in name_lower:
+            engine = EXERCISE_RULES["Crunches"]()
+        elif "dip" in name_lower:
+            engine = EXERCISE_RULES["Weighted Bench Dips"]()
+        elif "extension" in name_lower or "pushdown" in name_lower or "kickback" in name_lower:
+            engine = EXERCISE_RULES["Overhead Triceps Extension"]()
+        elif "plank" in name_lower or "bug" in name_lower or "rollout" in name_lower or "hold" in name_lower:
+            engine = EXERCISE_RULES["Plank"]()
+        elif "clean" in name_lower or "snatch" in name_lower or "thruster" in name_lower or "maker" in name_lower or "get-up" in name_lower:
+            engine = EXERCISE_RULES["Clean and Press"]()
+        elif "burpee" in name_lower or "devil" in name_lower:
+            engine = EXERCISE_RULES["Burpee Pull-Up"]()
+        elif "carry" in name_lower:
+            engine = EXERCISE_RULES["Overhead Barbell Press"]() # Track standing stability
+        else:
+            # Absolute fallback to Bicep Curl if nothing else matches (best effort)
+            engine = EXERCISE_RULES["Bicep Curl"]()
+            
+        return engine
 
     def set_exercise(self, exercise_name):
-        if self.current_exercise != exercise_name:
-            self.current_exercise = exercise_name
-            # 1. Try exact match
-            if exercise_name in EXERCISE_RULES:
-                self.rule_engine = EXERCISE_RULES[exercise_name]()
-            else:
-                # 2. Try keyword fallback
-                name_lower = exercise_name.lower()
-                self.rule_engine = None
-                
-                # Check keywords in order of specificity
-                if "push-up" in name_lower or "pushup" in name_lower:
-                    self.rule_engine = EXERCISE_RULES["Push-ups"]()
-                elif "leg press" in name_lower:
-                    self.rule_engine = EXERCISE_RULES["Squats"]()
-                elif "calf raise" in name_lower:
-                    self.rule_engine = EXERCISE_RULES["Standing Calf Raises"]()
-                elif "press" in name_lower:
-                    if "overhead" in name_lower or "arnold" in name_lower or "shoulder" in name_lower:
-                        self.rule_engine = EXERCISE_RULES["Overhead Barbell Press"]()
-                    else:
-                        self.rule_engine = EXERCISE_RULES["Flat Barbell Bench Press"]()
-                elif "curl" in name_lower:
-                    if "wrist" in name_lower:
-                        self.rule_engine = EXERCISE_RULES["Wrist Curl (Palms Up)"]()
-                    else:
-                        self.rule_engine = EXERCISE_RULES["Bicep Curl"]()
-                elif "squat" in name_lower:
-                    self.rule_engine = EXERCISE_RULES["Squats"]()
-                elif "lunge" in name_lower:
-                    self.rule_engine = EXERCISE_RULES["Lunges"]()
-                elif "pull-up" in name_lower or "pullup" in name_lower or "chin-up" in name_lower or "chinup" in name_lower:
-                    self.rule_engine = EXERCISE_RULES["Pull-ups"]()
-                elif "pulldown" in name_lower:
-                    self.rule_engine = EXERCISE_RULES["Pull-ups"]() # Pulldowns are vertical pulls
-                elif "row" in name_lower or "face pull" in name_lower:
-                    self.rule_engine = EXERCISE_RULES["Barbell Bent-Over Rows"]()
-                elif "deadlift" in name_lower or "thrust" in name_lower or "bridge" in name_lower or "extension" in name_lower and "back" in name_lower:
-                    self.rule_engine = EXERCISE_RULES["Deadlift"]()
-                elif "raise" in name_lower:
-                    if "leg" in name_lower or "knee" in name_lower:
-                        self.rule_engine = EXERCISE_RULES["Hanging Leg Raises"]()
-                    else:
-                        self.rule_engine = EXERCISE_RULES["Dumbbell Lateral Raises"]()
-                elif "shrug" in name_lower:
-                    self.rule_engine = EXERCISE_RULES["Dumbbell Lateral Raises"]() # Shrugs use lateral raise logic (shoulder height)
-                elif "fly" in name_lower or "crossover" in name_lower or "pec deck" in name_lower:
-                    self.rule_engine = EXERCISE_RULES["Incline Cable Fly"]()
-                elif "crunch" in name_lower or "sit-up" in name_lower or "twist" in name_lower:
-                    self.rule_engine = EXERCISE_RULES["Crunches"]()
-                elif "dip" in name_lower:
-                    self.rule_engine = EXERCISE_RULES["Weighted Bench Dips"]()
-                elif "extension" in name_lower or "pushdown" in name_lower or "kickback" in name_lower:
-                    self.rule_engine = EXERCISE_RULES["Overhead Triceps Extension"]()
-                elif "plank" in name_lower or "bug" in name_lower or "rollout" in name_lower or "hold" in name_lower:
-                    self.rule_engine = EXERCISE_RULES["Plank"]()
-                elif "clean" in name_lower or "snatch" in name_lower or "thruster" in name_lower or "maker" in name_lower or "get-up" in name_lower:
-                    self.rule_engine = EXERCISE_RULES["Clean and Press"]()
-                elif "burpee" in name_lower or "devil" in name_lower:
-                    self.rule_engine = EXERCISE_RULES["Burpee Pull-Up"]()
-                elif "carry" in name_lower:
-                    self.rule_engine = EXERCISE_RULES["Overhead Barbell Press"]() # Track standing stability
-
-            return True
-        return False
+        # Deprecated: use get_user_session instead
+        pass
 
     def reset_analyzer(self):
-        self.current_exercise = None
-        self.rule_engine = None
+        # Resetting the analyzer now means clearing all sessions
+        self.sessions = {}
         self.timestamp_ms = 0
 
-    def process_landmarks(self, landmarks_list, exercise_name):
-        self.set_exercise(exercise_name)
+    def process_landmarks(self, landmarks_list, exercise_name, user_id="default"):
+        rule_engine = self.get_user_session(user_id, exercise_name)
         
         # Convert list of dicts to objects with attributes for the rule engine
         class Landmark:
@@ -113,7 +144,7 @@ class PoseAnalyzer:
                 self.x = d.get('x', 0)
                 self.y = d.get('y', 0)
                 self.z = d.get('z', 0)
-                self.visibility = d.get('visibility', 0.9) # Default high visibility if sent from frontend
+                self.visibility = d.get('visibility', 0.5) # Lowered default for mobile
 
         landmarks = [Landmark(l) for l in landmarks_list]
 
@@ -129,8 +160,8 @@ class PoseAnalyzer:
             "visibility_ok": True
         }
 
-        if self.rule_engine:
-            analysis = self.rule_engine.process(landmarks)
+        if rule_engine:
+            analysis = rule_engine.process(landmarks)
             incorrect = analysis.get("incorrect_indices", [])
             is_correct = len(incorrect) == 0
             
@@ -153,6 +184,9 @@ class PoseAnalyzer:
         return feedback_data
 
     def process_frame(self, image_data, exercise_name):
+        if not self.detector:
+            return {"feedback": "Server vision model not loaded", "visibility_ok": False}
+            
         # Decode base64 image
         if isinstance(image_data, str) and "," in image_data:
             image_data = image_data.split(",")[1]
@@ -223,7 +257,10 @@ class PoseAnalyzer:
             
             frame_timestamp_ms += int(1000 / fps)
             mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
-            results = self.detector.detect_for_video(mp_image, frame_timestamp_ms)
+            if self.detector:
+                results = self.detector.detect(mp_image) # detect() for IMAGE mode
+            else:
+                results = None
 
             if results.pose_landmarks and self.rule_engine:
                 landmarks = results.pose_landmarks[0]

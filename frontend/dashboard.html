@@ -989,17 +989,35 @@
 
             const history = safeParse('workout_history', []);
             try {
-                // 3. Load Workout History & Volume
+                // 3. Load Workout History & Volume (Selected Day Specific)
+                const todayKey = getLocalKey(currentDashboardDate);
+                const daySessions = history.filter(sess => getLocalKey(new Date(sess.date)) === todayKey);
+
+                const dailyVolume = daySessions.reduce((acc, sess) => acc + sess.duration, 0);
+                document.getElementById('dash-volume').innerText = dailyVolume;
+
+                // Update the unit label contextually
+                const isToday = currentDashboardDate.toDateString() === new Date().toDateString();
+                const volumeLabel = document.querySelector('#dash-volume').parentElement.nextElementSibling;
+                volumeLabel.innerText = isToday ? "TODAY'S VOLUME" : "SESSION VOLUME";
+
+                let intensityLabel = "No Session";
+                let avgIntensity = 0;
+
+                if (daySessions.length > 0) {
+                    avgIntensity = Math.round(daySessions.reduce((acc, sess) => acc + sess.intensity, 0) / daySessions.length);
+                    intensityLabel = "Beginner";
+                    if (avgIntensity > 80) intensityLabel = "Elite";
+                    else if (avgIntensity > 60) intensityLabel = "Advanced";
+                    else if (avgIntensity > 40) intensityLabel = "Intermediate";
+                } else if (isToday) {
+                    intensityLabel = "Resting";
+                }
+
+                document.getElementById('dash-intensity-label').innerText = intensityLabel;
+
+                // Keep activity graph as a 7-day overview
                 if (history.length > 0) {
-                    const totalMins = history.reduce((acc, sess) => acc + sess.duration, 0);
-                    const avgMins = Math.round(totalMins / history.length);
-                    document.getElementById('dash-volume').innerText = avgMins;
-                    const avgIntensity = Math.round(history.reduce((acc, sess) => acc + sess.intensity, 0) / history.length);
-                    let label = "Beginner";
-                    if (avgIntensity > 80) label = "Elite";
-                    else if (avgIntensity > 60) label = "Advanced";
-                    else if (avgIntensity > 40) label = "Intermediate";
-                    document.getElementById('dash-intensity-label').innerText = label;
                     renderActivityGraph(history);
                 } else {
                     renderActivityGraph([]);

@@ -54,6 +54,7 @@ class ChatInput(BaseModel):
     context: Optional[dict] = None
 
 class LandmarksInput(BaseModel):
+    user_id: str
     landmarks: List[dict]
     exercise: str
 
@@ -172,10 +173,10 @@ async def reset_session():
 @app.post("/process_landmarks")
 async def process_landmarks(input_data: LandmarksInput):
     try:
-        feedback = analyzer.process_landmarks(input_data.landmarks, input_data.exercise)
+        feedback = analyzer.process_landmarks(input_data.landmarks, input_data.exercise, input_data.user_id)
         return feedback
     except Exception as e:
-        print(f"Error processing landmarks: {e}")
+        print(f"Error processing landmarks for user {input_data.user_id}: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/process_frame")

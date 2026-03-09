@@ -3,7 +3,7 @@ from .base import BaseRule
 class BicepCurlRule(BaseRule):
     def process(self, landmarks):
         # Indices: 11 (S), 13 (E), 15 (W)
-        if not self.is_visible(landmarks, [11, 13, 15], 0.6):
+        if not self.is_visible(landmarks, [11, 13, 15], 0.4): # Lowered for better detection
             return {
                 "counter": self.counter,
                 "correct_reps": self.correct_reps,
@@ -31,13 +31,13 @@ class BicepCurlRule(BaseRule):
             self.stage = "down"
         
         # Form check: Elbow drift (X-axis) - should be relatively fixed
-        is_stable = self.is_vertical(shoulder, elbow, tolerance=0.15)
+        is_stable = self.is_vertical(shoulder, elbow, tolerance=0.2) # Relaxed from 0.15
         incorrect_indices = []
         if not is_stable:
             incorrect_indices = [13] # Highlight elbow
             self.feedback = "Keep elbow fixed at side!"
 
-        if angle < 35 and self.stage == 'down':
+        if angle < 45 and self.stage == 'down': # Relaxed from 35 degrees
             if is_stable:
                 self.stage = "up"
                 self.counter += 1

@@ -146,8 +146,9 @@
             </div>
 
             <button onclick="window.location.href='dashboard.html'" class="btn-main"
-                style="margin-top: 25px; padding: 18px 80px; width: auto; background: transparent; border: 1px solid rgba(255,255,255,0.1); text-shadow: none;">EXIT
-                TO DASHBOARD</button>
+                style="margin-top: 45px; padding: 20px 80px; width: auto; background: #000; border: 2px solid #333; color: #fff; font-weight: 900; border-radius: 30px; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 10px 40px rgba(0,0,0,0.8);">
+                EXIT TO DASHBOARD
+            </button>
             <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
         </div>
 
@@ -247,20 +248,37 @@
         const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
         pose.setOptions({
-            modelComplexity: isMobile ? 0 : 1, // Lite model for mobile
+            modelComplexity: 1, // Full model for better accuracy by default
             smoothLandmarks: true,
             enableSegmentation: false,
-            minDetectionConfidence: 0.5,
-            minTrackingConfidence: 0.5
+            minDetectionConfidence: 0.6, // Higher confidence for stable lines
+            minTrackingConfidence: 0.6
         });
 
+        let smoothedLandmarks = null;
+        const SMOOTH_FACTOR = 0.6; // Higher = more stable, less reactive
+
         pose.onResults((results) => {
-            if (results.poseLandmarks) {
-                lastData = { landmarks: results.poseLandmarks };
-                // Send landmarks to backend for rule processing periodically
-                throttleProcessLandmarks(results.poseLandmarks);
+            if (isCounting && results.poseLandmarks) {
+                // Apply EMA smoothing for "Accuracy of Green Lines"
+                if (!smoothedLandmarks) {
+                    smoothedLandmarks = results.poseLandmarks;
+                } else {
+                    smoothedLandmarks = results.poseLandmarks.map((lm, i) => ({
+                        x: smoothedLandmarks[i].x * SMOOTH_FACTOR + lm.x * (1 - SMOOTH_FACTOR),
+                        y: smoothedLandmarks[i].y * SMOOTH_FACTOR + lm.y * (1 - SMOOTH_FACTOR),
+                        z: smoothedLandmarks[i].z * SMOOTH_FACTOR + lm.z * (1 - SMOOTH_FACTOR),
+                        visibility: lm.visibility
+                    }));
+                }
+
+                lastData = { landmarks: smoothedLandmarks };
+                throttleProcessLandmarks(results.poseLandmarks); // Send raw data for trigger accuracy, draw smooth data
+            } else if (isCounting) {
+                lastData = null;
             } else {
                 lastData = null;
+                smoothedLandmarks = null;
             }
         });
 
@@ -303,7 +321,7 @@
         }
 
         let isProcessing = false;
-        let isCounting = true;
+        let isCounting = false; // Initial state should match 'START' button
         let lastProcessTime = 0;
         const PROCESS_LANDMARKS_INTERVAL = 150; // Every 150ms is enough for rule logic (6-7 FPS)
 
@@ -317,10 +335,12 @@
             lastProcessTime = now;
 
             try {
+                const userId = localStorage.getItem('supabase_user_id') || 'guest';
                 const response = await fetch(`${API_BASE_URL}/process_landmarks`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
+                        user_id: userId,
                         landmarks: landmarks,
                         exercise: exercise
                     })
@@ -344,9 +364,11 @@
         }
 
         function renderLoop() {
-            if (lastData) {
+            // Only draw if we are ACTIVELY counting AND have data
+            if (isCounting && lastData) {
                 drawSkeleton(lastData.landmarks, lastData.is_correct, lastData.incorrect_indices);
             } else {
+                // Otherwise, the canvas MUST be empty
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
             }
             requestAnimationFrame(renderLoop);
@@ -515,10 +537,15 @@
 
         function toggleCounting(fromVoice = false) {
             isCounting = !isCounting;
+            if (fromVoice) console.log("Workout toggled by voice assistant");
+
             const voiceStatusText = document.getElementById('voiceStatusText');
             const now = Date.now();
 
             if (isCounting) {
+                // Reset session on server when starting
+                fetch(`${API_BASE_URL}/reset`, { method: 'POST' }).catch(e => console.warn("Reset failed", e));
+
                 totalSets++;
                 if (!sessionStartTime) sessionStartTime = now;
                 lastStartTime = now;
@@ -537,11 +564,18 @@
                     lastStartTime = null;
                 }
 
+                // Clear state when stopping
+                lastData = null;
+
                 startStopBtn.innerHTML = '<span class="icon">▶️</span> START';
                 startStopBtn.className = 'control-btn start-pnl';
                 voiceLight.classList.remove('active');
                 voiceStatusText.innerText = `Say "hey ${wakeWord} start"`;
                 if (!fromVoice) speak("Workout paused.");
+
+                // Clear state when stopping
+                // lastData = null; // Already done above
+                // ctx.clearRect(0, 0, canvas.width, canvas.height); // Handled by renderLoop
             }
         }
 
@@ -891,10 +925,10 @@
                 const wakeKeywords = [wakeWordLower, 'hey ' + wakeWordLower, 'hi ' + wakeWordLower, 'buddy', 'body', 'steady'];
                 if (!fuzzyMatch(lowerTranscript, wakeKeywords, 1)) return null;
 
-                const startKeywords = ['start', 'star', 'stark', 'sart', 'begin', 'began', 'begun'];
-                const stopKeywords = ['stop', 'stoop', 'pause', 'paws', 'halt'];
-                const recordKeywords = ['record', 'chord', 'accord', 'recorde', 'recording'];
-                const saveKeywords = ['save', 'safe', 'saved', 'saves'];
+                const startKeywords = ['start', 'begin'];
+                const stopKeywords = ['stop', 'pause', 'halt'];
+                const recordKeywords = ['record', 'recording'];
+                const saveKeywords = ['save', 'saved'];
 
                 const wantStart = fuzzyMatch(lowerTranscript, startKeywords, 1);
                 const wantStop = fuzzyMatch(lowerTranscript, stopKeywords, 1);
@@ -944,6 +978,8 @@
 
             recognition.onerror = (event) => {
                 console.warn('🎙️ Speech recognition error:', event.error);
+                if (!isVoiceActive) return; // DON'T restart if deactivated
+
                 if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
                     document.getElementById('voiceStatusText').innerText = '🔇 Mic access denied';
                     return;
@@ -951,29 +987,45 @@
                 const delay = Math.min(500 * Math.pow(2, restartAttempts), MAX_RESTART_DELAY);
                 restartAttempts++;
                 setTimeout(() => {
-                    try { recognition.start(); } catch (e) { }
+                    if (isVoiceActive) try { recognition.start(); } catch (e) { }
                 }, delay);
             };
 
             recognition.onend = () => {
                 restartAttempts = 0;
-                try { recognition.start(); } catch (e) { }
+                if (isVoiceActive) {
+                    try { recognition.start(); } catch (e) { }
+                }
             };
 
             recognition.onstart = () => {
                 restartAttempts = 0;
             };
 
-            recognition.start();
+            // recognition.start(); // REMOVED automatic start to prevent accidental triggers
         } else {
             document.getElementById('voiceStatusText').innerText = '🔇 Voice not supported';
         }
 
+        let isVoiceActive = false;
         voiceBtn.onclick = () => {
-            speak(`I'm listening, ${wakeWord}. Use commands like start, stop, or record.`);
-            const originalText = voiceStatusText.innerText;
-            voiceStatusText.innerText = "🎙️ Listening for commands...";
-            setTimeout(() => { if (voiceStatusText.innerText === "🎙️ Listening for commands...") voiceStatusText.innerText = originalText; }, 3000);
+            if (!SpeechRecognition) return;
+            isVoiceActive = !isVoiceActive;
+
+            if (isVoiceActive) {
+                try {
+                    recognition.start();
+                    voiceLight.style.background = '#00ff88';
+                    voiceStatusText.innerText = "🎙️ Listening for commands...";
+                    speak(`I'm listening, ${wakeWord}.`);
+                } catch (e) {
+                    console.warn("Recognition already started");
+                }
+            } else {
+                recognition.stop();
+                voiceLight.style.background = '#333';
+                voiceStatusText.innerText = `Say "hey ${wakeWord} start"`;
+            }
         };
 
         window.onload = async () => {
