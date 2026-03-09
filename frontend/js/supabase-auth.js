@@ -4,9 +4,18 @@
  */
 
 const SupabaseAuth = {
+    isSyncing: false,
     async init() {
-        const { data: { session } } = await supabase.auth.getSession();
-        this.handleSession(session);
+        if (this.isSyncing) return;
+        this.isSyncing = true;
+        try {
+            const { data: { session } } = await supabase.auth.getSession();
+            await this.handleSession(session);
+        } catch (e) {
+            console.warn("Auth Session Check Failed:", e);
+        } finally {
+            this.isSyncing = false;
+        }
 
         // Listen for auth changes
         supabase.auth.onAuthStateChange((_event, session) => {
@@ -185,6 +194,18 @@ const SupabaseAuth = {
         const profile = JSON.parse(localStorage.getItem('user_profile') || '{}');
         const newProfile = { ...profile, ...profileData };
         localStorage.setItem('user_profile', JSON.stringify(newProfile));
+    },
+
+    async saveMacroPlan(macroPlan) {
+        const userId = localStorage.getItem('supabase_user_id');
+        if (userId) {
+            // Upsert macro plan to user_data table
+            await supabase.from('user_data').upsert({
+                user_id: userId,
+                macro_plan: macroPlan
+            }, { onConflict: 'user_id' });
+        }
+        localStorage.setItem('user_macro_plan', JSON.stringify(macroPlan));
     }
 };
 

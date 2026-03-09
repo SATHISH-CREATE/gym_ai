@@ -11,6 +11,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap"
         rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/supabase-auth.js"></script>
+    <script src="js/app.js"></script>
     <style>
         body {
             background-attachment: fixed !important;
@@ -646,7 +649,7 @@
             ]
         };
 
-        let myPlan = JSON.parse(localStorage.getItem('my_6day_plan') || '[]');
+        let myPlan = safeParse('my_6day_plan', []);
         if (myPlan.length === 0) {
             for (let i = 1; i <= 6; i++) {
                 myPlan.push({ day: i, focus: "REST DAY", type: "REST", exercises: [] });
@@ -1082,16 +1085,12 @@
             startWorkout(sched.exercises[0]);
         }
 
-        (async () => {
-            const { createClient } = window.supabase;
-            const _sb = createClient(
-                "https://bleaekgciwewwyrrtmhj.supabase.co",
-                "sb_publishable_gndBrArguBapaDo96uf5XQ_aBa9anGY"
-            );
-            const { data: { session } } = await _sb.auth.getSession();
+        // Initialization logic using global Supabase client
+        window.addEventListener('load', async () => {
+            const { data: { session } } = await supabase.auth.getSession();
             if (!session) { window.location.replace('index.html'); return; }
             init();
-        })();
+        });
     </script>
 </body>
 

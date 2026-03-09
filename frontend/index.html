@@ -115,6 +115,7 @@
             -webkit-text-fill-color: transparent;
             animation: gradient-shift 4s ease infinite;
             filter: drop-shadow(0 0 30px rgba(112, 0, 255, 0.6));
+            will-change: filter, transform;
         }
 
         .sub-text {
@@ -132,6 +133,7 @@
         .enter-btn {
             display: inline-flex;
             align-items: center;
+            justify-content: center;
             gap: 14px;
             margin-top: 40px;
             padding: 22px 65px;
@@ -157,14 +159,6 @@
             box-shadow: 0 0 40px rgba(112, 0, 255, 0.8), 0 0 100px rgba(176, 0, 255, 0.3);
         }
 
-        .enter-btn .btn-arrow {
-            font-size: 1.3rem;
-            transition: transform 0.3s ease;
-        }
-
-        .enter-btn:hover .btn-arrow {
-            transform: translateX(6px);
-        }
 
         @keyframes blink {
 
@@ -196,13 +190,50 @@
             0% {
                 transform: scale(1.4);
                 opacity: 0;
-                filter: blur(40px);
+                filter: blur(20px);
             }
 
             100% {
                 transform: scale(1);
                 opacity: 1;
                 filter: blur(0);
+            }
+        }
+
+        /* Performance Optimization for Mobile */
+        @media (max-width: 768px) {
+            .content-wrap {
+                animation: fast-zoom-mobile 0.8s ease-out forwards;
+                filter: none !important;
+            }
+
+            @keyframes fast-zoom-mobile {
+                0% {
+                    transform: scale(1.1);
+                    opacity: 0;
+                }
+
+                100% {
+                    transform: scale(1);
+                    opacity: 1;
+                }
+            }
+
+            .main-title .highlight {
+                filter: none !important;
+                animation: none !important;
+                /* Static gradient for mobile perf */
+            }
+
+            .video-bg {
+                display: none;
+                /* Hide heavy video on mobile, use background from body */
+            }
+
+            body {
+                background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.95)), url('assets/chest_day.png');
+                background-size: cover;
+                background-position: center;
             }
         }
 
@@ -330,7 +361,8 @@
 
 <body>
     <div class="landing-container">
-        <video class="video-bg" autoplay muted loop playsinline>
+        <video class="video-bg" autoplay muted loop playsinline preload="auto" poster="assets/chest_day.png"
+            id="bg-video">
             <source src="assets/generated_videoo.mp4" type="video/mp4">
         </video>
         <div class="video-overlay"></div>
@@ -340,7 +372,7 @@
             <h1 class="main-title">PUSH<span class="highlight">LIMITS</span></h1>
             <p class="sub-text">AI-Powered Bodybuilding &bull; Pure Performance</p>
 
-            <button onclick="openAuthModal()" class="enter-btn">START TRAINING<span class="btn-arrow">→</span></button>
+            <button onclick="openAuthModal()" class="enter-btn">START TRAINING</button>
         </div>
     </div>
 
@@ -387,6 +419,17 @@
         let isSignUpMode = false;
 
         window.onload = async () => {
+            // Disable video on mobile to save bandwidth/CPU
+            if (window.innerWidth <= 768) {
+                const vid = document.getElementById('bg-video');
+                if (vid) {
+                    vid.pause();
+                    vid.src = "";
+                    vid.load();
+                    vid.remove();
+                }
+            }
+
             try {
                 // Auto-route if already logged in (e.g., returning from Google Auth)
                 const { data: { session } } = await supabase.auth.getSession();
@@ -394,6 +437,7 @@
                     const { data: profile } = await supabase
                         .from('profiles').select('name').eq('id', session.user.id).single();
                     window.location.href = (profile && profile.name) ? 'dashboard.html' : 'setup.html';
+                    return; // Stop execution
                 }
             } catch (e) {
                 console.warn('Auto-login check failed:', e);
@@ -474,20 +518,23 @@
             }
         }
 
-        setInterval(() => {
-            const trail = document.createElement('div');
-            trail.className = 'trail';
-            trail.style.top = Math.random() * 100 + '%';
-            trail.style.left = '-200px';
-            trail.style.width = (100 + Math.random() * 300) + 'px';
-            document.body.appendChild(trail);
-            const anim = trail.animate([
-                { left: '-200px', opacity: 0 },
-                { left: '50%', opacity: 0.5 },
-                { left: '100%', opacity: 0 }
-            ], { duration: 500 + Math.random() * 500 });
-            anim.onfinish = () => trail.remove();
-        }, 100);
+        // Only run trail effect on desktop for performance
+        if (window.innerWidth > 768) {
+            setInterval(() => {
+                const trail = document.createElement('div');
+                trail.className = 'trail';
+                trail.style.top = Math.random() * 100 + '%';
+                trail.style.left = '-200px';
+                trail.style.width = (100 + Math.random() * 300) + 'px';
+                document.body.appendChild(trail);
+                const anim = trail.animate([
+                    { left: '-200px', opacity: 0 },
+                    { left: '50%', opacity: 0.5 },
+                    { left: '100%', opacity: 0 }
+                ], { duration: 1000 + Math.random() * 1000 });
+                anim.onfinish = () => trail.remove();
+            }, 300); // Slower frequency
+        }
 
 
     </script>

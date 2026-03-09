@@ -12,6 +12,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
     <script src="js/supabase-config.js"></script>
     <script src="js/supabase-auth.js"></script>
+    <script src="js/app.js"></script>
     <style>
         :root {
             --primary-glow: rgba(112, 0, 255, 0.4);
@@ -19,7 +20,8 @@
         }
 
         body {
-            background-attachment: fixed !important;
+            background-attachment: scroll !important;
+            /* Fixed background is laggy on mobile scroll */
             background-image:
                 radial-gradient(circle at 50% 0%, rgba(0, 240, 255, 0.15), transparent 50%),
                 linear-gradient(to bottom, rgba(13, 5, 20, 0.88), rgba(9, 9, 11, 0.98)),
@@ -99,14 +101,20 @@
         }
 
         .dash-card {
-            background: rgba(20, 20, 25, 0.6);
-            backdrop-filter: blur(12px);
+            background: rgba(20, 20, 25, 0.8);
+            /* Less blur, more solid background for mobile perf */
             border: 1px solid var(--glass-border);
             border-radius: 30px;
             padding: 30px;
             position: relative;
             overflow: hidden;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @media (min-width: 769px) {
+            .dash-card {
+                backdrop-filter: blur(12px);
+            }
         }
 
         .dash-card:hover {
@@ -526,8 +534,8 @@
             <div class="welcome-section">
                 <div class="date-display">
                     <p id="current-month-year">MARCH 2026</p>
-                    <h1 id="current-day-long">Monday, 02</h1>
-                    <p id="user-greeting"></p>
+                    <h1 id="current-day-long">...</h1>
+                    <p id="user-greeting">Loading Dashboard...</p>
                 </div>
                 <div class="welcome-info-right"
                     style="display: flex; align-items: flex-end; flex-direction: column; gap: 8px;">
@@ -567,16 +575,16 @@
                             </svg>
                         </div>
                     </div>
-                    <div class="big-stat" id="dash-focus">LEGS & CORE</div>
+                    <div class="big-stat" id="dash-focus">---</div>
                     <p id="dash-plan-type"
                         style="color: var(--primary-color); font-weight: 700; font-size: 0.85rem; margin-top: -5px;">
-                        DOUBLE MUSCLE SPLIT</p>
+                        NO ACTIVE PLAN</p>
 
                     <div class="workout-preview" id="dash-workout-preview" style="margin-top: 20px;">
                         <!-- Injected by JS -->
                     </div>
 
-                    <a href="#" id="start-session-btn" class="btn-main">
+                    <a href="schedules.html" id="start-session-btn" class="btn-main">
                         START SESSION
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="3">
@@ -667,18 +675,26 @@
                     </div>
 
                     <div style="display: flex; align-items: baseline; gap: 10px;">
-                        <div class="big-stat"><span id="dash-water">0.0</span> <span class="unit">L</span></div>
-                        <div style="font-size: 0.8rem; color: #555; font-weight: 700;">/ <span
-                                id="dash-water-target">3.5</span> L GOAL</div>
+                        <div class="big-stat"><span id="dash-water">0</span> <span class="unit">ml</span></div>
+                        <div onclick="editWaterGoal()"
+                            style="font-size: 0.8rem; color: #555; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 4px;"
+                            title="Click to set custom goal">
+                            / <span id="dash-water-target">4000</span> ml GOAL
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="3">
+                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                            </svg>
+                        </div>
                     </div>
 
                     <div id="hydration-adjustments"
                         style="display: flex; gap: 8px; margin-top: -5px; margin-bottom: 15px;">
                         <span class="pill pill-blue"
                             style="font-size: 0.65rem; background: rgba(0, 150, 255, 0.1);">BASE: <span
-                                id="base-hyd">2.5</span>L</span>
+                                id="base-hyd">2500</span> ml</span>
                         <span id="int-adj" class="pill pill-purple" style="font-size: 0.65rem; display: none;">WORKOUT:
-                            +0.5L</span>
+                            +500 ml</span>
                     </div>
 
                     <div class="progress-bar-wrap" style="height: 12px; border-radius: 6px;">
@@ -698,20 +714,26 @@
                         </div>
                     </div>
 
-                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 18px;">
+                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 18px;">
                         <button onclick="addWater(250)" class="btn glass"
-                            style="padding: 10px 5px; font-size: 0.75rem; border-radius: 12px; flex-direction: column;">
-                            <span style="font-size: 1.1rem; margin-bottom: 2px;">🥛</span> 250ml
+                            style="padding: 10px 5px; font-size: 0.7rem; border-radius: 12px; flex-direction: column; min-width: 0;">
+                            <span style="font-size: 1rem; margin-bottom: 2px;">🥛</span> +250
+                        </button>
+                        <button onclick="addWater(-250)" class="btn glass"
+                            style="padding: 10px 5px; font-size: 0.7rem; border-radius: 12px; flex-direction: column; min-width: 0; color: #ff3366;">
+                            <span style="font-size: 1rem; margin-bottom: 2px;">➖</span> -250
                         </button>
                         <button onclick="addWater(500)" class="btn glass"
-                            style="padding: 10px 5px; font-size: 0.75rem; border-radius: 12px; flex-direction: column;">
-                            <span style="font-size: 1.1rem; margin-bottom: 2px;">🥤</span> 500ml
+                            style="padding: 10px 5px; font-size: 0.7rem; border-radius: 12px; flex-direction: column; min-width: 0;">
+                            <span style="font-size: 1rem; margin-bottom: 2px;">🥤</span> +500
                         </button>
                         <button onclick="customWater()" class="btn glass"
-                            style="padding: 10px 5px; font-size: 0.75rem; border-radius: 12px; flex-direction: column;">
-                            <span style="font-size: 1.1rem; margin-bottom: 2px;">➕</span> Manual
+                            style="padding: 10px 5px; font-size: 0.7rem; border-radius: 12px; flex-direction: column; min-width: 0;">
+                            <span style="font-size: 1rem; margin-bottom: 2px;">➕</span> Custom
                         </button>
                     </div>
+
+                    <!-- Electrolyte Tracker -->
 
                     <!-- Electrolyte Tracker -->
                     <div class="habit-item" onclick="toggleElectrolytes()" id="electrolyte-status"
@@ -823,7 +845,41 @@
     </div>
 
     <script>
-        let currentDashboardDate = new Date(); // Global selected date
+        // Global Constants & State
+        let currentDashboardDate = new Date();
+
+        // Helper to get local date key
+        function getLocalKey(date = new Date()) {
+            const d = new Date(date);
+            return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        }
+
+        const HABITS_LIST = [
+            { id: 'vits', label: 'Vitamins / Omega-3' },
+            { id: 'sleep', label: '7+ Hours Quality Sleep' },
+            { id: 'stretch', label: 'Post-workout Stretching' },
+            { id: 'junk', label: 'Zero Junk Food Day' }
+        ];
+
+        const SUPPS_LIST = [
+            { id: 'creatine', label: 'Creatine Monohydrate' },
+            { id: 'protein', label: 'Whey / Casein Shake' },
+            { id: 'pre', label: 'Pre-Workout / Caffeine' }
+        ];
+
+        const INSIGHT_TIPS = [
+            { title: "Optimal Recovery", text: "Based on your intensity, aim for 8 hours of sleep tonight to maximize protein synthesis." },
+            { title: "Hydration Focus", text: "Water is fuel for your fascia. Stay hydrated to keep your muscles elastic and prevent strains." },
+            { title: "Mind-Muscle Connect", text: "Focus on the squeeze, not the speed. Good form is the best injury prevention tool." },
+            { title: "Nutrition Peak", text: "Protein builds muscle, but sleep heals it. Make sure you get quality rest tonight." }
+        ];
+
+        const SESSION_RECS = [
+            "Focus on perfect form for squads today.",
+            "High volume day ahead. Pace yourself.",
+            "Active recovery suggested: Light cardio.",
+            "Strength push: Aim for a PR in your first lift."
+        ];
 
         // --- Date & Calendar Logic ---
         function selectDate(dateObj) {
@@ -868,109 +924,94 @@
             }
         }
 
-        // Safe parser helper
-        function safeParse(key, fallback) {
-            try {
-                const val = localStorage.getItem(key);
-                if (val === 'undefined' || val === 'null' || !val) return fallback;
-                return JSON.parse(val);
-            } catch (e) {
-                console.warn(`Failed to parse ${key} from local storage`, e);
-                return fallback;
-            }
-        }
 
         // --- Data Loading Logic ---
         function loadDashboardData() {
-            // 1. Load Macro Plan
-            const macroData = safeParse('user_macro_plan', null);
-            if (macroData && Object.keys(macroData).length > 0) {
-                document.getElementById('dash-calories').innerText = (macroData.calories || 0).toLocaleString();
-                document.getElementById('dash-goal').innerText = (macroData.goal || '').toUpperCase();
-                document.getElementById('dash-macros').innerHTML = `
-                    <span class="macro-label p-label">P: ${macroData.protein || 0}g</span>
-                    <span class="macro-label c-label">C: ${macroData.carbs || 0}g</span>
-                    <span class="macro-label f-label">F: ${macroData.fat || 0}g</span>
-                `;
-            }
-
-            // 2. Load 6-Day Split Plan
-            const myPlan = safeParse('my_6day_plan', []);
-            if (myPlan.length > 0) {
-                // Determine current day in the 6-day cycle using a stable anchor
-                // We'll use Days since Jan 1, 2024 as a stable reference
-                const anchor = new Date(2024, 0, 1);
-                // Important: clear time from anchor and current for exact day diffs
-                const anchorTime = Date.UTC(anchor.getFullYear(), anchor.getMonth(), anchor.getDate());
-                const currentTime = Date.UTC(currentDashboardDate.getFullYear(), currentDashboardDate.getMonth(), currentDashboardDate.getDate());
-
-                const daysSinceAnchor = Math.floor((currentTime - anchorTime) / (1000 * 60 * 60 * 24));
-                // Handle negative numbers safely
-                const todayCycleIndex = ((daysSinceAnchor % 6) + 6) % 6;
-                const todayWorkout = myPlan[todayCycleIndex];
-
-                if (todayWorkout) {
-                    document.getElementById('dash-focus').innerText = todayWorkout.focus.toUpperCase();
-                    document.getElementById('dash-plan-type').innerText = todayWorkout.type === 'REST' ? 'RECOVERY DAY' : `${todayWorkout.type} MUSCLE SPLIT`;
-
-                    // Update header level tag
-                    document.getElementById('user-level-tag').innerText = `Day ${todayCycleIndex + 1} of 6-Day Split • ${todayWorkout.focus}`;
-
-                    const previewContainer = document.getElementById('dash-workout-preview');
-                    if (todayWorkout.exercises.length > 0) {
-                        previewContainer.innerHTML = todayWorkout.exercises.slice(0, 3).map(exName => `
-                            <div class="exercise-mini">
-                                <img src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=100" alt="${exName}">
-                                <div>
-                                    <h4>${exName}</h4>
-                                    <span style="font-size: 0.7rem; color: #666;">AI Guided Form</span>
-                                </div>
-                            </div>
-                        `).join('');
-
-                        document.getElementById('start-session-btn').href = `workout.html?exercise=${encodeURIComponent(todayWorkout.exercises[0])}`;
-                    } else {
-                        previewContainer.innerHTML = '<p style="color: #444; font-size: 0.8rem; text-align: center; padding: 20px;">Rest & Recover properly today.</p>';
-                        document.getElementById('start-session-btn').style.display = 'none';
-                    }
+            try {
+                // 1. Load Macro Plan
+                const macroData = safeParse('user_macro_plan', null);
+                if (macroData && Object.keys(macroData).length > 0) {
+                    document.getElementById('dash-calories').innerText = (macroData.calories || 0).toLocaleString();
+                    document.getElementById('dash-goal').innerText = (macroData.goal || '').toUpperCase();
+                    document.getElementById('dash-macros').innerHTML = `
+                        <span class="macro-label p-label">P: ${macroData.protein || 0}g</span>
+                        <span class="macro-label c-label">C: ${macroData.carbs || 0}g</span>
+                        <span class="macro-label f-label">F: ${macroData.fat || 0}g</span>
+                    `;
                 }
-            }
+            } catch (e) { console.error("Error loading Macros:", e); }
 
-            // 3. Load Workout History & Volume
+            try {
+                // 2. Load 6-Day Split Plan
+                const myPlan = safeParse('my_6day_plan', []);
+                if (myPlan.length > 0) {
+                    const anchor = new Date(2024, 0, 1);
+                    const anchorTime = Date.UTC(anchor.getFullYear(), anchor.getMonth(), anchor.getDate());
+                    const currentTime = Date.UTC(currentDashboardDate.getFullYear(), currentDashboardDate.getMonth(), currentDashboardDate.getDate());
+                    const daysSinceAnchor = Math.floor((currentTime - anchorTime) / (1000 * 60 * 60 * 24));
+                    const todayCycleIndex = ((daysSinceAnchor % 6) + 6) % 6;
+                    const todayWorkout = myPlan[todayCycleIndex];
+
+                    if (todayWorkout) {
+                        document.getElementById('dash-focus').innerText = `DAY ${todayCycleIndex + 1}`;
+                        document.getElementById('dash-plan-type').innerText = todayWorkout.type === 'REST' ? 'RECOVERY DAY' : todayWorkout.focus.toUpperCase();
+                        document.getElementById('user-level-tag').innerText = `Day ${todayCycleIndex + 1} of 6-Day Split • ${todayWorkout.focus}`;
+
+                        const previewContainer = document.getElementById('dash-workout-preview');
+                        if (todayWorkout.exercises.length > 0) {
+                            previewContainer.innerHTML = todayWorkout.exercises.slice(0, 3).map(exName => `
+                                <div class="exercise-mini">
+                                    <img src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=100" alt="${exName}">
+                                    <div>
+                                        <h4>${exName}</h4>
+                                        <span style="font-size: 0.7rem; color: #666;">AI Guided Form</span>
+                                    </div>
+                                </div>
+                            `).join('');
+                            document.getElementById('start-session-btn').href = `workout.html?exercise=${encodeURIComponent(todayWorkout.exercises[0])}`;
+                        } else {
+                            previewContainer.innerHTML = '<p style="color: #444; font-size: 0.8rem; text-align: center; padding: 20px;">Rest & Recover properly today.</p>';
+                            document.getElementById('start-session-btn').style.display = 'none';
+                        }
+                    }
+                } else {
+                    // Fallback if no plan is set up locally or in cloud
+                    document.getElementById('dash-focus').innerText = "SETUP";
+                    document.getElementById('dash-plan-type').innerText = "CLICK TO CHOOSE A SPLIT";
+                    document.getElementById('start-session-btn').href = "schedules.html";
+                    document.getElementById('dash-workout-preview').innerHTML = `
+                         <p style="color: var(--primary-color); font-size: 0.8rem; text-align: center; padding: 20px; font-weight: 700;">
+                            No active training plan found. Head to Schedules to pick an Elite Cycle!
+                         </p>
+                    `;
+                }
+            } catch (e) { console.error("Error loading Plan:", e); }
+
             const history = safeParse('workout_history', []);
-            if (history.length > 0) {
-                const totalMins = history.reduce((acc, sess) => acc + sess.duration, 0);
-                const avgMins = Math.round(totalMins / history.length);
-                document.getElementById('dash-volume').innerText = avgMins;
+            try {
+                // 3. Load Workout History & Volume
+                if (history.length > 0) {
+                    const totalMins = history.reduce((acc, sess) => acc + sess.duration, 0);
+                    const avgMins = Math.round(totalMins / history.length);
+                    document.getElementById('dash-volume').innerText = avgMins;
+                    const avgIntensity = Math.round(history.reduce((acc, sess) => acc + sess.intensity, 0) / history.length);
+                    let label = "Beginner";
+                    if (avgIntensity > 80) label = "Elite";
+                    else if (avgIntensity > 60) label = "Advanced";
+                    else if (avgIntensity > 40) label = "Intermediate";
+                    document.getElementById('dash-intensity-label').innerText = label;
+                    renderActivityGraph(history);
+                } else {
+                    renderActivityGraph([]);
+                }
+            } catch (e) { console.error("Error loading History:", e); }
 
-                // Intensity
-                const avgIntensity = Math.round(history.reduce((acc, sess) => acc + sess.intensity, 0) / history.length);
-                let label = "Beginner";
-                if (avgIntensity > 80) label = "Elite";
-                else if (avgIntensity > 60) label = "Advanced";
-                else if (avgIntensity > 40) label = "Intermediate";
-                document.getElementById('dash-intensity-label').innerText = label;
-
-                renderActivityGraph(history);
-            } else {
-                renderActivityGraph([]); // Empty state
-            }
-
-            // 4. Load Hydration
-            loadHydration();
-
-            // 5. Load Habits
-            loadHabits();
-
-            // 6. Load Supplements
-            loadSupps();
-
-            // 7. Load PRs
-            loadPRs();
-
-            // 8. Load Streak & Insights
-            loadStreak();
-            loadInsights(history);
+            try { loadHydration(); } catch (e) { console.error("Error loading Hydration:", e); }
+            try { loadHabits(); } catch (e) { console.error("Error loading Habits:", e); }
+            try { loadSupps(); } catch (e) { console.error("Error loading Supps:", e); }
+            try { loadPRs(); } catch (e) { console.error("Error loading PRs:", e); }
+            try { loadStreak(); } catch (e) { console.error("Error loading Streak:", e); }
+            try { loadInsights(history); } catch (e) { console.error("Error loading Insights:", e); }
         }
 
         function loadStreak() {
@@ -1000,32 +1041,18 @@
         }
 
         function loadInsights(history) {
-            const tips = [
-                { title: "Optimal Recovery", text: "Based on your intensity, aim for 8 hours of sleep tonight to maximize protein synthesis." },
-                { title: "Hydration Focus", text: "Water is fuel for your fascia. Stay hydrated to keep your muscles elastic and prevent strains." },
-                { title: "Mind-Muscle Connect", text: "Focus on the squeeze, not the speed. Good form is the best injury prevention tool." },
-                { title: "Nutrition Peak", text: "Protein builds muscle, but sleep heals it. Make sure you get quality rest tonight." }
-            ];
-
-            const recs = [
-                "Focus on perfect form for squats today.",
-                "High volume day ahead. Pace yourself.",
-                "Active recovery suggested: Light cardio.",
-                "Strength push: Aim for a PR in your first lift."
-            ];
-
             // Select random tip or base it on history volume
             let tip;
             if (history.length > 0 && history[0].intensity > 80) {
-                tip = tips[0]; // Recovery tip for high intensity
+                tip = INSIGHT_TIPS[0]; // Recovery tip for high intensity
             } else {
-                const dayIndex = new Date().getDay() % tips.length;
-                tip = tips[dayIndex];
+                const dayIndex = new Date().getDay() % INSIGHT_TIPS.length;
+                tip = INSIGHT_TIPS[dayIndex];
             }
 
             document.getElementById('insight-title').innerText = tip.title;
             document.getElementById('insight-text').innerText = tip.text;
-            document.getElementById('session-rec').innerText = recs[new Date().getDay() % recs.length];
+            document.getElementById('session-rec').innerText = SESSION_RECS[new Date().getDay() % SESSION_RECS.length];
         }
 
         function speak(text) {
@@ -1037,14 +1064,9 @@
             }
         }
 
-        const SUPPS_LIST = [
-            { id: 'creatine', label: 'Creatine Monohydrate' },
-            { id: 'protein', label: 'Whey / Casein Shake' },
-            { id: 'pre', label: 'Pre-Workout / Caffeine' }
-        ];
 
         function loadSupps() {
-            const todayStr = currentDashboardDate.toISOString().split('T')[0];
+            const todayStr = getLocalKey(currentDashboardDate);
             const suppData = safeParse(`supps_${todayStr}`, {});
             const container = document.getElementById('supps-list');
 
@@ -1061,7 +1083,7 @@
         }
 
         function toggleSupp(id) {
-            const todayStr = currentDashboardDate.toISOString().split('T')[0];
+            const todayStr = getLocalKey(currentDashboardDate);
             let suppData = safeParse(`supps_${todayStr}`, {});
             suppData[id] = !suppData[id];
             localStorage.setItem(`supps_${todayStr}`, JSON.stringify(suppData));
@@ -1073,35 +1095,46 @@
             const container = document.getElementById('prs-list');
 
             container.innerHTML = Object.entries(prs).map(([name, weight]) => `
-                <div style="display: flex; justify-content: space-between; align-items: center; padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer;" onclick="editPRPrompt('${name}', '${weight}')" title="Click to edit or delete">
-                    <span style="font-size: 0.85rem; color: #ccc; font-weight: 600;">${name}</span>
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <span style="font-size: 1rem; color: #ffd700; font-weight: 900;">${weight} <small style="font-size: 0.6rem; color: #666;">KG</small></span>
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                        </svg>
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                    <div style="display: flex; flex-direction: column;">
+                         <span style="font-size: 0.85rem; color: #ccc; font-weight: 600;">${name}</span>
+                         <span style="font-size: 1.1rem; color: #ffd700; font-weight: 950; margin-top: 2px;">${weight} <small style="font-size: 0.65rem; color: #666;">KG</small></span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <!-- Edit Button -->
+                        <button onclick="editPRPrompt('${name}', '${weight}')" style="background: none; border: none; padding: 5px; cursor: pointer; color: #888; display: flex; align-items: center;" title="Edit Record">
+                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                            </svg>
+                        </button>
+                        <!-- Delete Button -->
+                        <button onclick="deletePR('${name}')" style="background: none; border: none; padding: 5px; cursor: pointer; color: var(--error-color, #ff3366); display: flex; align-items: center;" title="Delete Record">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="3 6 5 6 21 6"></polyline>
+                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                            </svg>
+                        </button>
                     </div>
                 </div>
             `).join('');
         }
 
-        function editPRPrompt(ex, oldWt) {
-            const wt = prompt(`Edit weight for ${ex} (KG) (leave blank to delete):`, oldWt);
-            if (wt === null) return; // Cancelled
-
-            let prs = safeParse('user_prs', { "Bench Press": "0", "Deadlift": "0", "Squat": "0" });
-
-            if (wt.trim() === '') {
-                if (confirm(`Delete record for ${ex}?`)) {
-                    delete prs[ex];
-                } else {
-                    return;
-                }
-            } else {
-                prs[ex] = wt;
+        function deletePR(name) {
+            if (confirm(`Are you sure you want to remove your ${name} record?`)) {
+                let prs = safeParse('user_prs', {});
+                delete prs[name];
+                localStorage.setItem('user_prs', JSON.stringify(prs));
+                loadPRs();
             }
+        }
 
+        function editPRPrompt(ex, oldWt) {
+            const wt = prompt(`New weight for ${ex} (KG):`, oldWt);
+            if (wt === null || wt.trim() === '') return;
+
+            let prs = safeParse('user_prs', {});
+            prs[ex] = wt;
             localStorage.setItem('user_prs', JSON.stringify(prs));
             loadPRs();
             // Sync up to Supabase if possible (lazy sync will happen on next session or reload usually, but we could trigger it here if desired)
@@ -1120,31 +1153,42 @@
         }
 
         function loadHydration() {
-            const todayStr = currentDashboardDate.toISOString().split('T')[0];
-            const waterData = safeParse(`water_${todayStr}`, 0);
+            const todayStr = getLocalKey(currentDashboardDate);
+            const waterData = Number(safeParse(`water_${todayStr}`, 0)) || 0;
 
-            // 1. Calculate Dynamic Goal
-            const profile = safeParse('user_profile', { weight: 70 });
-            const baseGoal = Math.round((profile.weight || 70) * 35); // 35ml per kg
+            // 1. Calculate Dynamic Goal (Check for Manual Override First)
+            const profile = safeParse('user_profile', { weight: 70, water_goal: 0 });
+            let baseGoal = Number(profile.water_goal);
+
+            if (!baseGoal || baseGoal <= 0) {
+                const userWt = Number(profile.weight) || 70;
+                baseGoal = Math.round(userWt * 35); // 35ml per kg
+            }
 
             // Intensity Adjustment (+500ml per hard workout today)
-            const history = safeParse('workout_history', []);
-            const trainedToday = history.filter(h => h.date.split('T')[0] === todayStr && h.intensity > 60);
-            const adjustment = trainedToday.length * 500;
-            const totalGoal = baseGoal + adjustment;
+            let history = safeParse('workout_history', []);
+            if (!Array.isArray(history)) history = [];
 
-            document.getElementById('dash-water').innerText = (waterData / 1000).toFixed(1);
-            document.getElementById('dash-water-target').innerText = (totalGoal / 1000).toFixed(1);
-            document.getElementById('base-hyd').innerText = (baseGoal / 1000).toFixed(1);
+            const trainedToday = history.filter(h => {
+                try {
+                    return h.date && getLocalKey(new Date(h.date)) === todayStr && h.intensity > 60;
+                } catch (e) { return false; }
+            });
+            const adjustment = trainedToday.length * 500;
+            const totalGoal = (Number(baseGoal) || 2500) + adjustment;
+
+            document.getElementById('dash-water').innerText = Math.round(waterData);
+            document.getElementById('dash-water-target').innerText = Math.round(totalGoal);
+            document.getElementById('base-hyd').innerText = Math.round(baseGoal);
 
             if (adjustment > 0) {
                 document.getElementById('int-adj').style.display = 'inline-block';
-                document.getElementById('int-adj').innerText = `WORKOUT: +${(adjustment / 1000).toFixed(1)}L`;
+                document.getElementById('int-adj').innerText = `WORKOUT: +${Math.round(adjustment)} ml`;
             } else {
                 document.getElementById('int-adj').style.display = 'none';
             }
 
-            const percent = Math.min(100, (waterData / totalGoal) * 100);
+            const percent = totalGoal > 0 ? Math.min(100, (waterData / totalGoal) * 100) : 0;
             document.getElementById('dash-water-progress').style.width = `${percent}%`;
 
             // 2. Load 7-Day History Chart
@@ -1162,9 +1206,9 @@
             container.innerHTML = '';
 
             for (let i = 6; i >= 0; i--) {
-                const date = new Date();
+                const date = new Date(currentDashboardDate);
                 date.setDate(date.getDate() - i);
-                const dateKey = date.toISOString().split('T')[0];
+                const dateKey = getLocalKey(date);
                 const amount = safeParse(`water_${dateKey}`, 0);
 
                 const ratio = Math.min(1, amount / currentGoal);
@@ -1192,52 +1236,67 @@
         }
 
         function addWater(ml) {
-            const todayStr = currentDashboardDate.toISOString().split('T')[0];
-            let waterData = safeParse(`water_${todayStr}`, 0);
-            waterData += ml;
+            const val = Number(ml);
+            if (isNaN(val)) return;
+
+            const todayStr = getLocalKey(currentDashboardDate);
+            let waterData = Number(safeParse(`water_${todayStr}`, 0)) || 0;
+
+            waterData += val;
+            if (waterData < 0) waterData = 0;
+
             localStorage.setItem(`water_${todayStr}`, JSON.stringify(waterData));
 
-            // Save to logs for history tracking (if needed for more precision)
-            const logs = safeParse('water_logs', []);
-            logs.push({ date: new Date().toISOString(), amount: ml });
-            localStorage.setItem('water_logs', JSON.stringify(logs.slice(-50))); // Keep last 50
+            // Save to logs
+            let logs = safeParse('water_logs', []);
+            if (!Array.isArray(logs)) logs = [];
+            logs.push({ date: new Date().toISOString(), amount: val, day: todayStr });
+            localStorage.setItem('water_logs', JSON.stringify(logs.slice(-50)));
 
             loadHydration();
 
-            // Interaction effect
-            const el = document.getElementById('dash-water');
-            el.style.transform = 'scale(1.2)';
-            el.style.color = '#00f0ff';
-            setTimeout(() => {
-                el.style.transform = 'scale(1)';
-                el.style.color = '';
-            }, 300);
+            // Pulse animation
+            const stat = document.getElementById('dash-water');
+            if (stat) {
+                stat.style.transition = '0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+                stat.style.transform = 'scale(1.3)';
+                stat.style.color = '#00f0ff';
+                setTimeout(() => {
+                    stat.style.transform = 'scale(1)';
+                    stat.style.color = '';
+                }, 300);
+            }
         }
 
         function customWater() {
             const ml = prompt("Enter amount in ml (e.g. 330):");
             if (ml && !isNaN(ml)) {
-                addWater(parseInt(ml));
+                addWater(Number(ml));
+            }
+        }
+
+        function editWaterGoal() {
+            const currentGoal = document.getElementById('dash-water-target').innerText;
+            const newGoal = prompt("Set your Daily Water Goal (ml):", currentGoal);
+            if (newGoal && !isNaN(newGoal)) {
+                const profile = safeParse('user_profile', {});
+                profile.water_goal = parseInt(newGoal);
+                localStorage.setItem('user_profile', JSON.stringify(profile));
+                loadHydration();
             }
         }
 
         function toggleElectrolytes() {
-            const todayStr = currentDashboardDate.toISOString().split('T')[0];
+            const todayStr = getLocalKey(currentDashboardDate);
             let electroData = safeParse(`electro_${todayStr}`, false);
             electroData = !electroData;
             localStorage.setItem(`electro_${todayStr}`, JSON.stringify(electroData));
             loadHydration();
         }
 
-        const HABITS_LIST = [
-            { id: 'vits', label: 'Vitamins / Omega-3' },
-            { id: 'sleep', label: '7+ Hours Quality Sleep' },
-            { id: 'stretch', label: 'Post-workout Stretching' },
-            { id: 'junk', label: 'Zero Junk Food Day' }
-        ];
 
         function loadHabits() {
-            const todayStr = currentDashboardDate.toISOString().split('T')[0];
+            const todayStr = getLocalKey(currentDashboardDate);
             const habitData = safeParse(`habits_${todayStr}`, {});
             const container = document.getElementById('habits-list');
 
@@ -1254,7 +1313,7 @@
         }
 
         function toggleHabit(id) {
-            const todayStr = currentDashboardDate.toISOString().split('T')[0];
+            const todayStr = getLocalKey(currentDashboardDate);
             let habitData = safeParse(`habits_${todayStr}`, {});
             habitData[id] = !habitData[id];
             localStorage.setItem(`habits_${todayStr}`, JSON.stringify(habitData));
@@ -1322,7 +1381,8 @@
             // Personalise greeting
             const hour = new Date().getHours();
             const greeting = hour < 12 ? 'GOOD MORNING' : hour < 17 ? 'GOOD AFTERNOON' : 'GOOD EVENING';
-            document.getElementById('user-greeting').innerText = `${greeting}, ${profile.name.split(' ')[0].toUpperCase()} 👊`;
+            const firstName = (profile && profile.name) ? profile.name.split(' ')[0].toUpperCase() : 'TRAINER';
+            document.getElementById('user-greeting').innerText = `${greeting}, ${firstName} 👊`;
 
             // Goal badge
             const goalBadge = document.getElementById('user-goal-badge');
@@ -1334,6 +1394,11 @@
             initCalendar();
             loadDashboardData();
         };
+
+        // Ensure data refreshes when returning to tab
+        window.addEventListener('pageshow', () => {
+            if (typeof loadDashboardData === 'function') loadDashboardData();
+        });
     </script>
 </body>
 

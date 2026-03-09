@@ -9,19 +9,24 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap"
         rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/supabase-auth.js"></script>
+    <script src="js/app.js"></script>
     <style>
-        html,
         body {
-            height: auto !important;
-            min-height: 100vh !important;
-            overflow-y: auto !important;
-            overflow-x: hidden !important;
-            scrollbar-width: thin;
-            background-attachment: fixed !important;
+            background-color: var(--bg-dark);
             background-image:
                 radial-gradient(circle at 50% 0%, rgba(0, 240, 255, 0.15), transparent 50%),
                 linear-gradient(to bottom, rgba(13, 5, 20, 0.88), rgba(9, 9, 11, 0.98)),
                 url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=2070') !important;
+            background-size: cover;
+            background-position: center;
+            background-attachment: scroll;
+            /* Performance over fixed */
+            color: var(--text-main);
+            overflow-x: hidden;
+            min-height: 100vh;
         }
 
         .tools-container {
@@ -1209,15 +1214,21 @@
                 resultPanel.style.display = 'block';
                 resultPanel.scrollIntoView({ behavior: 'smooth' });
 
-                // Persist to localStorage for Dashboard access
-                localStorage.setItem('user_macro_plan', JSON.stringify({
+                // Persist to Cloud & localStorage for Dashboard access
+                const planData = {
                     calories: targetCalories,
                     protein: totalProtein,
                     carbs: totalCarbs,
                     fat: totalFats,
                     goal: currentGoal,
                     timestamp: new Date().getTime()
-                }));
+                };
+
+                if (window.SupabaseAuth) {
+                    SupabaseAuth.saveMacroPlan(planData);
+                } else {
+                    localStorage.setItem('user_macro_plan', JSON.stringify(planData));
+                }
             } catch (e) {
                 console.error("Timetable Error:", e);
                 document.getElementById('food-plan-suggested').innerHTML = "<p style='color:red'>Plan rendering error. Check inputs.</p>";
@@ -1519,7 +1530,7 @@
             }
         }
         window.onload = () => {
-            const profile = JSON.parse(localStorage.getItem('user_profile'));
+            const profile = safeParse('user_profile', null);
             if (profile) {
                 // Pre-fill fields
                 syncInput('weight', profile.weight);

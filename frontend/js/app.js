@@ -8,6 +8,24 @@ const API_BASE_URL = window.location.hostname === "localhost" ||
     ? "http://localhost:8000"
     : ""; // Relative path works when frontend is served by the backend
 
+// Safe parser helper to prevent crashes from malformed localStorage data
+function safeParse(key, fallback) {
+    try {
+        const val = localStorage.getItem(key);
+        if (val === 'undefined' || val === 'null' || !val) return fallback;
+        return JSON.parse(val);
+    } catch (e) {
+        console.warn(`Failed to parse ${key} from local storage`, e);
+        return fallback;
+    }
+}
+
+// Return date string in local YYYY-MM-DD format
+function getLocalKey(date = new Date()) {
+    const d = new Date(date);
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
 async function apiPost(endpoint, data) {
     try {
         const response = await fetch(`${API_BASE_URL}${endpoint}`, {
@@ -52,10 +70,10 @@ const NotificationManager = {
     },
 
     checkHydrationReminder() {
-        const today = new Date().toISOString().split('T')[0];
-        const waterData = JSON.parse(localStorage.getItem(`water_${today}`) || '0');
-        const profile = JSON.parse(localStorage.getItem('user_profile') || '{"weight": 70}');
-        const goal = profile.weight * 35;
+        const today = getLocalKey();
+        const waterData = safeParse(`water_${today}`, 0);
+        const profile = safeParse('user_profile', { "weight": 70 });
+        const goal = (profile.weight || 70) * 35;
         const currentHour = new Date().getHours();
 
         // Hourly reminder between 8 AM and 9 PM if behind
