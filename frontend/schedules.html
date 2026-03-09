@@ -10,6 +10,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap"
         rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
     <style>
         body {
             background-attachment: fixed !important;
@@ -519,6 +520,7 @@
                 </a>
                 <div class="logo">FIT COACH AI</div>
             </div>
+
         </header>
 
         <section class="hero-mini">
@@ -1080,7 +1082,16 @@
             startWorkout(sched.exercises[0]);
         }
 
-        init();
+        (async () => {
+            const { createClient } = window.supabase;
+            const _sb = createClient(
+                "https://bleaekgciwewwyrrtmhj.supabase.co",
+                "sb_publishable_gndBrArguBapaDo96uf5XQ_aBa9anGY"
+            );
+            const { data: { session } } = await _sb.auth.getSession();
+            if (!session) { window.location.replace('index.html'); return; }
+            init();
+        })();
     </script>
 </body>
 

@@ -4,3 +4,5 @@ opencv-python-headless
 mediapipe
 numpy
 python-multipart
+google-generativeai
+python-dotenv

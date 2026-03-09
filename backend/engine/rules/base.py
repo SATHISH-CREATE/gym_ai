@@ -8,6 +8,7 @@ class BaseRule:
         self.feedback = "Get Ready"
         self.incorrect_indices = []
         self._last_angle = 0
+        self.last_positions = {} # Store {index: (x, y)}
 
     def calculate_angle(self, a, b, c):
         """Calculate angle between points a, b, c (b is vertex)."""
@@ -42,7 +43,6 @@ class BaseRule:
     def process(self, landmarks):
         """Main processing method - override in subclasses."""
         # Generic visibility check (at least some body parts should be visible)
-        # 11, 12 (shoulders) or 23, 24 (hips)
         if not self.is_visible(landmarks, [11, 12], 0.3) and not self.is_visible(landmarks, [23, 24], 0.3):
              return {
                 "counter": self.counter,
@@ -61,3 +61,34 @@ class BaseRule:
             "incorrect_indices": [],
             "visibility_ok": True
         }
+
+    def validate_motion(self, landmarks, active_indices, stable_indices, sensitivity=0.01):
+        """
+        Returns True if active_indices are moving MORE than stable_indices.
+        Helps prevent counting 'Squats' when you are actually doing 'Bicep Curls' etc.
+        """
+        is_valid = True
+        active_motion = 0
+        stable_motion = 0
+        
+        for idx in active_indices:
+            if idx in self.last_positions:
+                curr = landmarks[idx]
+                prev = self.last_positions[idx]
+                active_motion += abs(curr.x - prev[0]) + abs(curr.y - prev[1])
+            self.last_positions[idx] = (landmarks[idx].x, landmarks[idx].y)
+            
+        for idx in stable_indices:
+            if idx in self.last_positions:
+                curr = landmarks[idx]
+                prev = self.last_positions[idx]
+                stable_motion += abs(curr.x - prev[0]) + abs(curr.y - prev[1])
+            self.last_positions[idx] = (landmarks[idx].x, landmarks[idx].y)
+            
+        # If the 'stable' parts of the body are moving way more than the 'active' parts,
+        # it's likely a different exercise or just moving around.
+        if stable_motion > active_motion + sensitivity:
+            is_valid = False
+            
+        return is_valid
+

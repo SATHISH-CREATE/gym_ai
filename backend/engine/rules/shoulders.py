@@ -21,30 +21,40 @@ class OverheadPressRule(BaseRule):
         
         if angle < 90:
             self.stage = "down"
-        if angle > 160 and self.stage == 'down':
-            self.stage = "up"
-            self.counter += 1
-            self.correct_reps += 1
-            self.feedback = "Good press!"
             
-        if self.stage == "up" and angle < 90:
-            self.stage = "down"
-            self.feedback = "Lower elbows"
-
         # Form Check: Arched back
+        is_stable = True
         incorrect_indices = []
         if self.is_visible(landmarks, [11, 23, 25], 0.5):
             back_angle = self.calculate_angle(landmarks[11], landmarks[23], landmarks[25])
-            if back_angle < 160:
-                self.feedback = "Don't arch your back!"
+            if back_angle < 155: # Tighter rule
+                is_stable = False
+                self.feedback = "Keep core tight! Back is arching."
                 incorrect_indices = [23]
+
+        if angle > 160 and self.stage == 'down':
+            if is_stable:
+                self.stage = "up"
+                self.counter += 1
+                self.correct_reps += 1
+                self.feedback = "Good press!"
+            else:
+                self.stage = "up"
+                self.feedback = "Fix form: core stability"
+            
+        if self.stage == "up" and angle < 90:
+            self.stage = "down"
+            if "Fix" not in self.feedback:
+                self.feedback = "Lower elbows"
 
         return {
             "counter": self.counter,
             "correct_reps": self.correct_reps,
             "stage": self.stage,
             "feedback": self.feedback,
-            "incorrect_indices": incorrect_indices
+            "incorrect_indices": incorrect_indices,
+            "angle": angle,
+            "target": 160
         }
 
 class LateralRaiseRule(BaseRule):
@@ -57,28 +67,34 @@ class LateralRaiseRule(BaseRule):
         elbow = landmarks[13]
         
         # Lateral raise: Elbow comes up to shoulder height
-        # stage detection based on elbow Y relative to shoulder Y
         if elbow.y > shoulder.y + 0.1: # Elbow well below shoulder
             self.stage = "down"
             
-        if elbow.y < shoulder.y + 0.05 and self.stage == "down": # Elbow at/near shoulder height
-            self.stage = "up"
-            self.counter += 1
-            self.correct_reps += 1
-            self.feedback = "Great raise!"
-            
-        if self.stage == "up" and elbow.y > shoulder.y + 0.1:
-            self.stage = "down"
-            self.feedback = "Control the descent"
-            
         # Form Check: Hands too high
+        is_stable = True
         incorrect_indices = []
         if self.is_visible(landmarks, [13, 15], 0.5):
             wrist = landmarks[15]
             if wrist.y < elbow.y - 0.05:
-                self.feedback = "Keep elbows above wrists"
+                is_stable = False
+                self.feedback = "Elbows up! Hands too high."
                 incorrect_indices = [15]
 
+        if elbow.y < shoulder.y + 0.05 and self.stage == "down": # Elbow at/near shoulder height
+            if is_stable:
+                self.stage = "up"
+                self.counter += 1
+                self.correct_reps += 1
+                self.feedback = "Great raise!"
+            else:
+                self.stage = "up"
+                self.feedback = "Fix form: elbows above wrists"
+            
+        if self.stage == "up" and elbow.y > shoulder.y + 0.1:
+            self.stage = "down"
+            if "Fix" not in self.feedback:
+                self.feedback = "Control the descent"
+            
         return {
             "counter": self.counter,
             "correct_reps": self.correct_reps,

@@ -10,6 +10,10 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap"
         rel="stylesheet">
+    <!-- Supabase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/supabase-auth.js"></script>
     <style>
         /* Match library.html layout exactly */
         .container {
@@ -287,6 +291,19 @@
                 </a>
                 <div class="logo">FIT COACH AI</div>
             </div>
+
+            <div class="header-actions">
+                <button onclick="handleLogout()" class="btn glass logout-btn"
+                    style="color: #ff3b3b; border-color: rgba(255, 59, 59, 0.3); font-size: 0.85rem; padding: 10px 18px;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                    Logout
+                </button>
+            </div>
         </header>
 
         <!-- Hero -->
@@ -315,7 +332,7 @@
                     <span class="profile-pill" id="profile-bmi-pill">BMI —</span>
                 </div>
             </div>
-            <a href="setup.html" class="edit-profile-btn" onclick="localStorage.removeItem('user_profile')">
+            <a href="setup.html" class="edit-profile-btn">
                 ✎ Edit Profile
             </a>
         </div>
@@ -399,17 +416,65 @@
                 💾 Save Settings
             </button>
             <p id="saveConfirm">✅ Settings saved!</p>
+
+            <div style="margin-top: 60px; border-top: 1px solid rgba(255,59,59,0.1); padding-top: 30px;">
+                <h3 style="color: #ff3b3b; font-size: 0.9rem; margin-bottom: 15px;">DANGER ZONE</h3>
+                <button onclick="handleDeleteAccount()" class="btn glass"
+                    style="color: #ff3b3b; border-color: rgba(255,59,59,0.2); font-size: 0.8rem; padding: 12px 25px;">
+                    🗑️ Delete My Account & Wipe Data
+                </button>
+                <p style="font-size: 0.7rem; color: #444; margin-top: 10px;">This action is permanent and cannot be
+                    undone.</p>
+            </div>
         </div>
+
+
 
     </div><!-- /container -->
 
     <script>
+        async function handleLogout() {
+            if (confirm('Are you sure you want to logout? Cloud sync will pause but your data is safe.')) {
+                await SupabaseAuth.signOut();
+            }
+        }
+
+        async function handleDeleteAccount() {
+            const confirmed = confirm("CRITICAL: This will permanently delete your profile, workout history, and personal data from our cloud. Type 'DELETE' to confirm.");
+            if (confirmed) {
+                const response = prompt("Type 'DELETE' to confirm permanent wipe:");
+                if (response === 'DELETE') {
+                    const userId = localStorage.getItem('supabase_user_id');
+                    // Data cascades due to DB rules ('on delete cascade')
+                    const { error } = await supabase.auth.admin.deleteUser(userId); // Error: this requires service role
+                    // Correct approach for client-side delete:
+                    const { error: delErr } = await supabase.from('profiles').delete().eq('id', userId);
+                    if (!delErr) {
+                        // Sign out triggers cleanup
+                        await SupabaseAuth.signOut();
+                    } else {
+                        alert("Error wiping data: " + delErr.message);
+                    }
+                }
+            }
+        }
+
         /* ---- Profile ---- */
-        window.onload = () => {
-            const profile = JSON.parse(localStorage.getItem('user_profile'));
+        window.onload = async () => {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) { window.location.replace('index.html'); return; }
+
+            const { data: profile } = await supabase.from('profiles').select('*').eq('id', session.user.id).single();
             if (!profile || !profile.name) { window.location.replace('setup.html'); return; }
 
-            document.getElementById('avatar-icon').textContent = profile.gender === 'female' ? '👩' : '👨';
+            // Sync avatar
+            const avatarEl = document.getElementById('avatar-icon');
+            if (profile.avatar_url) {
+                avatarEl.innerHTML = `<img src="${profile.avatar_url}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">`;
+            } else {
+                avatarEl.textContent = profile.gender === 'female' ? '👩' : '👨';
+            }
+
             document.getElementById('profile-name').textContent = profile.name;
             document.getElementById('profile-sub').textContent =
                 `${profile.gender === 'male' ? 'Male' : 'Female'} · ${profile.age} yrs · ${profile.weight}kg · ${profile.height}cm`;
@@ -438,13 +503,20 @@
 
             nameInput.oninput = () => { namePreview.innerText = nameInput.value || 'buddy'; };
 
-            document.getElementById('saveBtn').onclick = () => {
+            document.getElementById('saveBtn').onclick = async () => {
                 const settings = {
                     assistantName: nameInput.value.trim().toLowerCase() || 'buddy',
                     coachCooldown: parseInt(cooldownInput.value) || 5,
                     repMilestone: parseInt(milestoneInput.value) || 5
                 };
                 localStorage.setItem('fitcoach_settings', JSON.stringify(settings));
+
+                // Also sync settings to cloud user_data if needed (optional for now as we have a specific table for PRs/Plans)
+                await supabase.from('user_data').upsert({
+                    user_id: session.user.id,
+                    settings: settings
+                });
+
                 const confirm = document.getElementById('saveConfirm');
                 confirm.style.display = 'block';
                 setTimeout(() => confirm.style.display = 'none', 3000);

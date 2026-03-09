@@ -16,29 +16,42 @@ class PushupRule(BaseRule):
         shoulder = landmarks[11]
         elbow = landmarks[13]
         wrist = landmarks[15]
+
+        # Movement Consistency: In a pushup, the body moves but the hands are fixed on floor
+        if not self.validate_motion(landmarks, [11, 23], [15, 16], sensitivity=0.01):
+            self.feedback = "Keep your hands firm on the ground"
         
         angle = self.calculate_angle(shoulder, elbow, wrist)
         
+        # State machine
         if angle > 160:
             self.stage = "up"
-        if angle < 90 and self.stage == 'up':
-            self.stage = "down"
-            self.counter += 1
-            self.correct_reps += 1
-            self.feedback = "Good depth!"
-            
-        if self.stage == "down" and angle > 160:
-            self.stage = "up"
-            self.feedback = "Down again"
-
+        
         # Form Check: Back Alignment (Shoulder - Hip - Knee)
+        is_straight = True
         incorrect_indices = []
         if self.is_visible(landmarks, [11, 23, 25], 0.5):
             back_angle = self.calculate_angle(landmarks[11], landmarks[23], landmarks[25])
             # A straight pushup should have a hip angle close to 180 degrees
             if back_angle < 155: # Hips too high or sagging
-                self.feedback = "Keep your back straight!"
+                is_straight = False
+                self.feedback = "Keep back straight!"
                 incorrect_indices = [23] # Highlight hips
+
+        if angle < 90 and self.stage == 'up':
+            if is_straight:
+                self.stage = "down"
+                self.counter += 1
+                self.correct_reps += 1
+                self.feedback = "Good depth!"
+            else:
+                self.stage = "down"
+                self.feedback = "Fix form: straight back"
+            
+        if self.stage == "down" and angle > 160:
+            self.stage = "up"
+            if "Fix" not in self.feedback:
+                self.feedback = "Down again"
 
         return {
             "counter": self.counter,

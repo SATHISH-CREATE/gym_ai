@@ -104,6 +104,54 @@ class PoseAnalyzer:
         self.rule_engine = None
         self.timestamp_ms = 0
 
+    def process_landmarks(self, landmarks_list, exercise_name):
+        self.set_exercise(exercise_name)
+        
+        # Convert list of dicts to objects with attributes for the rule engine
+        class Landmark:
+            def __init__(self, d):
+                self.x = d.get('x', 0)
+                self.y = d.get('y', 0)
+                self.z = d.get('z', 0)
+                self.visibility = d.get('visibility', 0.9) # Default high visibility if sent from frontend
+
+        landmarks = [Landmark(l) for l in landmarks_list]
+
+        feedback_data = {
+            "exercise": exercise_name,
+            "rep_count": 0,
+            "correct_reps": 0,
+            "form": "N/A",
+            "feedback": "Ready",
+            "landmarks": landmarks_list,
+            "incorrect_indices": [],
+            "is_correct": True,
+            "visibility_ok": True
+        }
+
+        if self.rule_engine:
+            analysis = self.rule_engine.process(landmarks)
+            incorrect = analysis.get("incorrect_indices", [])
+            is_correct = len(incorrect) == 0
+            
+            # Strictness Check: If the movement doesn't match the exercise type at all,
+            # we should avoid high-confidence feedback.
+            # (Subclasses can implement specific logic, but here we use the feedback from rules)
+            
+            feedback_data.update({
+                "rep_count": analysis["counter"],
+                "correct_reps": analysis["correct_reps"],
+                "form": analysis["stage"],
+                "feedback": analysis["feedback"],
+                "incorrect_indices": incorrect,
+                "is_correct": is_correct,
+                "angle": analysis.get("angle"),
+                "target": analysis.get("target"),
+                "visibility_ok": analysis.get("visibility_ok", True)
+            })
+
+        return feedback_data
+
     def process_frame(self, image_data, exercise_name):
         # Decode base64 image
         if isinstance(image_data, str) and "," in image_data:
@@ -144,32 +192,17 @@ class PoseAnalyzer:
         if results.pose_landmarks:
             landmarks = results.pose_landmarks[0] # Take first person
             
-            # Apply rules
-            if self.rule_engine:
-                analysis = self.rule_engine.process(landmarks)
-                # Correctness is now based on whether any joints were flagged this frame
-                incorrect = analysis.get("incorrect_indices", [])
-                is_correct = len(incorrect) == 0
-                
-                feedback_data.update({
-                    "rep_count": analysis["counter"],
-                    "correct_reps": analysis["correct_reps"],
-                    "form": analysis["stage"],
-                    "feedback": analysis["feedback"],
-                    "incorrect_indices": incorrect,
-                    "is_correct": is_correct
-                })
-
-
-
-            # Prepare landmarks for frontend
+            # Convert to frontend-compatible format
+            landmarks_list = []
             for lm in landmarks:
-                feedback_data["landmarks"].append({
+                landmarks_list.append({
                     "x": lm.x, 
                     "y": lm.y, 
                     "z": lm.z, 
                     "visibility": lm.visibility
                 })
+            
+            return self.process_landmarks(landmarks_list, exercise_name)
 
         return feedback_data
 

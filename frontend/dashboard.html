@@ -8,6 +8,10 @@
     <link rel="stylesheet" href="css/styles.css?v=5">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap"
         rel="stylesheet">
+    <!-- Supabase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/supabase-auth.js"></script>
     <style>
         :root {
             --primary-glow: rgba(112, 0, 255, 0.4);
@@ -88,9 +92,10 @@
 
         .stat-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
             gap: 25px;
             margin-bottom: 40px;
+            width: 100%;
         }
 
         .dash-card {
@@ -402,6 +407,61 @@
                 display: none !important;
             }
         }
+
+        /* Habit Item Styles */
+        .habit-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 15px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .habit-item:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .habit-item.done {
+            background: rgba(34, 197, 94, 0.05);
+            border-color: rgba(34, 197, 94, 0.2);
+        }
+
+        .habit-item.done h4 {
+            text-decoration: line-through;
+            opacity: 0.5;
+            color: #22c55e !important;
+        }
+
+        .checkbox-custom {
+            width: 20px;
+            height: 20px;
+            border-radius: 6px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+
+        .habit-item.done .checkbox-custom {
+            background: #22c55e;
+            border-color: #22c55e;
+        }
+
+        .checkbox-custom svg {
+            display: none;
+            color: black;
+        }
+
+        .habit-item.done .checkbox-custom svg {
+            display: block;
+        }
     </style>
 </head>
 
@@ -438,6 +498,15 @@
                     </svg>
                     Tools
                 </a>
+                <a href="coach.html" class="btn glass">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;">
+                        <rect x="3" y="11" width="18" height="10" rx="2"></rect>
+                        <circle cx="12" cy="5" r="2"></circle>
+                        <path d="M12 7v4"></path>
+                    </svg>
+                    AI Coach
+                </a>
                 <a href="profile.html" class="btn glass">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                         stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;">
@@ -460,9 +529,22 @@
                     <h1 id="current-day-long">Monday, 02</h1>
                     <p id="user-greeting"></p>
                 </div>
-                <div class="welcome-info-right">
-                    <span class="badge" id="user-goal-badge">🎯 ACTIVE CYCLE</span>
-                    <p id="user-level-tag">Day 1 of 6-Day Split</p>
+                <div class="welcome-info-right"
+                    style="display: flex; align-items: flex-end; flex-direction: column; gap: 8px;">
+                    <div id="streak-badge"
+                        style="display: flex; align-items: center; gap: 10px; background: rgba(255,100,0,0.1); border: 1px solid rgba(255,100,0,0.3); padding: 6px 15px; border-radius: 12px; margin-bottom: 5px;">
+                        <span style="font-size: 1.1rem;">🔥</span>
+                        <div style="text-align: left;">
+                            <span id="streak-count"
+                                style="display: block; font-weight: 950; color: #ff6400; font-size: 0.9rem; line-height: 1;">0
+                                DAYS</span>
+                        </div>
+                    </div>
+                    <span class="badge" id="user-goal-badge"
+                        style="background: rgba(34, 197, 94, 0.1); color: #22c55e; border: 1px solid rgba(34, 197, 94, 0.3); padding: 5px 12px; border-radius: 8px; font-weight: 800; font-size: 0.75rem;">🎯
+                        ACTIVE CYCLE</span>
+                    <p id="user-level-tag" style="font-size: 0.8rem; color: #888; margin: 0; font-weight: 600;">Day 1 of
+                        6-Day Split</p>
                 </div>
             </div>
 
@@ -526,10 +608,11 @@
                     </div>
 
                     <div class="progress-bar-wrap">
-                        <div class="progress-bar-fill" id="dash-cal-progress"></div>
+                        <div class="progress-bar-fill" id="dash-cal-progress" style="width: 0%;"></div>
                     </div>
-                    <p style="font-size: 0.75rem; color: #666; margin-top: 10px; text-align: center;">65% of daily
-                        target reached</p>
+                    <p id="dash-nutrition-status"
+                        style="font-size: 0.75rem; color: #666; margin-top: 10px; text-align: center;">Track your meals
+                        in Tools</p>
 
                     <a href="calculators.html" class="btn glass"
                         style="width: 100%; margin-top: 15px; border-radius: 15px; font-size: 0.85rem;">UPDATE DIET
@@ -549,7 +632,7 @@
                             </svg>
                         </div>
                     </div>
-                    <div class="big-stat">42 <span class="unit">mins</span></div>
+                    <div class="big-stat"><span id="dash-volume">0</span> <span class="unit">mins</span></div>
                     <p style="color: #39FF14; font-weight: 700; font-size: 0.85rem; margin-top: -5px;">AVG WORKOUT TIME
                     </p>
 
@@ -557,28 +640,11 @@
                         <div
                             style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 8px;">
                             <span style="color: #888;">Weekly Intensity</span>
-                            <span style="color: #fff;">Elite</span>
+                            <span id="dash-intensity-label" style="color: #fff;">Beginner</span>
                         </div>
-                        <div style="display: flex; align-items: flex-end; gap: 4px; height: 60px;">
-                            <div
-                                style="flex: 1; height: 40%; background: var(--primary-color); opacity: 0.3; border-radius: 4px;">
-                            </div>
-                            <div
-                                style="flex: 1; height: 60%; background: var(--primary-color); opacity: 0.5; border-radius: 4px;">
-                            </div>
-                            <div
-                                style="flex: 1; height: 90%; background: var(--primary-color); opacity: 0.7; border-radius: 4px;">
-                            </div>
-                            <div
-                                style="flex: 1; height: 75%; background: var(--primary-color); opacity: 0.5; border-radius: 4px;">
-                            </div>
-                            <div
-                                style="flex: 1; height: 100%; background: var(--primary-color); border-radius: 4px; box-shadow: 0 0 10px var(--primary-color);">
-                            </div>
-                            <div style="flex: 1; height: 20%; background: rgba(255,255,255,0.05); border-radius: 4px;">
-                            </div>
-                            <div style="flex: 1; height: 20%; background: rgba(255,255,255,0.05); border-radius: 4px;">
-                            </div>
+                        <div id="activity-graph"
+                            style="display: flex; align-items: flex-end; justify-content: space-between; height: 60px; margin-top: 10px; padding: 0 5px;">
+                            <!-- Injected by JS -->
                         </div>
                     </div>
 
@@ -587,64 +653,268 @@
                             talent doesn't persist."</p>
                     </div>
                 </div>
+
+                <!-- Smart Hydration Card -->
+                <div class="dash-card">
+                    <div class="card-header">
+                        <span class="card-title">Smart Hydration</span>
+                        <div class="card-icon" style="background: rgba(0, 150, 255, 0.1); color: #0096ff;">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.5">
+                                <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; align-items: baseline; gap: 10px;">
+                        <div class="big-stat"><span id="dash-water">0.0</span> <span class="unit">L</span></div>
+                        <div style="font-size: 0.8rem; color: #555; font-weight: 700;">/ <span
+                                id="dash-water-target">3.5</span> L GOAL</div>
+                    </div>
+
+                    <div id="hydration-adjustments"
+                        style="display: flex; gap: 8px; margin-top: -5px; margin-bottom: 15px;">
+                        <span class="pill pill-blue"
+                            style="font-size: 0.65rem; background: rgba(0, 150, 255, 0.1);">BASE: <span
+                                id="base-hyd">2.5</span>L</span>
+                        <span id="int-adj" class="pill pill-purple" style="font-size: 0.65rem; display: none;">WORKOUT:
+                            +0.5L</span>
+                    </div>
+
+                    <div class="progress-bar-wrap" style="height: 12px; border-radius: 6px;">
+                        <div class="progress-bar-fill" id="dash-water-progress"
+                            style="width: 0%; background: linear-gradient(90deg, #0096ff, #00f0ff); border-radius: 6px;">
+                        </div>
+                    </div>
+
+                    <!-- 7-Day History Chart -->
+                    <div style="margin-top: 15px;">
+                        <span
+                            style="font-size: 0.7rem; color: #666; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;">7-Day
+                            History</span>
+                        <div id="hydration-chart"
+                            style="display: flex; align-items: flex-end; justify-content: space-between; height: 50px; margin-top: 8px; padding: 0 5px;">
+                            <!-- Bars injected by JS -->
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 18px;">
+                        <button onclick="addWater(250)" class="btn glass"
+                            style="padding: 10px 5px; font-size: 0.75rem; border-radius: 12px; flex-direction: column;">
+                            <span style="font-size: 1.1rem; margin-bottom: 2px;">🥛</span> 250ml
+                        </button>
+                        <button onclick="addWater(500)" class="btn glass"
+                            style="padding: 10px 5px; font-size: 0.75rem; border-radius: 12px; flex-direction: column;">
+                            <span style="font-size: 1.1rem; margin-bottom: 2px;">🥤</span> 500ml
+                        </button>
+                        <button onclick="customWater()" class="btn glass"
+                            style="padding: 10px 5px; font-size: 0.75rem; border-radius: 12px; flex-direction: column;">
+                            <span style="font-size: 1.1rem; margin-bottom: 2px;">➕</span> Manual
+                        </button>
+                    </div>
+
+                    <!-- Electrolyte Tracker -->
+                    <div class="habit-item" onclick="toggleElectrolytes()" id="electrolyte-status"
+                        style="margin-top: 15px; padding: 8px 12px;">
+                        <div class="checkbox-custom" style="border-color: #ffd700;">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#ffd700"
+                                stroke-width="4">
+                                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path>
+                            </svg>
+                        </div>
+                        <div style="flex: 1;">
+                            <h4 style="font-size: 0.8rem; margin: 0; color: #ffd700;">Electrolytes Included</h4>
+                            <p style="font-size: 0.65rem; color: #666; margin: 0;">Crucial for high-intensity days</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Daily Habits Card -->
+                <div class="dash-card">
+                    <div class="card-header">
+                        <span class="card-title">Daily Discipline</span>
+                        <div class="card-icon" style="background: rgba(34, 197, 94, 0.1); color: #22c55e;">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.5">
+                                <path d="M20 6L9 17l-5-5"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div id="habits-list" style="display: flex; flex-direction: column; gap: 10px;">
+                        <!-- Injected by JS -->
+                    </div>
+                </div>
+
+                <!-- Supplements Card -->
+                <div class="dash-card">
+                    <div class="card-header">
+                        <span class="card-title">Supplements</span>
+                        <div class="card-icon" style="background: rgba(255, 100, 0, 0.1); color: #ff6400;">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.5">
+                                <path d="M4.5 12.5l3 3 7-7"></path>
+                                <circle cx="12" cy="12" r="10"></circle>
+                            </svg>
+                        </div>
+                    </div>
+                    <div id="supps-list" style="display: flex; flex-direction: column; gap: 10px;">
+                        <!-- Injected by JS -->
+                    </div>
+                </div>
+
+                <!-- Personal Records Card -->
+                <div class="dash-card">
+                    <div class="card-header">
+                        <span class="card-title">Strength PRESS</span>
+                        <div class="card-icon" style="background: rgba(255, 215, 0, 0.1); color: #ffd700;">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.5">
+                                <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path>
+                                <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path>
+                                <path d="M4 22h16"></path>
+                                <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path>
+                                <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path>
+                                <path d="M18 2H6v7a6 6 0 0 0 12 0V2z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div id="prs-list" style="display: flex; flex-direction: column; gap: 12px;">
+                        <!-- Injected by JS -->
+                    </div>
+                    <div style="margin-top: 15px;">
+                        <button onclick="addPRPrompt()" class="btn glass"
+                            style="width: 100%; font-size: 0.8rem; padding: 10px;">NEW RECORD 🏆</button>
+                    </div>
+                </div>
+
+                <!-- Daily Performance Card -->
+                <div class="dash-card"
+                    style="background: linear-gradient(135deg, rgba(112,0,255,0.08), rgba(20,20,30,0.6)); border-color: rgba(112,0,255,0.3);">
+                    <div class="card-header">
+                        <span class="card-title">AI Coaching Analysis</span>
+                        <div class="card-icon" style="background: rgba(112, 0, 255, 0.1); color: #7000ff;">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.5">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <path d="M12 16v-4"></path>
+                                <path d="M12 8h.01"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div id="daily-tip-container"
+                        style="min-height: 100px; display: flex; flex-direction: column; justify-content: center;">
+                        <h3 id="insight-title"
+                            style="font-size: 1rem; font-weight: 800; color: #fff; margin-bottom: 6px; letter-spacing: 0.5px;">
+                            Initializing Coach...</h3>
+                        <p id="insight-text" style="font-size: 0.82rem; color: #aaa; line-height: 1.6; margin: 0;">
+                            Calculating your performance metrics and recovery status.</p>
+                    </div>
+                    <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.05);">
+                        <span
+                            style="font-size: 0.7rem; color: #555; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">Session
+                            Recommendation:</span>
+                        <p id="session-rec"
+                            style="font-size: 0.75rem; color: var(--primary-color); font-weight: 700; margin-top: 4px;">
+                            Loading...</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
+        let currentDashboardDate = new Date(); // Global selected date
+
         // --- Date & Calendar Logic ---
+        function selectDate(dateObj) {
+            currentDashboardDate = dateObj;
+            initCalendar();
+            loadDashboardData();
+        }
+
         function initCalendar() {
-            const now = new Date();
+            const todayIndex = new Date().toDateString(); // To check if a date is "today"
             const monthNames = ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"];
             const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
-            document.getElementById('current-month-year').innerText = `${monthNames[now.getMonth()]} ${now.getFullYear()}`;
-            document.getElementById('current-day-long').innerText = `${dayNames[now.getDay()]}, ${String(now.getDate()).padStart(2, '0')}`;
+            document.getElementById('current-month-year').innerText = `${monthNames[currentDashboardDate.getMonth()]} ${currentDashboardDate.getFullYear()}`;
+            document.getElementById('current-day-long').innerText = `${dayNames[currentDashboardDate.getDay()]}, ${String(currentDashboardDate.getDate()).padStart(2, '0')}`;
 
             const strip = document.getElementById('calendar-strip');
             strip.innerHTML = '';
 
-            // Render center-aligned week
+            // Render center-aligned week relative to TODAY, 
+            // so the strip stays fixed and you select days within it.
+            const now = new Date();
             for (let i = -3; i <= 3; i++) {
-                const d = new Date();
+                const d = new Date(now);
                 d.setDate(now.getDate() + i);
 
+                const isActive = d.toDateString() === currentDashboardDate.toDateString();
+                const isToday = d.toDateString() === todayIndex;
+
                 const dayEl = document.createElement('div');
-                dayEl.className = `calendar-day ${i === 0 ? 'active' : ''}`;
+                dayEl.className = `calendar-day ${isActive ? 'active' : ''}`;
+                // Small highlight for Actual Today
+                if (isToday && !isActive) dayEl.style.borderColor = 'rgba(255,255,255,0.3)';
+
+                dayEl.onclick = () => selectDate(d);
+
                 dayEl.innerHTML = `
-                    <span class="day-name">${dayNames[d.getDay()].substring(0, 3)}</span>
+                    <span class="day-name">${isToday ? 'TODAY' : dayNames[d.getDay()].substring(0, 3)}</span>
                     <span class="day-num">${d.getDate()}</span>
                 `;
                 strip.appendChild(dayEl);
             }
         }
 
+        // Safe parser helper
+        function safeParse(key, fallback) {
+            try {
+                const val = localStorage.getItem(key);
+                if (val === 'undefined' || val === 'null' || !val) return fallback;
+                return JSON.parse(val);
+            } catch (e) {
+                console.warn(`Failed to parse ${key} from local storage`, e);
+                return fallback;
+            }
+        }
+
         // --- Data Loading Logic ---
         function loadDashboardData() {
             // 1. Load Macro Plan
-            const macroData = JSON.parse(localStorage.getItem('user_macro_plan'));
-            if (macroData) {
-                document.getElementById('dash-calories').innerText = macroData.calories.toLocaleString();
-                document.getElementById('dash-goal').innerText = macroData.goal.toUpperCase();
+            const macroData = safeParse('user_macro_plan', null);
+            if (macroData && Object.keys(macroData).length > 0) {
+                document.getElementById('dash-calories').innerText = (macroData.calories || 0).toLocaleString();
+                document.getElementById('dash-goal').innerText = (macroData.goal || '').toUpperCase();
                 document.getElementById('dash-macros').innerHTML = `
-                    <span class="macro-label p-label">P: ${macroData.protein}g</span>
-                    <span class="macro-label c-label">C: ${macroData.carbs}g</span>
-                    <span class="macro-label f-label">F: ${macroData.fat}g</span>
+                    <span class="macro-label p-label">P: ${macroData.protein || 0}g</span>
+                    <span class="macro-label c-label">C: ${macroData.carbs || 0}g</span>
+                    <span class="macro-label f-label">F: ${macroData.fat || 0}g</span>
                 `;
             }
 
             // 2. Load 6-Day Split Plan
-            const myPlan = JSON.parse(localStorage.getItem('my_6day_plan') || '[]');
+            const myPlan = safeParse('my_6day_plan', []);
             if (myPlan.length > 0) {
-                // Determine current day in the 6-day cycle (using simple modulo or just showing Day 1 as reactive sample)
-                // For a real app, you'd track the cycle start date.
-                // Let's assume today is Day 1 of the cycle for this demo.
-                const todayCycleIndex = 0;
+                // Determine current day in the 6-day cycle using a stable anchor
+                // We'll use Days since Jan 1, 2024 as a stable reference
+                const anchor = new Date(2024, 0, 1);
+                // Important: clear time from anchor and current for exact day diffs
+                const anchorTime = Date.UTC(anchor.getFullYear(), anchor.getMonth(), anchor.getDate());
+                const currentTime = Date.UTC(currentDashboardDate.getFullYear(), currentDashboardDate.getMonth(), currentDashboardDate.getDate());
+
+                const daysSinceAnchor = Math.floor((currentTime - anchorTime) / (1000 * 60 * 60 * 24));
+                // Handle negative numbers safely
+                const todayCycleIndex = ((daysSinceAnchor % 6) + 6) % 6;
                 const todayWorkout = myPlan[todayCycleIndex];
 
                 if (todayWorkout) {
                     document.getElementById('dash-focus').innerText = todayWorkout.focus.toUpperCase();
                     document.getElementById('dash-plan-type').innerText = todayWorkout.type === 'REST' ? 'RECOVERY DAY' : `${todayWorkout.type} MUSCLE SPLIT`;
+
+                    // Update header level tag
+                    document.getElementById('user-level-tag').innerText = `Day ${todayCycleIndex + 1} of 6-Day Split • ${todayWorkout.focus}`;
 
                     const previewContainer = document.getElementById('dash-workout-preview');
                     if (todayWorkout.exercises.length > 0) {
@@ -665,14 +935,388 @@
                     }
                 }
             }
+
+            // 3. Load Workout History & Volume
+            const history = safeParse('workout_history', []);
+            if (history.length > 0) {
+                const totalMins = history.reduce((acc, sess) => acc + sess.duration, 0);
+                const avgMins = Math.round(totalMins / history.length);
+                document.getElementById('dash-volume').innerText = avgMins;
+
+                // Intensity
+                const avgIntensity = Math.round(history.reduce((acc, sess) => acc + sess.intensity, 0) / history.length);
+                let label = "Beginner";
+                if (avgIntensity > 80) label = "Elite";
+                else if (avgIntensity > 60) label = "Advanced";
+                else if (avgIntensity > 40) label = "Intermediate";
+                document.getElementById('dash-intensity-label').innerText = label;
+
+                renderActivityGraph(history);
+            } else {
+                renderActivityGraph([]); // Empty state
+            }
+
+            // 4. Load Hydration
+            loadHydration();
+
+            // 5. Load Habits
+            loadHabits();
+
+            // 6. Load Supplements
+            loadSupps();
+
+            // 7. Load PRs
+            loadPRs();
+
+            // 8. Load Streak & Insights
+            loadStreak();
+            loadInsights(history);
         }
 
-        window.onload = () => {
-            // Guard: redirect to setup if no profile
-            const profile = JSON.parse(localStorage.getItem('user_profile'));
-            if (!profile || !profile.name) {
-                window.location.replace('setup.html');
+        function loadStreak() {
+            const history = safeParse('workout_history', []);
+            if (history.length === 0) {
+                document.getElementById('streak-count').innerText = "0 DAYS";
                 return;
+            }
+
+            // Simple streak calculation (consecutive days with at least one workout)
+            const dates = [...new Set(history.map(s => s.date.split('T')[0]))].sort().reverse();
+            let streak = 0;
+            let current = new Date();
+
+            for (let i = 0; i < dates.length; i++) {
+                const d = new Date(dates[i]);
+                const diffTime = Math.abs(current - d);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                if (diffDays <= streak + 1) {
+                    streak++;
+                } else {
+                    break;
+                }
+            }
+            document.getElementById('streak-count').innerText = `${streak} ${streak === 1 ? 'DAY' : 'DAYS'}`;
+        }
+
+        function loadInsights(history) {
+            const tips = [
+                { title: "Optimal Recovery", text: "Based on your intensity, aim for 8 hours of sleep tonight to maximize protein synthesis." },
+                { title: "Hydration Focus", text: "Water is fuel for your fascia. Stay hydrated to keep your muscles elastic and prevent strains." },
+                { title: "Mind-Muscle Connect", text: "Focus on the squeeze, not the speed. Good form is the best injury prevention tool." },
+                { title: "Nutrition Peak", text: "Protein builds muscle, but sleep heals it. Make sure you get quality rest tonight." }
+            ];
+
+            const recs = [
+                "Focus on perfect form for squats today.",
+                "High volume day ahead. Pace yourself.",
+                "Active recovery suggested: Light cardio.",
+                "Strength push: Aim for a PR in your first lift."
+            ];
+
+            // Select random tip or base it on history volume
+            let tip;
+            if (history.length > 0 && history[0].intensity > 80) {
+                tip = tips[0]; // Recovery tip for high intensity
+            } else {
+                const dayIndex = new Date().getDay() % tips.length;
+                tip = tips[dayIndex];
+            }
+
+            document.getElementById('insight-title').innerText = tip.title;
+            document.getElementById('insight-text').innerText = tip.text;
+            document.getElementById('session-rec').innerText = recs[new Date().getDay() % recs.length];
+        }
+
+        function speak(text) {
+            if ('speechSynthesis' in window) {
+                const msg = new SpeechSynthesisUtterance(text);
+                msg.rate = 0.9;
+                msg.pitch = 1.0;
+                window.speechSynthesis.speak(msg);
+            }
+        }
+
+        const SUPPS_LIST = [
+            { id: 'creatine', label: 'Creatine Monohydrate' },
+            { id: 'protein', label: 'Whey / Casein Shake' },
+            { id: 'pre', label: 'Pre-Workout / Caffeine' }
+        ];
+
+        function loadSupps() {
+            const todayStr = currentDashboardDate.toISOString().split('T')[0];
+            const suppData = safeParse(`supps_${todayStr}`, {});
+            const container = document.getElementById('supps-list');
+
+            container.innerHTML = SUPPS_LIST.map(supp => `
+                <div class="habit-item ${suppData[supp.id] ? 'done' : ''}" onclick="toggleSupp('${supp.id}')">
+                    <div class="checkbox-custom" style="border-radius: 50%;">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4">
+                            <path d="M20 6L9 17l-5-5"></path>
+                        </svg>
+                    </div>
+                    <h4 style="font-size: 0.85rem; margin: 0; color: #eee; font-weight: 600;">${supp.label}</h4>
+                </div>
+            `).join('');
+        }
+
+        function toggleSupp(id) {
+            const todayStr = currentDashboardDate.toISOString().split('T')[0];
+            let suppData = safeParse(`supps_${todayStr}`, {});
+            suppData[id] = !suppData[id];
+            localStorage.setItem(`supps_${todayStr}`, JSON.stringify(suppData));
+            loadSupps();
+        }
+
+        function loadPRs() {
+            const prs = safeParse('user_prs', { "Bench Press": "0", "Deadlift": "0", "Squat": "0" });
+            const container = document.getElementById('prs-list');
+
+            container.innerHTML = Object.entries(prs).map(([name, weight]) => `
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer;" onclick="editPRPrompt('${name}', '${weight}')" title="Click to edit or delete">
+                    <span style="font-size: 0.85rem; color: #ccc; font-weight: 600;">${name}</span>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span style="font-size: 1rem; color: #ffd700; font-weight: 900;">${weight} <small style="font-size: 0.6rem; color: #666;">KG</small></span>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                        </svg>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function editPRPrompt(ex, oldWt) {
+            const wt = prompt(`Edit weight for ${ex} (KG) (leave blank to delete):`, oldWt);
+            if (wt === null) return; // Cancelled
+
+            let prs = safeParse('user_prs', { "Bench Press": "0", "Deadlift": "0", "Squat": "0" });
+
+            if (wt.trim() === '') {
+                if (confirm(`Delete record for ${ex}?`)) {
+                    delete prs[ex];
+                } else {
+                    return;
+                }
+            } else {
+                prs[ex] = wt;
+            }
+
+            localStorage.setItem('user_prs', JSON.stringify(prs));
+            loadPRs();
+            // Sync up to Supabase if possible (lazy sync will happen on next session or reload usually, but we could trigger it here if desired)
+        }
+
+        function addPRPrompt() {
+            const ex = prompt("Exercise Name (e.g. Overhead Press):");
+            if (!ex) return;
+            const wt = prompt("Weight (KG):");
+            if (!wt) return;
+
+            let prs = safeParse('user_prs', { "Bench Press": "0", "Deadlift": "0", "Squat": "0" });
+            prs[ex] = wt;
+            localStorage.setItem('user_prs', JSON.stringify(prs));
+            loadPRs();
+        }
+
+        function loadHydration() {
+            const todayStr = currentDashboardDate.toISOString().split('T')[0];
+            const waterData = safeParse(`water_${todayStr}`, 0);
+
+            // 1. Calculate Dynamic Goal
+            const profile = safeParse('user_profile', { weight: 70 });
+            const baseGoal = Math.round((profile.weight || 70) * 35); // 35ml per kg
+
+            // Intensity Adjustment (+500ml per hard workout today)
+            const history = safeParse('workout_history', []);
+            const trainedToday = history.filter(h => h.date.split('T')[0] === todayStr && h.intensity > 60);
+            const adjustment = trainedToday.length * 500;
+            const totalGoal = baseGoal + adjustment;
+
+            document.getElementById('dash-water').innerText = (waterData / 1000).toFixed(1);
+            document.getElementById('dash-water-target').innerText = (totalGoal / 1000).toFixed(1);
+            document.getElementById('base-hyd').innerText = (baseGoal / 1000).toFixed(1);
+
+            if (adjustment > 0) {
+                document.getElementById('int-adj').style.display = 'inline-block';
+                document.getElementById('int-adj').innerText = `WORKOUT: +${(adjustment / 1000).toFixed(1)}L`;
+            } else {
+                document.getElementById('int-adj').style.display = 'none';
+            }
+
+            const percent = Math.min(100, (waterData / totalGoal) * 100);
+            document.getElementById('dash-water-progress').style.width = `${percent}%`;
+
+            // 2. Load 7-Day History Chart
+            renderHydrationChart(totalGoal);
+
+            // 3. Load Electrolytes
+            const electroData = safeParse(`electro_${todayStr}`, false);
+            const elStatus = document.getElementById('electrolyte-status');
+            if (electroData) elStatus.classList.add('done');
+            else elStatus.classList.remove('done');
+        }
+
+        function renderHydrationChart(currentGoal) {
+            const container = document.getElementById('hydration-chart');
+            container.innerHTML = '';
+
+            for (let i = 6; i >= 0; i--) {
+                const date = new Date();
+                date.setDate(date.getDate() - i);
+                const dateKey = date.toISOString().split('T')[0];
+                const amount = safeParse(`water_${dateKey}`, 0);
+
+                const ratio = Math.min(1, amount / currentGoal);
+                const height = Math.max(5, ratio * 100);
+                const opacity = i === 0 ? 1 : 0.3;
+
+                const bar = document.createElement('div');
+                bar.style.cssText = `
+                    width: 12%; 
+                    height: ${height}%; 
+                    background: ${i === 0 ? 'var(--accent-color)' : '#0096ff'}; 
+                    opacity: ${opacity};
+                    border-radius: 4px 4px 0 0;
+                    position: relative;
+                `;
+
+                // Day label
+                const label = document.createElement('span');
+                label.innerText = date.toLocaleDateString('en', { weekday: 'narrow' });
+                label.style.cssText = 'position: absolute; bottom: -18px; left: 50%; transform: translateX(-50%); font-size: 10px; color: #444; font-weight: 800;';
+                bar.appendChild(label);
+
+                container.appendChild(bar);
+            }
+        }
+
+        function addWater(ml) {
+            const todayStr = currentDashboardDate.toISOString().split('T')[0];
+            let waterData = safeParse(`water_${todayStr}`, 0);
+            waterData += ml;
+            localStorage.setItem(`water_${todayStr}`, JSON.stringify(waterData));
+
+            // Save to logs for history tracking (if needed for more precision)
+            const logs = safeParse('water_logs', []);
+            logs.push({ date: new Date().toISOString(), amount: ml });
+            localStorage.setItem('water_logs', JSON.stringify(logs.slice(-50))); // Keep last 50
+
+            loadHydration();
+
+            // Interaction effect
+            const el = document.getElementById('dash-water');
+            el.style.transform = 'scale(1.2)';
+            el.style.color = '#00f0ff';
+            setTimeout(() => {
+                el.style.transform = 'scale(1)';
+                el.style.color = '';
+            }, 300);
+        }
+
+        function customWater() {
+            const ml = prompt("Enter amount in ml (e.g. 330):");
+            if (ml && !isNaN(ml)) {
+                addWater(parseInt(ml));
+            }
+        }
+
+        function toggleElectrolytes() {
+            const todayStr = currentDashboardDate.toISOString().split('T')[0];
+            let electroData = safeParse(`electro_${todayStr}`, false);
+            electroData = !electroData;
+            localStorage.setItem(`electro_${todayStr}`, JSON.stringify(electroData));
+            loadHydration();
+        }
+
+        const HABITS_LIST = [
+            { id: 'vits', label: 'Vitamins / Omega-3' },
+            { id: 'sleep', label: '7+ Hours Quality Sleep' },
+            { id: 'stretch', label: 'Post-workout Stretching' },
+            { id: 'junk', label: 'Zero Junk Food Day' }
+        ];
+
+        function loadHabits() {
+            const todayStr = currentDashboardDate.toISOString().split('T')[0];
+            const habitData = safeParse(`habits_${todayStr}`, {});
+            const container = document.getElementById('habits-list');
+
+            container.innerHTML = HABITS_LIST.map(habit => `
+                <div class="habit-item ${habitData[habit.id] ? 'done' : ''}" onclick="toggleHabit('${habit.id}')">
+                    <div class="checkbox-custom">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4">
+                            <path d="M20 6L9 17l-5-5"></path>
+                        </svg>
+                    </div>
+                    <h4 style="font-size: 0.85rem; margin: 0; color: #eee; font-weight: 600;">${habit.label}</h4>
+                </div>
+            `).join('');
+        }
+
+        function toggleHabit(id) {
+            const todayStr = currentDashboardDate.toISOString().split('T')[0];
+            let habitData = safeParse(`habits_${todayStr}`, {});
+            habitData[id] = !habitData[id];
+            localStorage.setItem(`habits_${todayStr}`, JSON.stringify(habitData));
+            loadHabits();
+        }
+
+        function renderActivityGraph(history) {
+            const graph = document.getElementById('activity-graph');
+            graph.innerHTML = '';
+
+            for (let i = 6; i >= 0; i--) {
+                const date = new Date();
+                date.setDate(date.getDate() - i);
+                const dateKey = date.toISOString().split('T')[0];
+
+                const daySessions = history.filter(s => s.date.startsWith(dateKey));
+                const totalIntensity = daySessions.reduce((acc, s) => acc + s.intensity, 0);
+                const intensity = daySessions.length > 0 ? Math.min(100, totalIntensity / daySessions.length) : 0;
+
+                const height = Math.max(5, intensity);
+                const opacity = i === 0 ? 1 : 0.3;
+
+                const bar = document.createElement('div');
+                bar.style.cssText = `
+                    width: 12%; 
+                    height: ${height}%; 
+                    background: ${i === 0 ? 'var(--primary-color)' : '#39FF14'}; 
+                    opacity: ${opacity};
+                    border-radius: 4px 4px 0 0;
+                    position: relative;
+                `;
+
+                if (i === 0 && intensity > 0) {
+                    bar.style.boxShadow = '0 0 10px var(--primary-color)';
+                }
+
+                // Day label
+                const label = document.createElement('span');
+                label.innerText = date.toLocaleDateString('en', { weekday: 'narrow' });
+                label.style.cssText = 'position: absolute; bottom: -18px; left: 50%; transform: translateX(-50%); font-size: 10px; color: #444; font-weight: 800;';
+                bar.appendChild(label);
+
+                graph.appendChild(bar);
+            }
+        }
+
+        window.onload = async () => {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) {
+                window.location.replace('index.html');
+                return;
+            }
+
+            // Sync cloud data to local if not present
+            let profile = safeParse('user_profile', null);
+            if (!profile || !profile.name) {
+                await SupabaseAuth.syncCloudToLocal(session.user.id);
+                profile = safeParse('user_profile', null);
+                if (!profile || !profile.name) {
+                    window.location.replace('setup.html');
+                    return;
+                }
             }
 
             // Personalise greeting
@@ -684,7 +1328,7 @@
             const goalBadge = document.getElementById('user-goal-badge');
             goalBadge.innerHTML = `<span>🎯</span> ${profile.goal.toUpperCase()}`;
 
-            // Level tag
+            // Initial level tag (will be refined by loadDashboardData if plan exists)
             document.getElementById('user-level-tag').innerText = `${profile.level} • ${profile.gender === 'male' ? '♂' : '♀'} ${profile.weight}kg · ${profile.height}cm`;
 
             initCalendar();

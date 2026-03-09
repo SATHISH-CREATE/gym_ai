@@ -17,25 +17,38 @@ class SquatRule(BaseRule):
         knee = landmarks[25]
         ankle = landmarks[27]
         
+        # Movement Consistency: In a squat, the hips should move more than the wrists/elbows
+        if not self.validate_motion(landmarks, [23], [13, 14, 15, 16], sensitivity=0.015):
+            self.feedback = "Focus on the squat movement"
+        
         angle = self.calculate_angle(hip, knee, ankle)
         
+        # State machine
         if angle > 160:
             self.stage = "up"
+        
+        # Form Check: Knee Stability (Don't let knees go too far past toes)
+        # Using a tighter tolerance for better accuracy
+        is_stable = knee.x <= ankle.x + 0.08 
+        incorrect_indices = []
+        if not is_stable:
+            incorrect_indices = [25] # Highlight knee
+            self.feedback = "Knees too far forward!"
+
         if angle < 100 and self.stage == 'up':
-            self.stage = "down"
-            self.counter += 1
-            self.correct_reps += 1
-            self.feedback = "Good depth!"
+            if is_stable:
+                self.stage = "down"
+                self.counter += 1
+                self.correct_reps += 1
+                self.feedback = "Good depth!"
+            else:
+                self.stage = "down" # Still move to down stage to prevent double counting
+                self.feedback = "Fix form: keep knees back"
             
         if self.stage == "down" and angle > 160:
             self.stage = "up"
-            self.feedback = "Squat down"
-
-        # Form Check: Knee Stability (Don't let knees go too far past toes)
-        incorrect_indices = []
-        if knee.x > ankle.x + 0.1: # Knee moving too far forward relative to ankle
-            self.feedback = "Watch your knees! Keep them back."
-            incorrect_indices = [25]
+            if "Fix" not in self.feedback:
+                self.feedback = "Squat down"
 
         return {
             "counter": self.counter,
@@ -62,22 +75,29 @@ class LungeRule(BaseRule):
         
         if angle > 160:
             self.stage = "up"
+
+        # Form Check: Knee alignment
+        is_stable = knee.x <= ankle.x + 0.12
+        incorrect_indices = []
+        if not is_stable:
+            incorrect_indices = [25]
+            self.feedback = "Keep knee behind toes"
+
         if angle < 110 and self.stage == "up":
-            self.stage = "down"
-            self.counter += 1
-            self.correct_reps += 1
-            self.feedback = "Deep lunge!"
+            if is_stable:
+                self.stage = "down"
+                self.counter += 1
+                self.correct_reps += 1
+                self.feedback = "Deep lunge!"
+            else:
+                self.stage = "down"
+                self.feedback = "Fix form: knee forward"
             
         if self.stage == "down" and angle > 160:
             self.stage = "up"
-            self.feedback = "Switch legs or repeat"
+            if "Fix" not in self.feedback:
+                self.feedback = "Switch legs or repeat"
             
-        # Form Check: Knee alignment
-        incorrect_indices = []
-        if knee.x > ankle.x + 0.15:
-            self.feedback = "Keep knee behind toes"
-            incorrect_indices = [25]
-
         return {
             "counter": self.counter,
             "correct_reps": self.correct_reps,

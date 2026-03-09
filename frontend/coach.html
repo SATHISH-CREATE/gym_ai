@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI COACH | FIT COACH AI</title>
+    <link rel="stylesheet" href="css/styles.css?v=6">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/supabase-auth.js"></script>
+    <style>
+        .container {
+            max-width: 100% !important;
+            padding: 0 16px !important;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: rgba(20, 20, 25, 0.4);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 30px;
+            margin-top: 20px;
+            margin-bottom: 30px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .chat-header {
+            padding: 20px 30px;
+            border-bottom: 1px solid var(--glass-border);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: rgba(112, 0, 255, 0.05);
+        }
+
+        .ai-status {
+            width: 10px;
+            height: 10px;
+            background: #22c55e;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #22c55e;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary-color) transparent;
+        }
+
+        .chat-messages::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 10px;
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 16px 20px;
+            border-radius: 20px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            position: relative;
+            animation: messageFadeIn 0.3s ease forwards;
+        }
+
+        @keyframes messageFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.ai {
+            align-self: flex-start;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            color: #eee;
+            border-bottom-left-radius: 4px;
+        }
+
+        .message.user {
+            align-self: flex-end;
+            background: linear-gradient(135deg, #7000ff, #b000ff);
+            color: white;
+            border-bottom-right-radius: 4px;
+            box-shadow: 0 10px 20px rgba(112, 0, 255, 0.2);
+        }
+
+        .chat-input-area {
+            padding: 25px 30px;
+            background: rgba(255, 255, 255, 0.02);
+            border-top: 1px solid var(--glass-border);
+            display: flex;
+            gap: 15px;
+        }
+
+        .chat-input {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            padding: 15px 20px;
+            color: white;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .chat-input:focus {
+            border-color: var(--primary-color);
+            background: rgba(112, 0, 255, 0.05);
+            box-shadow: 0 0 15px rgba(112, 0, 255, 0.1);
+        }
+
+        .send-btn {
+            width: 50px;
+            height: 50px;
+            background: var(--primary-color);
+            border: none;
+            border-radius: 15px;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            flex-shrink: 0;
+        }
+
+        .send-btn:hover {
+            transform: scale(1.05);
+            background: #b000ff;
+            box-shadow: 0 0 20px rgba(112, 0, 255, 0.4);
+        }
+
+        .typing-indicator {
+            display: none;
+            align-self: flex-start;
+            padding: 10px 15px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 15px;
+            font-size: 0.8rem;
+            color: #888;
+            margin-bottom: 20px;
+        }
+
+        .suggested-chips {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            overflow-x: auto;
+            padding-bottom: 5px;
+            scrollbar-width: none;
+        }
+
+        .suggested-chips::-webkit-scrollbar {
+            display: none;
+        }
+
+        .chip {
+            white-space: nowrap;
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 100px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #888;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .chip:hover {
+            background: rgba(112, 0, 255, 0.1);
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        @media (max-width: 768px) {
+            .chat-wrapper {
+                border-radius: 20px;
+                margin-top: 10px;
+            }
+
+            .message {
+                max-width: 90%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <div class="logo-container">
+                <a href="dashboard.html" class="back-arrow" title="Back to Home">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="19" y1="12" x2="5" y2="12"></line>
+                        <polyline points="12 19 5 12 12 5"></polyline>
+                    </svg>
+                </a>
+                <div class="logo">FIT COACH AI</div>
+            </div>
+        </header>
+
+        <div class="chat-wrapper">
+            <div class="chat-header">
+                <div class="ai-status"></div>
+                <div>
+                    <h3 style="margin: 0; font-size: 1.1rem; letter-spacing: 0.5px;">AI COACH AGENT</h3>
+                    <div style="display: flex; align-items: center; gap: 8px; margin-top: 2px;">
+                        <p style="margin: 0; font-size: 0.75rem; color: #888; font-weight: 600;">ACTIVE 24/7</p>
+                        <span id="engine-status"
+                            style="font-size: 0.65rem; padding: 2px 8px; border-radius: 4px; background: rgba(255,255,255,0.05); color: #555; font-weight: 800; text-transform: uppercase;">STANDARD</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chat-messages" id="chat-messages">
+                <div class="message ai">
+                    Hello! I'm your FIT COACH AI agent. I'm here to answer your training questions, help with form, or
+                    adjust your diet plan. What's on your mind today?
+                </div>
+            </div>
+
+            <div id="typing-indicator" class="typing-indicator">AI Coach is thinking...</div>
+
+            <div class="chat-input-area">
+                <div style="flex: 1;">
+                    <input type="text" id="chat-input" placeholder="Ask anything about your fitness journey..."
+                        class="chat-input">
+                    <div class="suggested-chips">
+                        <div class="chip" onclick="sendQuickMessage('How to improve my squat form?')">Squat Form</div>
+                        <div class="chip" onclick="sendQuickMessage('Suggest a high protein diet')">Protein Diet</div>
+                        <div class="chip" onclick="sendQuickMessage('How to bench press correctly?')">Bench Press</div>
+                        <div class="chip" onclick="sendQuickMessage('What is progressive overload?')">Workout Tips</div>
+                    </div>
+                </div>
+                <button id="send-btn" class="send-btn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2.5">
+                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+        const chatMessages = document.getElementById('chat-messages');
+        const chatInput = document.getElementById('chat-input');
+        const sendBtn = document.getElementById('send-btn');
+        const typingIndicator = document.getElementById('typing-indicator');
+
+
+
+        function appendMessage(text, role) {
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `message ${role}`;
+            msgDiv.innerText = text;
+            chatMessages.appendChild(msgDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        async function handleSendMessage() {
+            const message = chatInput.value.trim();
+            if (!message) return;
+
+            appendMessage(message, 'user');
+            chatInput.value = '';
+
+            typingIndicator.style.display = 'block';
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            // Get profile and recent history for context
+            const profile = JSON.parse(localStorage.getItem('user_profile')) || {};
+            const messages = Array.from(chatMessages.querySelectorAll('.message')).slice(-6);
+            const history = messages.map(m => ({
+                role: m.classList.contains('user') ? 'user' : 'ai',
+                text: m.innerText
+            }));
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/chat`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message: message,
+                        context: {
+                            user_profile: profile,
+                            history: history
+                        }
+                    })
+                });
+
+                const data = await response.json();
+                typingIndicator.style.display = 'none';
+
+                // Identify Engine Status
+                const statusBadge = document.getElementById('engine-status');
+                if (data.model_type === 'gemini') {
+                    statusBadge.innerText = 'GENIUS (AI)';
+                    statusBadge.style.background = 'rgba(112, 0, 255, 0.2)';
+                    statusBadge.style.color = '#c084fc';
+                } else {
+                    statusBadge.innerText = 'STANDARD';
+                    statusBadge.style.background = 'rgba(255,255,255,0.05)';
+                    statusBadge.style.color = '#555';
+                }
+
+                appendMessage(data.response, 'ai');
+            } catch (error) {
+                console.error('Chat Error:', error);
+                typingIndicator.style.display = 'none';
+                appendMessage("Sorry, I'm having trouble connecting to the server. Please ensure the backend is running.", 'ai');
+            }
+        }
+
+        function sendQuickMessage(text) {
+            chatInput.value = text;
+            handleSendMessage();
+        }
+
+        sendBtn.addEventListener('click', handleSendMessage);
+        chatInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') handleSendMessage();
+        });
+
+        window.onload = async () => {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) {
+                window.location.replace('index.html');
+                return;
+            }
+            // Profile is synced to localStorage by supabase-auth.js on login.
+            // Pull any fresh data if needed for the chat context:
+            const { data: profile } = await supabase
+                .from('profiles').select('*').eq('id', session.user.id).single();
+            if (profile) {
+                localStorage.setItem('user_profile', JSON.stringify(profile));
+            }
+        };
+    </script>
+</body>
+
+</html>

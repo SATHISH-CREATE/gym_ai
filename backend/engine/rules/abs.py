@@ -16,20 +16,27 @@ class CrunchRule(BaseRule):
         
         if dist > 0.45:
             self.stage = "down"
-        if dist < 0.35 and self.stage == "down":
-            self.stage = "up"
-            self.counter += 1
-            self.correct_reps += 1
-            self.feedback = "Crunch those abs!"
             
-        # Form Check: Neck strain (don't pull head)
+        # Form Check: Neck strain
+        is_stable = True
         incorrect_indices = []
         if self.is_visible(landmarks, [0, 11], 0.5):
             nose = landmarks[0]
             if nose.y < shoulder.y - 0.2:
-                self.feedback = "Relax your neck"
+                is_stable = False
+                self.feedback = "Relax your neck!"
                 incorrect_indices = [0]
 
+        if dist < 0.35 and self.stage == "down":
+            if is_stable:
+                self.stage = "up"
+                self.counter += 1
+                self.correct_reps += 1
+                self.feedback = "Crunch those abs!"
+            else:
+                self.stage = "up"
+                self.feedback = "Fix form: relax neck"
+            
         return {
             "counter": self.counter,
             "correct_reps": self.correct_reps,
@@ -52,23 +59,30 @@ class LegRaiseRule(BaseRule):
         
         if angle > 160:
             self.stage = "down"
+            
+        # Form Check: Bent knees
+        is_stable = True
+        incorrect_indices = []
+        if self.is_visible(landmarks, [23, 25, 27], 0.5):
+            knee_angle = self.calculate_angle(landmarks[23], landmarks[25], landmarks[27])
+            if knee_angle < 155: # Tighter rule
+                is_stable = False
+                self.feedback = "Keep legs straight!"
+                incorrect_indices = [25]
+
         if angle < 100 and self.stage == "down":
-            self.stage = "up"
-            self.counter += 1
-            self.correct_reps += 1
-            self.feedback = "Legs high!"
+            if is_stable:
+                self.stage = "up"
+                self.counter += 1
+                self.correct_reps += 1
+                self.feedback = "Legs high!"
+            else:
+                self.stage = "up"
+                self.feedback = "Fix form: straight legs"
             
         if self.stage == "up" and angle > 160:
             self.stage = "down"
             
-        # Form Check: Bent knees
-        incorrect_indices = []
-        if self.is_visible(landmarks, [23, 25, 27], 0.5):
-            knee_angle = self.calculate_angle(landmarks[23], landmarks[25], landmarks[27])
-            if knee_angle < 150:
-                self.feedback = "Keep your legs straight!"
-                incorrect_indices = [25]
-
         return {
             "counter": self.counter,
             "correct_reps": self.correct_reps,
@@ -125,25 +139,31 @@ class RussianTwistRule(BaseRule):
             return super().process(landmarks)
             
         l_wrist = landmarks[15]
-        r_wrist = landmarks[16]
         hip = landmarks[23]
         
         # Twist: Hands move from one side of hip to other
         if l_wrist.x < hip.x - 0.1:
             self.stage = "left"
-        if l_wrist.x > hip.x + 0.1 and self.stage == "left":
-            self.stage = "right"
-            self.counter += 1
-            self.correct_reps += 1
-            self.feedback = "Feel the twist!"
             
         # Form Check: Slumping
+        is_stable = True
         incorrect_indices = []
         if self.is_visible(landmarks, [11, 23], 0.5):
-            if abs(landmarks[11].x - hip.x) > 0.2:
-                self.feedback = "Sit up straight"
+            if abs(landmarks[11].x - hip.x) > 0.15:
+                is_stable = False
+                self.feedback = "Sit up straight!"
                 incorrect_indices = [11]
 
+        if l_wrist.x > hip.x + 0.1 and self.stage == "left":
+            if is_stable:
+                self.stage = "right"
+                self.counter += 1
+                self.correct_reps += 1
+                self.feedback = "Feel the twist!"
+            else:
+                self.stage = "right"
+                self.feedback = "Fix form: sit tall"
+            
         return {
             "counter": self.counter,
             "correct_reps": self.correct_reps,

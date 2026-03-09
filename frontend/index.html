@@ -11,6 +11,8 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Outfit:ital,wght@0,300;0,400;0,500;0,700;0,900;1,900&display=swap"
         rel="stylesheet">
+    <!-- Supabase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
     <style>
         body,
         html {
@@ -61,9 +63,10 @@
 
         .content-wrap {
             position: relative;
-            z-index: 2;
+            z-index: 10;
             padding: 20px;
             animation: fast-zoom 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            pointer-events: auto;
         }
 
         .edition-tag {
@@ -124,11 +127,13 @@
             letter-spacing: 4px;
         }
 
+
+
         .enter-btn {
             display: inline-flex;
             align-items: center;
             gap: 14px;
-            margin-top: 55px;
+            margin-top: 40px;
             padding: 22px 65px;
             font-family: 'Outfit', sans-serif;
             font-size: 1.1rem;
@@ -147,30 +152,14 @@
             overflow: hidden;
         }
 
+        .enter-btn:hover {
+            transform: scale(1.06) translateY(-3px);
+            box-shadow: 0 0 40px rgba(112, 0, 255, 0.8), 0 0 100px rgba(176, 0, 255, 0.3);
+        }
+
         .enter-btn .btn-arrow {
             font-size: 1.3rem;
             transition: transform 0.3s ease;
-        }
-
-        .enter-btn::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -75%;
-            width: 50%;
-            height: 200%;
-            background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.25), transparent);
-            transform: skewX(-20deg);
-            transition: left 0.6s ease;
-        }
-
-        .enter-btn:hover::before {
-            left: 125%;
-        }
-
-        .enter-btn:hover {
-            transform: scale(1.06) translateY(-3px);
-            box-shadow: 0 0 40px rgba(112, 0, 255, 0.8), 0 0 100px rgba(176, 0, 255, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.25);
         }
 
         .enter-btn:hover .btn-arrow {
@@ -240,19 +229,101 @@
             .enter-btn {
                 padding: 18px 45px;
                 font-size: 0.95rem;
-                letter-spacing: 2px;
-            }
-
-            .edition-tag {
-                font-size: 0.65rem;
-                letter-spacing: 2px;
             }
         }
 
-        @media (max-width: 480px) {
-            .main-title {
-                font-size: 2.8rem;
-            }
+        /* Auth Modal (Global) */
+        .auth-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(20px);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .auth-card {
+            background: rgba(20, 20, 30, 0.95);
+            border: 1px solid rgba(112, 0, 255, 0.2);
+            border-radius: 40px;
+            padding: 40px;
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+        }
+
+        .auth-input-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        .auth-input-group label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #666;
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+        }
+
+        .auth-input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 14px 18px;
+            color: #fff;
+            font-family: 'Outfit';
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .auth-input:focus {
+            border-color: #7000ff;
+            background: rgba(112, 0, 255, 0.05);
+        }
+
+        .google-btn {
+            width: 100%;
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 25px;
+            transition: all 0.3s;
+        }
+
+        .google-btn:hover {
+            background: #fff;
+            color: #000;
+        }
+
+        .auth-divider {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin: 25px 0;
+            color: #444;
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+
+        .auth-divider::before,
+        .auth-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.05);
         }
     </style>
 </head>
@@ -268,12 +339,141 @@
             <div class="edition-tag"><span class="dot"></span>2026 EDITION</div>
             <h1 class="main-title">PUSH<span class="highlight">LIMITS</span></h1>
             <p class="sub-text">AI-Powered Bodybuilding &bull; Pure Performance</p>
-            <a href="setup.html" class="enter-btn">START TRAINING<span class="btn-arrow">→</span></a>
+
+            <button onclick="openAuthModal()" class="enter-btn">START TRAINING<span class="btn-arrow">→</span></button>
         </div>
     </div>
 
+    <!-- Auth Modal Overlay -->
+    <div id="authModal" class="auth-modal">
+        <div class="auth-card">
+            <h2 style="font-size: 2rem; font-weight: 900; margin-bottom: 10px;">WELCOME BACK</h2>
+            <p style="color: #666; font-size: 0.85rem; margin-bottom: 30px;">Login to sync your training across devices
+            </p>
+
+            <button onclick="SupabaseAuth.signInWithGoogle()" class="google-btn">
+                <img src="https://www.google.com/favicon.ico" width="18"> Continue with Google
+            </button>
+
+            <div class="auth-divider">OR USE EMAIL</div>
+
+            <div id="email-flow">
+                <div class="auth-input-group">
+                    <label>Email Address</label>
+                    <input type="email" id="auth-email" class="auth-input" placeholder="gym@pro.com">
+                </div>
+                <div class="auth-input-group">
+                    <label>Password</label>
+                    <input type="password" id="auth-password" class="auth-input" placeholder="••••••••">
+                </div>
+                <button onclick="handleEmailLogin()" id="auth-main-btn" class="enter-btn"
+                    style="width: 100%; margin-top: 20px; padding: 18px;">SIGN IN</button>
+                <p style="margin-top: 25px; font-size: 0.8rem; color: #555;">
+                    New athlete? <a href="#" onclick="toggleAuthMode()" id="auth-toggle-link"
+                        style="color: #7000ff; font-weight: 700; text-decoration: none;">Create Account</a>
+                </p>
+                <p id="auth-error" style="color: #ff4444; font-size: 0.75rem; margin-top: 15px; display: none;"></p>
+            </div>
+
+            <button onclick="closeAuthModal()"
+                style="background: none; border: none; color: #444; font-size: 0.75rem; margin-top: 20px; cursor: pointer; text-decoration: underline;">BACK
+                TO LANDING</button>
+        </div>
+    </div>
+
+    <script src="js/supabase-config.js"></script>
+    <script src="js/supabase-auth.js"></script>
     <script>
-        // Create random speed trails
+        let isSignUpMode = false;
+
+        window.onload = async () => {
+            try {
+                // Auto-route if already logged in (e.g., returning from Google Auth)
+                const { data: { session } } = await supabase.auth.getSession();
+                if (session) {
+                    const { data: profile } = await supabase
+                        .from('profiles').select('name').eq('id', session.user.id).single();
+                    window.location.href = (profile && profile.name) ? 'dashboard.html' : 'setup.html';
+                }
+            } catch (e) {
+                console.warn('Auto-login check failed:', e);
+            }
+        };
+
+        async function openAuthModal() {
+            try {
+                const { data } = await supabase.auth.getSession();
+                if (data && data.session) {
+                    const { data: profile } = await supabase
+                        .from('profiles').select('name').eq('id', data.session.user.id).single();
+                    window.location.href = (profile && profile.name) ? 'dashboard.html' : 'setup.html';
+                    return;
+                }
+            } catch (e) {
+                console.warn('Supabase session check failed:', e);
+            }
+            // Always show modal — even if supabase check fails
+            document.getElementById('authModal').style.display = 'flex';
+        }
+
+        function closeAuthModal() {
+            document.getElementById('authModal').style.display = 'none';
+        }
+
+        function toggleAuthMode() {
+            isSignUpMode = !isSignUpMode;
+            document.getElementById('auth-main-btn').innerText = isSignUpMode ? 'CREATE ACCOUNT' : 'SIGN IN';
+            document.getElementById('auth-toggle-link').innerText = isSignUpMode ? 'Already have an account?' : 'Create Account';
+            document.getElementById('authModal').querySelector('h2').innerText = isSignUpMode ? 'NEW ATHLETE' : 'WELCOME BACK';
+        }
+
+        async function handleEmailLogin() {
+            const email = document.getElementById('auth-email').value.trim();
+            const password = document.getElementById('auth-password').value;
+            const errorEl = document.getElementById('auth-error');
+            const mainBtn = document.getElementById('auth-main-btn');
+
+            if (!email || !password) {
+                errorEl.innerText = 'Please fill in both email and password.';
+                errorEl.style.display = 'block';
+                return;
+            }
+
+            errorEl.style.display = 'none';
+            mainBtn.innerText = 'AUTHENTICATING...';
+            mainBtn.disabled = true;
+
+            try {
+                if (isSignUpMode) {
+                    const data = await SupabaseAuth.signUpEmail(email, password);
+                    // Check if they were automatically logged in
+                    const { data: { session } } = await supabase.auth.getSession();
+                    if (session) {
+                        window.location.href = 'setup.html'; // Direct to profile setup
+                    } else {
+                        // Fallback in case email verification is still required by Supabase
+                        alert("Account created! Please check your email to verify your account, then sign in.");
+                        mainBtn.innerText = 'CREATE ACCOUNT';
+                        mainBtn.disabled = false;
+                    }
+                } else {
+                    await SupabaseAuth.signInEmail(email, password);
+                    // Check if profile exists → go to dashboard or setup
+                    const { data: { session } } = await supabase.auth.getSession();
+                    if (session) {
+                        const { data: profile } = await supabase
+                            .from('profiles').select('name').eq('id', session.user.id).single();
+                        window.location.href = (profile && profile.name) ? 'dashboard.html' : 'setup.html';
+                    }
+                }
+            } catch (error) {
+                errorEl.innerText = error.message;
+                errorEl.style.display = 'block';
+                mainBtn.innerText = isSignUpMode ? 'CREATE ACCOUNT' : 'SIGN IN';
+                mainBtn.disabled = false;
+            }
+        }
+
         setInterval(() => {
             const trail = document.createElement('div');
             trail.className = 'trail';
@@ -281,15 +481,15 @@
             trail.style.left = '-200px';
             trail.style.width = (100 + Math.random() * 300) + 'px';
             document.body.appendChild(trail);
-
             const anim = trail.animate([
                 { left: '-200px', opacity: 0 },
                 { left: '50%', opacity: 0.5 },
                 { left: '100%', opacity: 0 }
             ], { duration: 500 + Math.random() * 500 });
-
             anim.onfinish = () => trail.remove();
         }, 100);
+
+
     </script>
 </body>
 

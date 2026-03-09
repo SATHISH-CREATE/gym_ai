@@ -21,28 +21,38 @@ class TricepExtensionRule(BaseRule):
         
         if angle < 90:
             self.stage = "down"
+            
+        # Form Check: Elbow drift
+        is_stable = True
+        incorrect_indices = []
+        if abs(elbow.x - shoulder.x) > 0.12: # Tighter tolerance
+            is_stable = False
+            self.feedback = "Keep elbows tucked!"
+            incorrect_indices = [13]
+
         if angle > 160 and self.stage == 'down':
-            self.stage = "up"
-            self.counter += 1
-            self.correct_reps += 1
-            self.feedback = "Full extension!"
+            if is_stable:
+                self.stage = "up"
+                self.counter += 1
+                self.correct_reps += 1
+                self.feedback = "Full extension!"
+            else:
+                self.stage = "up"
+                self.feedback = "Fix form: tuck elbows"
             
         if self.stage == "up" and angle < 90:
             self.stage = "down"
-            self.feedback = "Good stretch"
-
-        # Form Check: Elbow drift
-        incorrect_indices = []
-        if abs(elbow.x - shoulder.x) > 0.15:
-            self.feedback = "Keep elbows tucked"
-            incorrect_indices = [13]
+            if "Fix" not in self.feedback:
+                self.feedback = "Good stretch"
 
         return {
             "counter": self.counter,
             "correct_reps": self.correct_reps,
             "stage": self.stage,
             "feedback": self.feedback,
-            "incorrect_indices": incorrect_indices
+            "incorrect_indices": incorrect_indices,
+            "angle": angle,
+            "target": 160
         }
 
 class DipRule(BaseRule):

@@ -17,16 +17,26 @@ class BicepCurlRule(BaseRule):
         elbow = landmarks[13]
         wrist = landmarks[15]
         
+        # Movement Consistency: In a curl, the wrist should move more than the hips
+        # If the user is squatting, the hips will have high motion.
+        if not self.validate_motion(landmarks, [15], [23, 24], sensitivity=0.015):
+            self.feedback = "Stay stable! Too much body movement."
+            # We don't return early to allow feedback, but we set a flag if needed
+            # In this case we just change the feedback.
+        
         angle = self.calculate_angle(shoulder, elbow, wrist)
         
         # State machine
         if angle > 160:
             self.stage = "down"
         
-        # Stability check: Upper arm should be relatively vertical for a curl
-        # If the elbow is flared out or raised, it's likely a different movement (like a raise)
-        is_stable = self.is_vertical(shoulder, elbow, tolerance=0.2)
-        
+        # Form check: Elbow drift (X-axis) - should be relatively fixed
+        is_stable = self.is_vertical(shoulder, elbow, tolerance=0.15)
+        incorrect_indices = []
+        if not is_stable:
+            incorrect_indices = [13] # Highlight elbow
+            self.feedback = "Keep elbow fixed at side!"
+
         if angle < 35 and self.stage == 'down':
             if is_stable:
                 self.stage = "up"
@@ -34,16 +44,13 @@ class BicepCurlRule(BaseRule):
                 self.correct_reps += 1
                 self.feedback = "Good rep!"
             else:
-                self.feedback = "Keep elbow down/fixed"
+                self.stage = "up" # Transition stage even if bad rep
+                self.feedback = "Form issue: elbow moved"
             
         if self.stage == "up" and angle > 160:
             self.stage = "down"
-            self.feedback = "Go down"
-
-        # Form check: Elbow drift (X-axis)
-        incorrect_indices = []
-        if not is_stable:
-            incorrect_indices = [13] # Highlight elbow
+            if "Form" not in self.feedback:
+                self.feedback = "Straighten arm fully"
 
         return {
             "counter": self.counter,

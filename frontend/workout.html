@@ -10,6 +10,14 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap"
         rel="stylesheet">
+    <!-- Supabase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/supabase-auth.js"></script>
+
+    <!-- MediaPipe Pose SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
 </head>
 
 <body>
@@ -27,6 +35,121 @@
                     style="text-decoration: none; color: inherit; margin: 0;">WORKOUT</a>
             </div>
         </header>
+
+        <div id="warmup-overlay" class="glass"
+            style="position:fixed; top:0; left:0; width:100%; height:100%; z-index:1000; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; background: rgba(13,5,20,0.95);">
+            <div id="warmup-content">
+                <h1 style="font-size: 3rem; margin-bottom: 20px;">Ready to Start?</h1>
+                <p style="font-size: 1.2rem; color: #94a3b8; margin-bottom: 40px;">Scientific warm-up reduces injury
+                    risk by 70%.</p>
+                <div style="display: flex; gap: 20px; justify-content: center;">
+                    <button onclick="startWarmupTimer()" class="btn-main"
+                        style="padding: 20px 40px; background: #ff6400; box-shadow: 0 10px 30px rgba(255,100,0,0.3);">START
+                        5-MIN WARM-UP</button>
+                    <button onclick="skipWarmup()" class="btn glass"
+                        style="padding: 20px 40px; border-radius: 20px;">SKIP TO WORKOUT</button>
+                </div>
+            </div>
+            <div id="warmup-timer-ui" style="display: none;">
+                <p id="warmup-ex-status" style="font-weight: 800; color: #888; letter-spacing: 2px;">ACTIVE WARM-UP</p>
+                <h2 id="warmup-ex-name" style="font-size: 2.5rem; color: #ff6400; margin: 10px 0;">Jumping Jacks</h2>
+                <div style="font-size: 5rem; font-weight: 900; margin: 20px 0;" id="warmup-timer-val">0:45</div>
+                <p id="warmup-ex-desc" style="color: #ccc; max-width: 400px; margin: 0 auto 30px;">Full body activation
+                    and heart rate elevation.</p>
+                <button onclick="skipWarmup()" class="btn glass" style="opacity: 0.6;">SKIP WARM-UP</button>
+            </div>
+        </div>
+
+        <div id="finish-overlay" class="glass"
+            style="position:fixed; top:0; left:0; width:100%; height:100%; z-index:1001; display:none; flex-direction:column; align-items:center; justify-content:center; text-align:center; background: rgba(13,5,20,0.98); padding: 20px; overflow-y: auto;">
+
+            <div id="summary-card"
+                style="background: rgba(20,20,25,0.9); padding: 40px; border-radius: 35px; border: 1px solid var(--glass-border); max-width: 600px; width: 100%; position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.5);">
+                <div
+                    style="position: absolute; top: -20px; left: 50%; transform: translateX(-50%); background: #00ff88; color: #000; padding: 8px 25px; border-radius: 10px; font-weight: 900; font-size: 0.8rem; letter-spacing: 2px;">
+                    SESSION COMPLETE</div>
+
+                <h1 id="summary-exercise"
+                    style="font-size: 2.2rem; font-weight: 900; margin-bottom: 30px; background: linear-gradient(135deg, #fff, #888); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">
+                    BICEP CURLS</h1>
+
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 30px;">
+                    <div
+                        style="background: rgba(255,255,255,0.03); padding: 15px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05);">
+                        <span
+                            style="font-size: 0.7rem; color: #888; font-weight: 700; display: block; margin-bottom: 5px;">REPS</span>
+                        <span id="summary-reps" style="font-size: 1.8rem; font-weight: 950; color: #fff;">0</span>
+                    </div>
+                    <div
+                        style="background: rgba(255,255,255,0.03); padding: 15px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05);">
+                        <span
+                            style="font-size: 0.7rem; color: #888; font-weight: 700; display: block; margin-bottom: 5px;">SETS</span>
+                        <span id="summary-sets" style="font-size: 1.8rem; font-weight: 950; color: #fff;">0</span>
+                    </div>
+                    <div
+                        style="background: rgba(255,255,255,0.03); padding: 15px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05);">
+                        <span
+                            style="font-size: 0.7rem; color: #888; font-weight: 700; display: block; margin-bottom: 5px;">TIME</span>
+                        <span id="summary-duration" style="font-size: 1.8rem; font-weight: 950; color: #fff;">0m</span>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 30px;">
+                    <div
+                        style="background: rgba(112, 0, 255, 0.1); padding: 20px; border-radius: 25px; border: 1px solid rgba(112, 0, 255, 0.2);">
+                        <span
+                            style="font-size: 0.7rem; color: #a855f7; font-weight: 800; display: block; margin-bottom: 10px;">FORM
+                            GRADE</span>
+                        <div id="summary-grade"
+                            style="font-size: 3.5rem; font-weight: 950; color: #00f0ff; line-height: 1;">A</div>
+                        <span id="summary-accuracy" style="font-size: 0.8rem; color: #666; font-weight: 700;">95%
+                            Accuracy</span>
+                    </div>
+                    <div
+                        style="background: rgba(255, 100, 0, 0.1); padding: 20px; border-radius: 25px; border: 1px solid rgba(255, 100, 0, 0.2);">
+                        <span
+                            style="font-size: 0.7rem; color: #ff6400; font-weight: 800; display: block; margin-bottom: 10px;">EST.
+                            BURN</span>
+                        <div id="summary-calories"
+                            style="font-size: 3.5rem; font-weight: 950; color: #ff6400; line-height: 1;">142</div>
+                        <span style="font-size: 0.8rem; color: #666; font-weight: 700;">KCAL TOTAL</span>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 12px; margin-bottom: 20px;">
+                    <button onclick="shareAsImage()" class="btn glass"
+                        style="flex: 1; padding: 15px; font-size: 0.85rem; border-radius: 15px;">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2.5" style="margin-right: 8px;">
+                            <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
+                            <polyline points="16 6 12 2 8 6"></polyline>
+                            <line x1="12" y1="2" x2="12" y2="15"></line>
+                        </svg>
+                        SHARE CARD
+                    </button>
+                    <button id="summary-save-btn" class="btn glass" onclick="handleSyncRetry()"
+                        style="flex: 1; padding: 15px; font-size: 0.85rem; border-radius: 15px; background: rgba(34, 197, 94, 0.1); color: #22c55e;">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2.5" style="margin-right: 8px;">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                        </svg>
+                        SAVED TO CLOUD
+                    </button>
+                </div>
+
+                <div style="text-align: center; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px;">
+                    <h4 style="color: #00f0ff; font-size: 0.8rem; margin-bottom: 10px;">PRO RECOVERY TIP</h4>
+                    <p id="summary-recovery" style="font-size: 0.85rem; color: #666; line-height: 1.4;">Bicep stretch:
+                        Extend one arm forward, palm up, and gently pull fingers back with other hand.</p>
+                </div>
+            </div>
+
+            <button onclick="window.location.href='dashboard.html'" class="btn-main"
+                style="margin-top: 25px; padding: 18px 80px; width: auto; background: transparent; border: 1px solid rgba(255,255,255,0.1); text-shadow: none;">EXIT
+                TO DASHBOARD</button>
+            <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+        </div>
 
         <div class="workout-view">
             <div class="camera-section">
@@ -101,15 +224,46 @@
         const accuracyEl = document.getElementById('overlay-accuracy');
         const exerciseTitle = document.getElementById('active-exercise');
 
+        let currentSessionData = null;
+
+        function calculateIntensity(reps, duration) {
+            // Simple logic: reps per minute relative to a baseline (e.g. 15 reps/min = 100%)
+            const rpm = reps / (duration || 1);
+            return Math.min(Math.round((rpm / 15) * 100), 100);
+        }
+
 
         const urlParams = new URLSearchParams(window.location.search);
         const exercise = urlParams.get('exercise') || 'Bicep Curl';
         exerciseTitle.innerText = exercise.toUpperCase();
         // overlayExerciseName.innerText = exercise.toUpperCase();
 
+        // Initialize MediaPipe Pose
+        const pose = new Pose({
+            locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`
+        });
+
+        pose.setOptions({
+            modelComplexity: 1,
+            smoothLandmarks: true,
+            enableSegmentation: false,
+            minDetectionConfidence: 0.5,
+            minTrackingConfidence: 0.5
+        });
+
+        pose.onResults((results) => {
+            if (results.poseLandmarks) {
+                lastData = { landmarks: results.poseLandmarks };
+                // Send landmarks to backend for rule processing periodically
+                throttleProcessLandmarks(results.poseLandmarks);
+            } else {
+                lastData = null;
+            }
+        });
+
         // Initialize Camera
-        let currentFacingMode = 'user';
         let stream = null;
+        let currentFacingMode = 'user';
 
         async function setupCamera() {
             try {
@@ -118,10 +272,20 @@
                 }
 
                 stream = await navigator.mediaDevices.getUserMedia({
-                    video: { facingMode: currentFacingMode },
-                    audio: true
+                    video: { facingMode: currentFacingMode, width: 640, height: 480 },
+                    audio: false
                 });
                 video.srcObject = stream;
+
+                const camera = new Camera(video, {
+                    onFrame: async () => {
+                        await pose.send({ image: video });
+                    },
+                    width: 640,
+                    height: 480
+                });
+                camera.start();
+
                 return new Promise((resolve) => {
                     video.onloadedmetadata = () => {
                         canvas.width = video.videoWidth;
@@ -131,72 +295,51 @@
                 });
             } catch (err) {
                 console.error("Camera error:", err);
-                alert("Please enable camera/mic access.");
+                alert("Please enable camera access.");
             }
         }
 
-
         let isProcessing = false;
-        let isCounting = false;
-
-        // Ultra-Optimized Frame Processing
-        const tempCanvas = document.createElement('canvas');
-        const tempCtx = tempCanvas.getContext('2d');
-        const TARGET_WIDTH = 240; // Even smaller for lightning fast network transfer
+        let isCounting = true;
         let lastProcessTime = 0;
-        const MIN_FRAME_INTERVAL = 20; // Aim for ~50 FPS logic (will be capped by network)
-        let lastData = null;
+        const PROCESS_LANDMARKS_INTERVAL = 150; // Every 150ms is enough for rule logic (6-7 FPS)
 
-        // Send frames to backend
-        async function processFrame() {
+        async function throttleProcessLandmarks(landmarks) {
             const now = Date.now();
-
-            if (!isCounting || isProcessing) {
-                requestAnimationFrame(processFrame);
-                return;
-            }
-
-            if (now - lastProcessTime < MIN_FRAME_INTERVAL) {
-                requestAnimationFrame(processFrame);
+            if (!isCounting || isProcessing || (now - lastProcessTime < PROCESS_LANDMARKS_INTERVAL)) {
                 return;
             }
 
             isProcessing = true;
             lastProcessTime = now;
 
-            // Smallest viable size for MediaPipe
-            const scale = TARGET_WIDTH / video.videoWidth;
-            tempCanvas.width = TARGET_WIDTH;
-            tempCanvas.height = video.videoHeight * scale;
-
-            tempCtx.drawImage(video, 0, 0, tempCanvas.width, tempCanvas.height);
-            const imageData = tempCanvas.toDataURL('image/jpeg', 0.2); // Ultra low quality for speed
-
             try {
-                const response = await fetch(`${API_BASE_URL}/process_frame`, {
+                const response = await fetch(`${API_BASE_URL}/process_landmarks`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        image: imageData,
+                        landmarks: landmarks,
                         exercise: exercise
                     })
                 });
 
                 if (response.ok) {
                     const data = await response.json();
-                    lastData = data;
                     updateUI(data);
                     voiceCoach(data);
+                    // Update global state for drawing utilities (e.g. red highlights)
+                    if (lastData) {
+                        lastData.is_correct = data.is_correct;
+                        lastData.incorrect_indices = data.incorrect_indices;
+                    }
                 }
             } catch (err) {
                 console.error("Backend error:", err);
             } finally {
                 isProcessing = false;
-                requestAnimationFrame(processFrame);
             }
         }
 
-        // Dedicated Render Loop (Smoothest visuals)
         function renderLoop() {
             if (lastData) {
                 drawSkeleton(lastData.landmarks, lastData.is_correct, lastData.incorrect_indices);
@@ -374,16 +517,36 @@
         const recordingIndicator = document.getElementById('recordingIndicator');
         const recordTimer = document.getElementById('recordTimer');
 
+        let sessionStartTime = null;
+        let totalActiveTime = 0; // in milliseconds
+        let lastStartTime = null;
+
+        let totalSets = 0;
+
         function toggleCounting(fromVoice = false) {
             isCounting = !isCounting;
             const voiceStatusText = document.getElementById('voiceStatusText');
+            const now = Date.now();
+
             if (isCounting) {
+                totalSets++;
+                if (!sessionStartTime) sessionStartTime = now;
+                lastStartTime = now;
+
                 startStopBtn.innerHTML = '<span class="icon">⏸️</span> STOP';
                 startStopBtn.className = 'control-btn stop-pnl';
                 voiceLight.classList.add('active');
                 voiceStatusText.innerText = '🟢 Counting...';
                 if (!fromVoice) speak("Workout started!");
+
+                // Show Finish Button if it exists or create it
+                showFinishButton();
             } else {
+                if (lastStartTime) {
+                    totalActiveTime += (now - lastStartTime);
+                    lastStartTime = null;
+                }
+
                 startStopBtn.innerHTML = '<span class="icon">▶️</span> START';
                 startStopBtn.className = 'control-btn start-pnl';
                 voiceLight.classList.remove('active');
@@ -391,6 +554,164 @@
                 if (!fromVoice) speak("Workout paused.");
             }
         }
+
+        function showFinishButton() {
+            if (document.getElementById('finishBtn')) return;
+
+            const finishBtn = document.createElement('button');
+            finishBtn.id = 'finishBtn';
+            finishBtn.className = 'control-btn';
+            finishBtn.style.background = 'linear-gradient(135deg, #00ff88, #00cc66)';
+            finishBtn.style.color = 'black';
+            finishBtn.style.fontWeight = '900';
+            finishBtn.innerHTML = '🏁 FINISH';
+            finishBtn.onclick = finishSession;
+
+            document.querySelector('.controls-bar').appendChild(finishBtn);
+        }
+
+        function finishSession() {
+            const now = Date.now();
+            if (isCounting && lastStartTime) {
+                totalActiveTime += (now - lastStartTime);
+            }
+
+            const durationMins = Math.round(totalActiveTime / 60000) || 1;
+            const totalReps = parseInt(repCountEl.innerText) || 0;
+            const accuracy = parseInt(accuracyEl.innerText.replace('%', '')) || 0;
+            const calories = Math.round((totalReps * 0.4) + (durationMins * 5)); // 0.4 kcal per rep + 5 kcal per min base
+
+            let grade = 'C';
+            if (accuracy >= 90) grade = 'A';
+            else if (accuracy >= 70) grade = 'B';
+
+            const sessionData = {
+                date: new Date().toISOString(),
+                exercise: exercise,
+                reps: totalReps,
+                sets: totalSets,
+                duration: durationMins,
+                accuracy: accuracy,
+                calories: calories,
+                grade: grade,
+                intensity: calculateIntensity(totalReps, durationMins)
+            };
+            currentSessionData = sessionData;
+
+            // Save to history (Supabase Cloud + Local Cache)
+            SupabaseAuth.saveWorkout(sessionData);
+
+            speak(`Excellent work! You completed ${totalReps} reps in ${durationMins} minutes. Form grade: ${grade}.`);
+
+            // Populate Finish Overlay
+            document.getElementById('summary-exercise').innerText = exercise.toUpperCase();
+            document.getElementById('summary-reps').innerText = totalReps;
+            document.getElementById('summary-sets').innerText = totalSets;
+            document.getElementById('summary-duration').innerText = `${durationMins}m`;
+            document.getElementById('summary-grade').innerText = grade;
+            document.getElementById('summary-accuracy').innerText = `${accuracy}% Accuracy`;
+            document.getElementById('summary-calories').innerText = calories;
+
+            // Contextual recovery tip
+            const tips = {
+                'Bicep': 'Bicep stretch: Extend one arm forward, palm up, and gently pull fingers back.',
+                'Chest': 'Doorway stretch: Place forearms on door frame and lean forward gently.',
+                'Back': 'Childs pose: Sit on your handles and reach forward to stretch your lats.',
+                'Leg': 'Standing quad stretch: Pull your heel to your glutes, keeping knees together.'
+            };
+            const tipKey = Object.keys(tips).find(k => exercise.includes(k)) || 'Chest';
+            document.getElementById('summary-recovery').innerText = tips[tipKey];
+
+            document.getElementById('finish-overlay').style.display = 'flex';
+        }
+
+        async function shareAsImage() {
+            const card = document.getElementById('summary-card');
+            const canvas = await html2canvas(card, {
+                backgroundColor: '#0d0514',
+                scale: 2
+            });
+            const image = canvas.toDataURL("image/png");
+            const link = document.createElement('a');
+            link.download = `FitCoach_Session_${exercise}.png`;
+            link.href = image;
+            link.click();
+            speak("Session card downloaded! Share it with your friends.");
+        }
+
+        async function handleSyncRetry() {
+            if (!currentSessionData) return;
+            const btn = document.getElementById('summary-save-btn');
+            btn.innerHTML = '⚡ SYNCING...';
+            btn.disabled = true;
+            try {
+                await SupabaseAuth.saveWorkout(currentSessionData);
+                btn.innerHTML = '✅ SYNCED TO CLOUD';
+                btn.style.color = '#22c55e';
+            } catch (e) {
+                btn.innerHTML = '❌ RETRY SYNC';
+                btn.style.color = '#ef4444';
+                btn.disabled = false;
+            }
+        }
+
+        function skipWarmup() {
+            document.getElementById('warmup-overlay').style.display = 'none';
+            if (warmupTimer) clearInterval(warmupTimer);
+            speak("Ready when you are. Just say start or press the button.");
+        }
+
+        let warmupTimer = null;
+        let warmupIdx = 0;
+        const WARMUP_ROUTINE = [
+            { name: "Jumping Jacks", desc: "Full body activation and heart rate elevation.", duration: 45 },
+            { name: "Arm Circles", desc: "Rotate arms forward and backward for shoulder mobility.", duration: 45 },
+            { name: "High Knees", desc: "Bring knees to waist level quickly while jogging in place.", duration: 45 },
+            { name: "Leg Swings", desc: "Swing each leg forward and back to open hips.", duration: 45 },
+            { name: "Butt Kicks", desc: "Jog in place, kicking your heels to your glutes.", duration: 45 }
+        ];
+
+        function startWarmupTimer() {
+            document.getElementById('warmup-content').style.display = 'none';
+            document.getElementById('warmup-timer-ui').style.display = 'block';
+            runWarmupStep();
+        }
+
+        function runWarmupStep() {
+            if (warmupIdx >= WARMUP_ROUTINE.length) {
+                skipWarmup();
+                return;
+            }
+
+            const step = WARMUP_ROUTINE[warmupIdx];
+            document.getElementById('warmup-ex-name').innerText = step.name;
+            document.getElementById('warmup-ex-desc').innerText = step.desc;
+            let stepTime = step.duration;
+            document.getElementById('warmup-timer-val').innerText = `0:${stepTime.toString().padStart(2, '0')}`;
+
+            speak(`Start ${step.name}`);
+
+            warmupTimer = setInterval(() => {
+                stepTime--;
+                document.getElementById('warmup-timer-val').innerText = `0:${stepTime.toString().padStart(2, '0')}`;
+
+                if (stepTime <= 0) {
+                    clearInterval(warmupTimer);
+                    warmupIdx++;
+                    runWarmupStep();
+                }
+            }, 1000);
+        }
+
+        function calculateIntensity(reps, mins) {
+            if (mins === 0) return 0;
+            const rpm = reps / mins;
+            if (rpm > 15) return 90;
+            if (rpm > 10) return 75;
+            if (rpm > 5) return 50;
+            return 30;
+        }
+
         startStopBtn.onclick = () => toggleCounting(false);
 
         cameraToggle.onclick = async () => {
@@ -665,13 +986,20 @@
             setTimeout(() => { if (voiceStatusText.innerText === "🎙️ Listening for commands...") voiceStatusText.innerText = originalText; }, 3000);
         };
 
-        // ---- Start ----
-        setupCamera().then(async () => {
-            try {
-                await fetch(`${API_BASE_URL}/reset`, { method: 'POST' });
-            } catch (e) { console.error("Reset failed", e); }
-            processFrame();
-        });
+        window.onload = async () => {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) { window.location.replace('index.html'); return; }
+
+            // Apply AI Coaching settings
+            const settings = JSON.parse(localStorage.getItem('fitcoach_settings') || '{}');
+            wakeWord = settings.assistantName || 'buddy';
+            repThreshold = settings.repMilestone || 5;
+
+            // Start camera
+            setupCamera().then(async () => {
+                try { await fetch(`${API_BASE_URL}/reset`, { method: 'POST' }); } catch (e) { }
+            });
+        };
     </script>
 </body>
 

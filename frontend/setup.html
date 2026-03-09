@@ -7,6 +7,10 @@
     <title>Profile Setup | FIT COACH AI</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap"
         rel="stylesheet">
+    <!-- Supabase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/supabase-auth.js"></script>
     <style>
         *,
         *::before,
@@ -518,6 +522,8 @@
                         autocomplete="off">
                 </div>
 
+
+
                 <div class="input-group">
                     <label>Gender</label>
                     <div class="pill-grid cols-2">
@@ -752,34 +758,62 @@
         }
 
         // ---- Launch ----
-        function launchDashboard() {
+        async function launchDashboard() {
             if (!profile.level) { showError('err-4'); return; }
 
             // Collect final step values
             profile.name = document.getElementById('input-name').value.trim() || profile.name;
-            profile.age = document.getElementById('input-age').value || profile.age;
-            profile.height = document.getElementById('input-height').value || profile.height;
-            profile.weight = document.getElementById('input-weight').value || profile.weight;
-
-            // Save to localStorage
-            localStorage.setItem('user_profile', JSON.stringify(profile));
+            profile.age = parseInt(document.getElementById('input-age').value) || profile.age;
+            profile.height = parseFloat(document.getElementById('input-height').value) || profile.height;
+            profile.weight = parseFloat(document.getElementById('input-weight').value) || profile.weight;
 
             // Animate button
             const btn = document.getElementById('btn-launch');
-            btn.innerHTML = '⚡ LOADING...';
+            btn.innerHTML = '⚡ SYNCING TO CLOUD...';
             btn.disabled = true;
 
-            setTimeout(() => {
-                window.location.href = 'dashboard.html';
-            }, 600);
+            try {
+                // Save to Supabase
+                await SupabaseAuth.updateProfile(profile);
+
+                // Final redirect
+                setTimeout(() => {
+                    window.location.href = 'dashboard.html';
+                }, 600);
+            } catch (error) {
+                alert("Error saving profile: " + error.message);
+                btn.innerHTML = '🚀 LAUNCH DASHBOARD';
+                btn.disabled = false;
+            }
         }
 
-        // ---- Check if already set up ----
-        window.onload = () => {
-            const existing = JSON.parse(localStorage.getItem('user_profile'));
-            if (existing && existing.name) {
-                // Already set up — go straight to dashboard
+        // ---- Check Auth & Profile ----
+        window.onload = async () => {
+            const { data: { session } } = await supabase.auth.getSession();
+
+            if (!session) {
+                // Not logged in -> go to landing
+                window.location.replace('index.html');
+                return;
+            }
+
+            // Check if profile already exists in Supabase
+            const { data: existingProfile } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', session.user.id)
+                .single();
+
+            if (existingProfile && existingProfile.name) {
+                // Already have a profile, go to dashboard
                 window.location.replace('dashboard.html');
+                return;
+            }
+
+            // If new user from Google, pre-fill name
+            if (session.user.user_metadata && session.user.user_metadata.full_name) {
+                document.getElementById('input-name').value = session.user.user_metadata.full_name;
+                profile.name = session.user.user_metadata.full_name;
             }
         };
     </script>
