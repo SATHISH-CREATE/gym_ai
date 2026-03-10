@@ -435,8 +435,8 @@
                 const { data: { session } } = await supabase.auth.getSession();
                 if (session) {
                     const { data: profile } = await supabase
-                        .from('profiles').select('name').eq('id', session.user.id).single();
-                    window.location.href = (profile && profile.name) ? 'dashboard.html' : 'setup.html';
+                        .from('profiles').select('goal').eq('id', session.user.id).single();
+                    window.location.href = (profile && profile.goal) ? 'dashboard.html' : 'setup.html';
                     return; // Stop execution
                 }
             } catch (e) {
@@ -449,8 +449,8 @@
                 const { data } = await supabase.auth.getSession();
                 if (data && data.session) {
                     const { data: profile } = await supabase
-                        .from('profiles').select('name').eq('id', data.session.user.id).single();
-                    window.location.href = (profile && profile.name) ? 'dashboard.html' : 'setup.html';
+                        .from('profiles').select('goal').eq('id', data.session.user.id).single();
+                    window.location.href = (profile && profile.goal) ? 'dashboard.html' : 'setup.html';
                     return;
                 }
             } catch (e) {

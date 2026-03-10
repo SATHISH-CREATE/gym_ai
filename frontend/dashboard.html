@@ -498,6 +498,15 @@
                     </svg>
                     Schedule
                 </a>
+                <a href="gyms.html" class="btn glass">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;">
+                        <circle cx="12" cy="11" r="3"></circle>
+                        <path d="M17.6 15c.4.7.4 1.5 0 2.2l-5 8.8c-.3.5-1 .5-1.3 0l-5-8.8c-.4-.7-.4-1.5 0-2.2"></path>
+                        <circle cx="12" cy="11" r="10"></circle>
+                    </svg>
+                    Find Gym
+                </a>
                 <a href="calculators.html" class="btn glass">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                         stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;">
@@ -532,10 +541,16 @@
 
         <div class="dashboard-container">
             <div class="welcome-section">
-                <div class="date-display">
-                    <p id="current-month-year">MARCH 2026</p>
-                    <h1 id="current-day-long">...</h1>
-                    <p id="user-greeting">Loading Dashboard...</p>
+                <div class="date-display" style="flex: 1; display: flex; align-items: center; gap: 20px;">
+                    <div id="user-avatar"
+                        style="width: 70px; height: 70px; border-radius: 50%; background: #111; border: 2px solid rgba(112, 0, 255, 0.4); display: flex; align-items: center; justify-content: center; font-size: 1.8rem; flex-shrink: 0; box-shadow: 0 0 25px rgba(112, 0, 255, 0.2); overflow: hidden;">
+                        👤</div>
+                    <div style="text-align: left;">
+                        <p id="current-month-year">MARCH 2026</p>
+                        <h1 id="current-day-long" style="font-size: 2.2rem; line-height: 1;">...</h1>
+                        <p id="user-greeting" style="font-size: 0.9rem; color: #888; margin-top: 4px;">Loading
+                            Dashboard...</p>
+                    </div>
                 </div>
                 <div class="welcome-info-right"
                     style="display: flex; align-items: flex-end; flex-direction: column; gap: 8px;">
@@ -1387,13 +1402,21 @@
 
             // Sync cloud data to local if not present
             let profile = safeParse('user_profile', null);
-            if (!profile || !profile.name) {
+            if (!profile || !profile.goal) {
                 await SupabaseAuth.syncCloudToLocal(session.user.id);
                 profile = safeParse('user_profile', null);
-                if (!profile || !profile.name) {
+                if (!profile || !profile.goal) {
                     window.location.replace('setup.html');
                     return;
                 }
+            }
+
+            // Sync visual avatar
+            const avatarEl = document.getElementById('user-avatar');
+            if (profile.avatar_url) {
+                avatarEl.innerHTML = `<img src="${profile.avatar_url}" style="width:100%; height:100%; object-fit:cover;">`;
+            } else {
+                avatarEl.textContent = profile.gender === 'female' ? '👩' : '👨';
             }
 
             // Personalise greeting

@@ -513,8 +513,15 @@
 
             <!-- STEP 1: Name & Gender -->
             <div class="step-panel active" id="step-1">
-                <div class="step-title">Step 1 of 4</div>
-                <div class="step-subtitle">Who are you? 👋</div>
+                <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 25px;">
+                    <div id="setup-avatar"
+                        style="width: 50px; height: 50px; border-radius: 50%; background: #111; border: 1px solid rgba(112,0,255,0.3); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; overflow: hidden; flex-shrink: 0;">
+                        👤</div>
+                    <div>
+                        <div class="step-title" style="margin-bottom: 0;">Step 1 of 4</div>
+                        <div class="step-subtitle" style="margin-bottom: 0; font-size: 1.4rem;">Who are you? 👋</div>
+                    </div>
+                </div>
 
                 <div class="input-group">
                     <label>Full Name</label>
@@ -804,16 +811,21 @@
                 .eq('id', session.user.id)
                 .single();
 
-            if (existingProfile && existingProfile.name) {
-                // Already have a profile, go to dashboard
+            if (existingProfile && existingProfile.goal) {
+                // Already have a complete profile, go to dashboard
                 window.location.replace('dashboard.html');
                 return;
             }
 
-            // If new user from Google, pre-fill name
-            if (session.user.user_metadata && session.user.user_metadata.full_name) {
-                document.getElementById('input-name').value = session.user.user_metadata.full_name;
-                profile.name = session.user.user_metadata.full_name;
+            // If new user from Google, pre-fill name & avatar
+            if (session.user.user_metadata) {
+                if (session.user.user_metadata.full_name) {
+                    document.getElementById('input-name').value = session.user.user_metadata.full_name;
+                    profile.name = session.user.user_metadata.full_name;
+                }
+                if (session.user.user_metadata.avatar_url) {
+                    document.getElementById('setup-avatar').innerHTML = `<img src="${session.user.user_metadata.avatar_url}" style="width:100%; height:100%; object-fit:cover;">`;
+                }
             }
         };
     </script>

@@ -1,6 +1,6 @@
 // Supabase Configuration
 const SUPABASE_URL = "https://bleaekgciwewwyrrtmhj.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_gndBrArguBapaDo96uf5XQ_aBa9anGY";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJsZWFla2djaXdld3d5cnJ0bWhqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMwMjg5MzIsImV4cCI6MjA4ODYwNDkzMn0.A-rVRYx5XxrLrVCTEFztjvXkwOhrmNB0BusReP39F4Q";
 
 // The Supabase CDN UMD bundle exposes itself on window.supabase.
 try {

@@ -417,15 +417,7 @@
             </button>
             <p id="saveConfirm">✅ Settings saved!</p>
 
-            <div style="margin-top: 60px; border-top: 1px solid rgba(255,59,59,0.1); padding-top: 30px;">
-                <h3 style="color: #ff3b3b; font-size: 0.9rem; margin-bottom: 15px;">DANGER ZONE</h3>
-                <button onclick="handleDeleteAccount()" class="btn glass"
-                    style="color: #ff3b3b; border-color: rgba(255,59,59,0.2); font-size: 0.8rem; padding: 12px 25px;">
-                    🗑️ Delete My Account & Wipe Data
-                </button>
-                <p style="font-size: 0.7rem; color: #444; margin-top: 10px;">This action is permanent and cannot be
-                    undone.</p>
-            </div>
+
         </div>
 
 
@@ -439,25 +431,7 @@
             }
         }
 
-        async function handleDeleteAccount() {
-            const confirmed = confirm("CRITICAL: This will permanently delete your profile, workout history, and personal data from our cloud. Type 'DELETE' to confirm.");
-            if (confirmed) {
-                const response = prompt("Type 'DELETE' to confirm permanent wipe:");
-                if (response === 'DELETE') {
-                    const userId = localStorage.getItem('supabase_user_id');
-                    // Data cascades due to DB rules ('on delete cascade')
-                    const { error } = await supabase.auth.admin.deleteUser(userId); // Error: this requires service role
-                    // Correct approach for client-side delete:
-                    const { error: delErr } = await supabase.from('profiles').delete().eq('id', userId);
-                    if (!delErr) {
-                        // Sign out triggers cleanup
-                        await SupabaseAuth.signOut();
-                    } else {
-                        alert("Error wiping data: " + delErr.message);
-                    }
-                }
-            }
-        }
+
 
         /* ---- Profile ---- */
         window.onload = async () => {
