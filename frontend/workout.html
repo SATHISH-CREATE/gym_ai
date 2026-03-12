@@ -1042,6 +1042,43 @@
                 try { await fetch(`${API_BASE_URL}/reset`, { method: 'POST' }); } catch (e) { }
             });
         };
+
+        // ============================================================
+        // CLEANUP ON PAGE LEAVE — Stop voice & mic when navigating away
+        // ============================================================
+        function cleanupOnLeave() {
+            // 1. Stop any ongoing speech immediately
+            if (window.speechSynthesis) {
+                window.speechSynthesis.cancel();
+            }
+
+            // 2. Stop the speech recognition microphone
+            if (typeof isVoiceActive !== 'undefined' && isVoiceActive) {
+                isVoiceActive = false;
+                try {
+                    if (typeof recognition !== 'undefined') recognition.stop();
+                } catch (e) { }
+            }
+
+            // 3. Stop the camera stream
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+
+            // 4. Stop warmup timer if running
+            if (warmupTimer) clearInterval(warmupTimer);
+        }
+
+        // Fires when user clicks back, navigates to another page, or closes tab
+        window.addEventListener('beforeunload', cleanupOnLeave);
+
+        // Fires when user switches tabs or the page becomes hidden (e.g. bottom nav tap)
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                // Page went to background — stop voice so it doesn't speak on other screens
+                if (window.speechSynthesis) window.speechSynthesis.cancel();
+            }
+        });
     </script>
 </body>
 
