@@ -26,6 +26,7 @@
         .container {
             max-width: 100% !important;
             padding: 0 12px !important;
+            position: relative;
         }
 
         .hero-mini {
@@ -535,7 +536,6 @@
             <button class="tab-btn active" onclick="switchTab('single')">Single Muscle</button>
             <button class="tab-btn" onclick="switchTab('double')">Double Muscle</button>
             <button class="tab-btn" onclick="switchTab('fatloss')">Fat Loss & Strength</button>
-            <button class="tab-btn" onclick="switchTab('my')"> My Schedule</button>
         </div>
 
         <div id="loader" class="loader">
@@ -544,6 +544,10 @@
 
         <div id="schedule-container" class="schedule-grid">
             <!-- Schedules will be injected here -->
+        </div>
+
+        <div id="my-plan-section" style="margin-top: 80px; padding-top: 50px; border-top: 1px solid var(--glass-border);">
+            <!-- Your 6-day split grid will be injected here -->
         </div>
     </div>
 
@@ -664,12 +668,25 @@
                 const response = await fetch('exercises.json');
                 exerciseData = await response.json();
                 renderSchedules('single');
+                renderMyPlanStandalone();
             } catch (err) {
                 console.error("Failed to load exercise data:", err);
             }
         }
 
+        // Listen for cloud sync completion to refresh UI
+        window.addEventListener('supabase-sync-complete', () => {
+            console.log("Cloud sync complete, refreshing schedule...");
+            refreshPlanData();
+            renderMyPlan();
+        });
+
         function findExercise(name) {
+            // Safety check: if an object was passed, extract the name string
+            if (name && typeof name === 'object' && name.name) {
+                name = name.name;
+            }
+
             for (const category of exerciseData) {
                 for (const sub of category.subcategories) {
                     const ex = sub.exercises.find(e => e.name === name);
@@ -677,10 +694,37 @@
                 }
             }
             return {
-                name: name,
+                name: name || "Unknown Exercise",
                 imageUrl: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=300",
                 description: "AI guidance available."
             };
+        }
+
+        function assignAndEdit(planName, type) {
+            const plan = schedules[type].find(s => s.name === planName);
+            if (!plan) return;
+
+            const daySelection = prompt("Which Day (1-6) of your split would you like to assign this to?", "1");
+            if (!daySelection) return;
+            
+            const dayIdx = parseInt(daySelection) - 1;
+            if (dayIdx >= 0 && dayIdx < 6) {
+                myPlan[dayIdx].focus = plan.name;
+                myPlan[dayIdx].type = type === 'single' ? 'SINGLE' : (type === 'double' ? 'DOUBLE' : 'FAT LOSS');
+                myPlan[dayIdx].exercises = [...plan.exercises];
+                savePlan();
+                
+                // Switch to "my" view (editor mode)
+                currentEditingDay = dayIdx;
+                
+                // Hide tabs and hero to focus on editor
+                document.querySelector('.schedule-tabs').style.display = 'none';
+                document.querySelector('.hero-mini').style.display = 'none';
+                
+                renderMyPlan();
+            } else {
+                alert("Please enter a valid day between 1 and 6.");
+            }
         }
 
         function renderSchedules(type) {
@@ -707,9 +751,14 @@
                 `).join('');
 
                 card.innerHTML = `
-                    <div class="schedule-header">
+                    <div class="schedule-header" style="position: relative;">
                         <h2>${sched.name}</h2>
                         <p>${sched.desc}</p>
+                        <button class="btn glass" onclick="assignAndEdit('${sched.name.replace(/'/g, "\\'")}', '${type}')" 
+                            style="position: absolute; top: 20px; right: 20px; padding: 8px 12px; font-size: 0.75rem; border-radius: 10px; color: var(--primary-color);">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right: 5px;"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                            EDIT
+                        </button>
                     </div>
                     <div class="exercise-list">
                         ${exercisesHTML}
@@ -728,7 +777,7 @@
             // Update buttons
             document.querySelectorAll('.tab-btn').forEach(btn => {
                 btn.classList.remove('active');
-                if (btn.innerText.toLowerCase().includes(type === 'fatloss' ? 'fat' : (type === 'my' ? 'my' : type))) {
+                if (btn.innerText.toLowerCase().includes(type === 'fatloss' ? 'fat' : type)) {
                     btn.classList.add('active');
                 }
             });
@@ -740,25 +789,73 @@
             loader.style.display = 'flex';
 
             setTimeout(() => {
-                if (type === 'my') {
-                    renderMyPlan();
-                } else {
-                    renderSchedules(type);
-                }
-                container.style.opacity = '1';
                 loader.style.display = 'none';
-            }, 300);
+                container.style.opacity = '1';
+                renderSchedules(type);
+                renderMyPlanStandalone();
+            }, 400);
         }
 
 
 
+        function renderMyPlanStandalone() {
+            const container = document.getElementById('my-plan-section');
+            if (currentEditingDay !== -1) {
+                container.innerHTML = ''; // Hide when editing a specific day
+                return;
+            }
+
+            container.innerHTML = `
+                <div class="my-schedule-builder" style="text-align: center;">
+                    <div class="plan-header" style="margin-bottom: 40px;">
+                        <span style="color: var(--primary-color); font-weight: 800; letter-spacing: 2px; font-size: 0.8rem; display: block; margin-bottom: 10px;">YOUR CUSTOM CYCLE</span>
+                        <h2 style="color: white; font-size: 2.2rem; font-weight: 900;">ACTIVE 6-DAY SPLIT</h2>
+                        <p style="color: var(--text-muted);">Manage and refine your personal training week.</p>
+                    </div>
+                    
+                    <div class="day-grid">
+                        ${myPlan.map((dayData, index) => `
+                            <div class="day-card ${dayData.type === 'REST' ? 'empty-day' : ''}" onclick="editDay(${index})">
+                                <div class="day-focus">DAY ${dayData.day}</div>
+                                ${dayData.type !== 'REST' ? `
+                                    <div class="day-stats" style="margin-bottom: 15px;">
+                                        <span class="badge-type">${dayData.type}</span>
+                                        <span style="color: white; font-weight: 500;">${dayData.focus}</span>
+                                    </div>
+                                    <div class="day-exercises-list" style="display: flex; flex-direction: column; gap: 8px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 15px; min-height: 80px;">
+                                        ${dayData.exercises.length > 0 ? dayData.exercises.map(exName => {
+                                            const ex = findExercise(exName);
+                                            return `
+                                            <div style="font-size: 0.85rem; color: #eee; display: flex; align-items: center; gap: 10px;">
+                                                <div style="min-width: 6px; height: 6px; border-radius: 50%; background: var(--primary-color); box-shadow: 0 0 5px var(--primary-color);"></div>
+                                                <span style="font-weight: 600; line-height: 1.3;">${ex.name}</span>
+                                            </div>
+                                        `}).join('') : '<span style="font-size: 0.85rem; color: #555; font-style: italic; text-align: center; width: 100%; display: block; padding: 10px 0;">No exercises added</span>'}
+                                    </div>
+                                ` : '<span style="font-size: 0.9rem; color: #666; font-weight: 600;">REST DAY</span>'}
+                                <div class="btn-day-edit" style="background: var(--primary-color); color: white;">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <div style="margin-top: 30px;">
+                        <button onclick="clearFullPlan()" class="btn glass" style="color: #666; font-size: 0.8rem;">Reset Week</button>
+                    </div>
+                </div>
+            `;
+        }
+
         function renderMyPlan() {
             const container = document.getElementById('schedule-container');
+            const myPlanSection = document.getElementById('my-plan-section');
             container.innerHTML = '';
 
             if (currentEditingDay === -1) {
-                renderPlanDashboard(container);
+                renderSchedules('single'); // Fallback if somehow called
             } else {
+                myPlanSection.innerHTML = ''; // Hide standalone split when editing
                 renderDayEditor(container, currentEditingDay);
             }
         }
@@ -780,14 +877,19 @@
                                         <span class="badge-type">${dayData.type}</span>
                                         <span style="color: white; font-weight: 500;">${dayData.focus}</span>
                                     </div>
-                                    <div class="day-exercises-list" style="display: flex; flex-direction: column; gap: 6px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 12px;">
-                                        ${dayData.exercises.length > 0 ? dayData.exercises.map(ex => `
-                                            <div style="font-size: 0.75rem; color: var(--text-muted); display: flex; align-items: center; gap: 8px;">
-                                                <div style="width: 4px; height: 4px; border-radius: 50%; background: var(--primary-color); opacity: 0.6;"></div>
-                                                <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${ex}</span>
+                                    <div class="day-exercises-list" style="display: flex; flex-direction: column; gap: 8px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 15px; min-height: 80px;">
+                                        ${dayData.exercises.length > 0 ? dayData.exercises.map(exName => {
+                                            const ex = findExercise(exName);
+                                            return `
+                                            <div style="font-size: 0.85rem; color: #eee; display: flex; align-items: center; gap: 10px;">
+                                                <div style="min-width: 6px; height: 6px; border-radius: 50%; background: var(--primary-color); box-shadow: 0 0 5px var(--primary-color);"></div>
+                                                <span style="font-weight: 600; line-height: 1.3;">${ex.name}</span>
                                             </div>
-                                        `).join('') : '<span style="font-size: 0.75rem; color: #444; font-style: italic;">No exercises added</span>'}
+                                        `}).join('') : '<span style="font-size: 0.85rem; color: #555; font-style: italic; text-align: center; width: 100%; display: block; padding: 10px 0;">No exercises added</span>'}
                                     </div>
+                                    ${dayData.exercises.length > 0 ? `
+                                        <button onclick="event.stopPropagation(); startDaySession(${index})" class="btn btn-primary" style="margin-top: 20px; width: 100%; padding: 10px; font-size: 0.8rem; border-radius: 12px; font-weight: 800; letter-spacing: 1px;">START SESSION</button>
+                                    ` : ''}
                                 ` : '<span style="font-size: 0.9rem; color: #666; font-weight: 600;">REST DAY</span>'}
                                 <div class="btn-day-edit">
                                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
@@ -891,15 +993,38 @@
             }).join('');
         }
 
+        function refreshPlanData() {
+            const saved = safeParse('my_6day_plan', null);
+            if (saved && Array.isArray(saved) && saved.length > 0) {
+                myPlan = saved;
+            }
+        }
+
         function editDay(index) {
+            refreshPlanData();
             currentEditingDay = index;
             renderMyPlan();
         }
 
         function backToPlan() {
             currentEditingDay = -1;
-            lastBrowsedCategory = 'all'; // Reset browsing state when going back to plan dashboard
-            renderMyPlan();
+            lastBrowsedCategory = 'all'; 
+            
+            // Restore visibility of tabs and hero
+            document.querySelector('.schedule-tabs').style.display = 'flex';
+            document.querySelector('.hero-mini').style.display = 'block';
+            
+            // Determine which tab to show based on what was active before
+            const activeTab = document.querySelector('.tab-btn.active');
+            if (activeTab) {
+                const type = activeTab.innerText.toLowerCase().includes('double') ? 'double' : 
+                             (activeTab.innerText.toLowerCase().includes('fat') ? 'fatloss' : 'single');
+                renderSchedules(type);
+                renderMyPlanStandalone();
+            } else {
+                renderSchedules('single');
+                renderMyPlanStandalone();
+            }
         }
 
         function updateDayFocus(index, val) {
@@ -944,8 +1069,32 @@
             }
         }
 
-        function savePlan() {
-            localStorage.setItem('my_6day_plan', JSON.stringify(myPlan));
+        async function savePlan() {
+            // Update UI to show syncing
+            const saveBtn = document.querySelector('.btn-primary');
+            const originalText = saveBtn ? saveBtn.innerHTML : null;
+            
+            if (saveBtn && originalText && originalText.includes('SAVE')) {
+                saveBtn.innerHTML = '🔄 SYNCING...';
+                saveBtn.disabled = true;
+            }
+
+            try {
+                if (typeof SupabaseAuth !== 'undefined' && SupabaseAuth.saveWorkoutPlan) {
+                    await SupabaseAuth.saveWorkoutPlan(myPlan);
+                } else {
+                    localStorage.setItem('my_6day_plan', JSON.stringify(myPlan));
+                    // Fake a small delay for local saves so the UI doesn't flicker too fast
+                    await new Promise(r => setTimeout(r, 300));
+                }
+            } catch (err) {
+                console.error("Save failed:", err);
+            } finally {
+                if (saveBtn && originalText && originalText.includes('SAVE')) {
+                    saveBtn.innerHTML = originalText;
+                    saveBtn.disabled = false;
+                }
+            }
         }
 
         function clearFullPlan() {

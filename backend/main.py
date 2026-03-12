@@ -30,9 +30,14 @@ load_dotenv()
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 if GEMINI_API_KEY:
     genai.configure(api_key=GEMINI_API_KEY)
-    model = genai.GenerativeModel('gemini-2.5-flash')
+    model = genai.GenerativeModel('gemini-pro')
 else:
     model = None
+
+class DietInput(BaseModel):
+    user_profile: dict
+    calorie_goal: int
+    macros: dict
 
 app = FastAPI(title="AI Gym Backend")
 
@@ -160,6 +165,37 @@ async def chat_with_ai(input_data: ChatInput):
 
     # Generic fallback
     return {"response": f"That's a good training question about {message}, {user_name}. To give you the best advice, are you asking about form, frequency, or nutrition?", "model_type": "standard"}
+
+@app.post("/generate_diet")
+async def generate_diet_plan(input_data: DietInput):
+    """
+    Generate a full personalized meal plan using AI.
+    """
+    if not model:
+        raise HTTPException(status_code=503, detail="Gemini AI is not configured on the server.")
+    
+    profile = input_data.user_profile
+    goal_cals = input_data.calorie_goal
+    macros = input_data.macros
+    
+    prompt = (
+        f"Generate a professional, detailed 1-day meal plan for a {profile.get('gender', 'person')} "
+        f"with the goal: {profile.get('goal', 'Fitness')}.\n"
+        f"TARGETS: {goal_cals} kcal | Protein: {macros.get('p')}g | Carbs: {macros.get('c')}g | Fats: {macros.get('f')}g.\n\n"
+        "STRUCTURE:\n"
+        "1. Breakfast, Snack 1, Lunch, Pre-Workout, Post-Workout, Dinner.\n"
+        "2. For each meal, specify the food and the exact portion size (e.g., 100g Chicken, 1 cup Rice).\n"
+        "3. Focus on nutritious, whole foods suitable for an athlete/bodybuilder.\n"
+        "4. Keep the tone professional and encouraging.\n"
+        "5. Output ONLY the meal plan in a clean, readable list format."
+    )
+    
+    try:
+        response = model.generate_content(prompt)
+        return {"plan": response.text.strip()}
+    except Exception as e:
+        print(f"Diet Generation Error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/reset")
 async def reset_session():

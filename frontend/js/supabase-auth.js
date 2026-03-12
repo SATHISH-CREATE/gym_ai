@@ -163,11 +163,15 @@ const SupabaseAuth = {
             localStorage.setItem('workout_history', JSON.stringify(mappedHistory));
         }
         if (userData) {
-            localStorage.setItem('user_prs', JSON.stringify(userData.prs || {}));
-            localStorage.setItem('user_macro_plan', JSON.stringify(userData.macro_plan || {}));
-            localStorage.setItem('my_6day_plan', JSON.stringify(userData.workout_plan || []));
+            if (userData.prs) localStorage.setItem('user_prs', JSON.stringify(userData.prs));
+            if (userData.macro_plan) localStorage.setItem('user_macro_plan', JSON.stringify(userData.macro_plan));
+            if (userData.workout_plan && Array.isArray(userData.workout_plan) && userData.workout_plan.length > 0) {
+                localStorage.setItem('my_6day_plan', JSON.stringify(userData.workout_plan));
+            }
         }
 
+        // Notify app that sync is complete
+        window.dispatchEvent(new CustomEvent('supabase-sync-complete'));
     },
 
     // --- Helper for Real-time Cloud updates ---
@@ -206,6 +210,26 @@ const SupabaseAuth = {
             }, { onConflict: 'user_id' });
         }
         localStorage.setItem('user_macro_plan', JSON.stringify(macroPlan));
+    },
+
+    async saveWorkoutPlan(plan) {
+        const userId = localStorage.getItem('supabase_user_id');
+        if (userId) {
+            try {
+                const { error } = await supabase.from('user_data').upsert({
+                    user_id: userId,
+                    workout_plan: plan,
+                    updated_at: new Date().toISOString()
+                }, { onConflict: 'user_id' });
+                
+                if (error) throw error;
+                console.log("Workout plan synced to cloud successfully");
+            } catch (err) {
+                console.error("Failed to sync workout plan to cloud:", err);
+            }
+        }
+        // Always update local for immediate feedback
+        localStorage.setItem('my_6day_plan', JSON.stringify(plan));
     }
 };
 

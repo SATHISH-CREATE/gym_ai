@@ -974,16 +974,19 @@
 
                         const previewContainer = document.getElementById('dash-workout-preview');
                         if (todayWorkout.exercises.length > 0) {
-                            previewContainer.innerHTML = todayWorkout.exercises.slice(0, 3).map(exName => `
+                            previewContainer.innerHTML = todayWorkout.exercises.slice(0, 3).map(ex => {
+                                const name = (ex && typeof ex === 'object') ? ex.name : ex;
+                                return `
                                 <div class="exercise-mini">
-                                    <img src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=100" alt="${exName}">
+                                    <img src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=100" alt="${name}">
                                     <div>
-                                        <h4>${exName}</h4>
+                                        <h4>${name}</h4>
                                         <span style="font-size: 0.7rem; color: #666;">AI Guided Form</span>
                                     </div>
                                 </div>
-                            `).join('');
-                            document.getElementById('start-session-btn').href = `workout.html?exercise=${encodeURIComponent(todayWorkout.exercises[0])}`;
+                            `}).join('');
+                            const firstExName = (todayWorkout.exercises[0] && typeof todayWorkout.exercises[0] === 'object') ? todayWorkout.exercises[0].name : todayWorkout.exercises[0];
+                            document.getElementById('start-session-btn').href = `workout.html?exercise=${encodeURIComponent(firstExName)}`;
                         } else {
                             previewContainer.innerHTML = '<p style="color: #444; font-size: 0.8rem; text-align: center; padding: 20px;">Rest & Recover properly today.</p>';
                             document.getElementById('start-session-btn').style.display = 'none';

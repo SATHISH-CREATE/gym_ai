@@ -991,6 +991,7 @@
 
         let calculationDetails = {};
 
+
         function calculateDiet() {
             const weight = parseFloat(document.getElementById('diet-weight').value);
             const age = parseFloat(document.getElementById('diet-age').value);
@@ -1221,6 +1222,7 @@
                     carbs: totalCarbs,
                     fat: totalFats,
                     goal: currentGoal,
+                    timetable: timetableHTML,
                     timestamp: new Date().getTime()
                 };
 
@@ -1473,11 +1475,19 @@
             }
 
             if (isDietVisible) {
+                const suggestedPlan = document.getElementById('food-plan-suggested').innerHTML;
                 contentHtml += `
                     <div class="section">
                         <div class="section-title">Daily Diet Plan</div>
-                        <div class="big-val">${document.getElementById('res-calories').innerText} kcal</div>
-                        <p>P: ${document.getElementById('sum-p').innerText}g | C: ${document.getElementById('sum-c').innerText}g | F: ${document.getElementById('sum-f').innerText}g</p>
+                        <div class="big-val" style="margin-bottom:10px;">${document.getElementById('res-calories').innerText} kcal</div>
+                        <div style="display:flex; gap:15px; margin-bottom:20px; font-weight:700; color:#fff;">
+                            <span style="color:#ff3b3b">🥩P: ${document.getElementById('sum-p').innerText}g</span>
+                            <span style="color:#b000ff">🍚C: ${document.getElementById('sum-c').innerText}g</span>
+                            <span style="color:#facc15">🥑F: ${document.getElementById('sum-f').innerText}g</span>
+                        </div>
+                        <div class="diet-plan-content" style="color:#eee; font-size:0.85rem;">
+                            ${suggestedPlan}
+                        </div>
                     </div>
                 `;
             }
